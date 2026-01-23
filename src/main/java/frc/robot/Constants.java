@@ -101,7 +101,7 @@ public final class Constants {
 
   public static class ShooterConstants {
     public static final int frontMotorID = 0;
-    public static final int backMotorID = 1;
+    public static final int backMotorID = 9;
 
     public static final AngularVelocity frontSpeed = RadiansPerSecond.of(10);
     public static final AngularVelocity backSpeed = RadiansPerSecond.of(5);
