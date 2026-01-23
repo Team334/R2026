@@ -34,10 +34,26 @@ public class Shooter extends AdvancedSubsystem {
     var frontMotorConfig = new TalonFXConfiguration();
     var backMotorConfig = new TalonFXConfiguration();
 
-    backMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
+    // front motor configs
     frontMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     frontMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    frontMotorConfig.Slot0.kS = ShooterConstants.frontFlywheelkS.in(Volts);
+    frontMotorConfig.Slot0.kV = ShooterConstants.frontFlywheelkV.in(Volts.per(RotationsPerSecond));
+
+    frontMotorConfig.Slot0.kP = ShooterConstants.frontFlywheelkP.in(Volts.per(RotationsPerSecond));
+
+    frontMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.frontFlywheelGearRatio;
+
+    // back motor configs
+    backMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    backMotorConfig.Slot0.kS = ShooterConstants.backFlywheelkS.in(Volts);
+    backMotorConfig.Slot0.kV = ShooterConstants.backFlywheelkV.in(Volts.per(RotationsPerSecond));
+
+    backMotorConfig.Slot0.kP = ShooterConstants.backFlywheelkP.in(Volts.per(RotationsPerSecond));
+
+    backMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.backFlywheelGearRatio;
 
     CTREUtil.attempt(() -> _frontMotor.getConfigurator().apply(frontMotorConfig), _frontMotor);
     CTREUtil.attempt(() -> _backMotor.getConfigurator().apply(backMotorConfig), _backMotor);
@@ -80,6 +96,7 @@ public class Shooter extends AdvancedSubsystem {
         });
   }
 
+  /** Shoot. */
   public Command shoot() {
     return setSpeed(
         ShooterConstants.frontSpeed.in(RadiansPerSecond),
