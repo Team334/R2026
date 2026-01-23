@@ -14,6 +14,7 @@ import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.LinearVelocityUnit;
+import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Frequency;
@@ -22,6 +23,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.units.measure.Voltage;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -33,6 +35,7 @@ import edu.wpi.first.units.measure.Per;
  */
 public final class Constants {
   public static final Frequency simNotifierFrequency = Hertz.of(200);
+  public static final String canivore = "rio";
 
   public static class Ports {
     public static final int driverController = 0;
@@ -94,5 +97,28 @@ public final class Constants {
 
     public static LinearVelocity translationalDeadband = MetersPerSecond.of(0.01);
     public static AngularVelocity rotationalDeadband = RadiansPerSecond.of(0.01);
+  }
+
+  public static class ShooterConstants {
+    public static final int frontMotorID = 0;
+    public static final int backMotorID = 1;
+
+    public static final AngularVelocity frontSpeed = RadiansPerSecond.of(10);
+    public static final AngularVelocity backSpeed = RadiansPerSecond.of(5);
+
+    public static final Voltage frontFlywheelkS = Volts.of(0.0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkV =
+        Volts.per(RotationsPerSecond).ofNative(0.0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkP =
+        Volts.per(RotationsPerSecond).ofNative(0.0);
+
+    public static final Voltage backFlywheelkS = Volts.of(0.0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkV =
+        Volts.per(RotationsPerSecond).ofNative(0.0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkP =
+        Volts.per(RotationsPerSecond).ofNative(0.0);
+
+    public static final double frontFlywheelGearRatio = 3;
+    public static final double backFlywheelGearRatio = 3;
   }
 }
