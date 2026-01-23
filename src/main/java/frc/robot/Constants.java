@@ -33,6 +33,7 @@ import edu.wpi.first.units.measure.Per;
  */
 public final class Constants {
   public static final Frequency simNotifierFrequency = Hertz.of(200);
+  public static final String canivore = "rio";
 
   public static class Ports {
     public static final int driverController = 0;
@@ -94,5 +95,13 @@ public final class Constants {
 
     public static LinearVelocity translationalDeadband = MetersPerSecond.of(0.01);
     public static AngularVelocity rotationalDeadband = RadiansPerSecond.of(0.01);
+  }
+
+  public static class ShooterConstants {
+    public static final int frontMotorID = 0;
+    public static final int backMotorID = 1;
+
+    public static final AngularVelocity frontSpeed = RadiansPerSecond.of(10);
+    public static final AngularVelocity backSpeed = RadiansPerSecond.of(5);
   }
 }

@@ -34,6 +34,7 @@ import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import java.lang.reflect.Field;
 
@@ -51,6 +52,9 @@ public class Robot extends TimedRobot {
   // subsystems
   @Logged(name = "Swerve")
   private final Swerve _swerve = TunerConstants.createDrivetrain();
+
+  @Logged(name = "Shooter")
+  private final Shooter _shooter = new Shooter();
 
   private final Autos _autos = new Autos(_swerve);
 
@@ -184,6 +188,8 @@ public class Robot extends TimedRobot {
     _driverController.x().whileTrue(_swerve.brake());
     _driverController.a().onTrue(_swerve.toggleFieldOriented());
     _driverController.y().onTrue(_swerve.resetHeading());
+
+    _driverController.rightTrigger().whileTrue(_shooter.shoot());
   }
 
   /**
@@ -226,5 +232,6 @@ public class Robot extends TimedRobot {
     super.close();
 
     _swerve.close();
+    _shooter.close();
   }
 }
