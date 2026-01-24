@@ -76,20 +76,20 @@ public final class Constants {
     public static final int frontMotorID = 0;
     public static final int backMotorID = 9;
 
-    public static final AngularVelocity frontSpeed = RadiansPerSecond.of(10);
-    public static final AngularVelocity backSpeed = RadiansPerSecond.of(5);
+    public static final AngularVelocity frontSpeed = RotationsPerSecond.of(10);
+    public static final AngularVelocity backSpeed = RotationsPerSecond.of(5);
 
-    public static final Voltage frontFlywheelkS = Volts.of(0.0);
+    public static final Voltage frontFlywheelkS = Volts.of(0.39);
     public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkV =
-        Volts.per(RotationsPerSecond).ofNative(0.0);
+        Volts.per(RotationsPerSecond).ofNative(0.27);
     public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkP =
-        Volts.per(RotationsPerSecond).ofNative(0.0);
+        Volts.per(RotationsPerSecond).ofNative(0.2);
 
-    public static final Voltage backFlywheelkS = Volts.of(0.0);
+    public static final Voltage backFlywheelkS = Volts.of(0.47);
     public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkV =
-        Volts.per(RotationsPerSecond).ofNative(0.0);
+        Volts.per(RotationsPerSecond).ofNative(0.3);
     public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkP =
-        Volts.per(RotationsPerSecond).ofNative(0.0);
+        Volts.per(RotationsPerSecond).ofNative(0.1);
 
     public static final double frontFlywheelGearRatio = 3;
     public static final double backFlywheelGearRatio = 3;

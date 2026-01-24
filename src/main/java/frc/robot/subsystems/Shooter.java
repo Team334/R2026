@@ -5,12 +5,14 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.AdvancedSubsystem;
@@ -31,13 +33,19 @@ public class Shooter extends AdvancedSubsystem {
   private final StatusSignal<AngularVelocity> _frontVelocityGetter = _frontMotor.getVelocity();
   private final StatusSignal<AngularVelocity> _backVelocityGetter = _backMotor.getVelocity();
 
+  private final DoubleSubscriber _frontSpeed = DogLog.tunable("Front Speed RPS", 0.0);
+  private final DoubleSubscriber _backSpeed = DogLog.tunable("Back Speed RPS", 0.0);
+
   public Shooter() {
     var frontMotorConfig = new TalonFXConfiguration();
     var backMotorConfig = new TalonFXConfiguration();
 
     // front motor configs
-    frontMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    frontMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    frontMotorConfig.CurrentLimits.StatorCurrentLimit = 80;
+    frontMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
+    frontMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    frontMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     frontMotorConfig.Slot0.kS = ShooterConstants.frontFlywheelkS.in(Volts);
     frontMotorConfig.Slot0.kV = ShooterConstants.frontFlywheelkV.in(Volts.per(RotationsPerSecond));
@@ -47,7 +55,10 @@ public class Shooter extends AdvancedSubsystem {
     frontMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.frontFlywheelGearRatio;
 
     // back motor configs
-    backMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    backMotorConfig.CurrentLimits.StatorCurrentLimit = 80;
+    backMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
+    backMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     backMotorConfig.Slot0.kS = ShooterConstants.backFlywheelkS.in(Volts);
     backMotorConfig.Slot0.kV = ShooterConstants.backFlywheelkV.in(Volts.per(RotationsPerSecond));
@@ -83,25 +94,34 @@ public class Shooter extends AdvancedSubsystem {
     FaultLogger.register(_frontMotor);
     FaultLogger.register(_backMotor);
 
-    setDefaultCommand(setSpeed(0, 0));
+    // setDefaultCommand(setSpeed(RotationsPerSecond.zero(), RotationsPerSecond.zero()));
+
+    final CoastOut frontCoast = new CoastOut();
+    final CoastOut backCoast = new CoastOut();
+
+    setDefaultCommand(
+        run(
+            () -> {
+              _frontMotor.setControl(frontCoast);
+              _backMotor.setControl(backCoast);
+            }));
   }
 
-  private Command setSpeed(double frontSpeed, double backSpeed) {
+  private Command setSpeed(AngularVelocity frontSpeed, AngularVelocity backSpeed) {
     return run(
         () -> {
-          _frontVelocitySetter.Velocity = Units.radiansToRotations(frontSpeed);
-          _backVelocitySetter.Velocity = Units.radiansToRotations(backSpeed);
-
-          _frontMotor.setControl(_frontVelocitySetter);
-          _backMotor.setControl(_backVelocitySetter);
+          _frontMotor.setControl(_frontVelocitySetter.withVelocity(frontSpeed));
+          _backMotor.setControl(_backVelocitySetter.withVelocity(backSpeed));
         });
   }
 
   /** Shoot. */
   public Command shoot() {
-    return setSpeed(
-        ShooterConstants.frontSpeed.in(RadiansPerSecond),
-        ShooterConstants.backSpeed.in(RadiansPerSecond));
+    return run(() -> {
+          _frontMotor.setControl(_frontVelocitySetter.withVelocity(_frontSpeed.get()));
+          _backMotor.setControl(_backVelocitySetter.withVelocity(_backSpeed.get()));
+        })
+        .withName("Shoot");
   }
 
   @Logged(name = "Front Speed")
