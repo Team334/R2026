@@ -224,6 +224,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     } else {
       _visionSystemSim = null;
     }
+
+    final Idle idle = new Idle();
+
+    setDefaultCommand(run(() -> setControl(idle)));
   }
 
   // COPIED FROM ADVANCED SUBSYSTEM
@@ -544,7 +548,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
     return Commands.runOnce(
             () -> {
-              DCMotor driveMotor = DCMotor.getKrakenX60(1);
+              DCMotor driveMotor = SwerveConstants.krakenX60;
 
               double chassisTorque =
                   (driveMotor.getTorque(driveMotor.getCurrent(0, angularkA.get()))
@@ -564,7 +568,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   public Command calculateWheelCOF() {
     return Commands.runOnce(
             () -> {
-              DCMotor driveMotor = DCMotor.getKrakenX60(1);
+              DCMotor driveMotor = SwerveConstants.krakenX60;
 
               double totalFrictionForce =
                   (driveMotor.getTorque(TunerConstants.FrontLeft.SlipCurrent)
@@ -590,7 +594,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
     return Commands.runOnce(
             () -> {
-              DCMotor driveMotor = DCMotor.getKrakenX60(1);
+              DCMotor driveMotor = SwerveConstants.krakenX60;
 
               double maxSpeed =
                   Units.radiansPerSecondToRotationsPerMinute(

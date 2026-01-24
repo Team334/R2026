@@ -11,6 +11,8 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.DistanceUnit;
@@ -70,11 +72,37 @@ public final class Constants {
     public static final double zBoundMargin = 0.01;
   }
 
+  public static class ShooterConstants {
+    public static final int frontMotorID = 0;
+    public static final int backMotorID = 9;
+
+    public static final AngularVelocity frontSpeed = RadiansPerSecond.of(10);
+    public static final AngularVelocity backSpeed = RadiansPerSecond.of(5);
+
+    public static final Voltage frontFlywheelkS = Volts.of(0.0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkV =
+        Volts.per(RotationsPerSecond).ofNative(0.0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkP =
+        Volts.per(RotationsPerSecond).ofNative(0.0);
+
+    public static final Voltage backFlywheelkS = Volts.of(0.0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkV =
+        Volts.per(RotationsPerSecond).ofNative(0.0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkP =
+        Volts.per(RotationsPerSecond).ofNative(0.0);
+
+    public static final double frontFlywheelGearRatio = 3;
+    public static final double backFlywheelGearRatio = 3;
+  }
+
   public static class SwerveConstants {
     public static final Frequency odometryFrequency = Hertz.of(250);
 
     public static final Mass mass = Pounds.of(136.38);
     public static final MomentOfInertia moi = KilogramSquareMeters.of(0);
+
+    public static final DCMotor krakenX60 =
+        new DCMotor(12, 7.16, 374.4, 3, Units.rotationsPerMinuteToRadiansPerSecond(6065), 1);
 
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
     public static final AngularVelocity driverAngularVelocity = RadiansPerSecond.of(Math.PI);
@@ -99,28 +127,5 @@ public final class Constants {
 
     public static LinearVelocity translationalDeadband = MetersPerSecond.of(0.01);
     public static AngularVelocity rotationalDeadband = RadiansPerSecond.of(0.01);
-  }
-
-  public static class ShooterConstants {
-    public static final int frontMotorID = 0;
-    public static final int backMotorID = 9;
-
-    public static final AngularVelocity frontSpeed = RadiansPerSecond.of(10);
-    public static final AngularVelocity backSpeed = RadiansPerSecond.of(5);
-
-    public static final Voltage frontFlywheelkS = Volts.of(0.0);
-    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkV =
-        Volts.per(RotationsPerSecond).ofNative(0.0);
-    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkP =
-        Volts.per(RotationsPerSecond).ofNative(0.0);
-
-    public static final Voltage backFlywheelkS = Volts.of(0.0);
-    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkV =
-        Volts.per(RotationsPerSecond).ofNative(0.0);
-    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkP =
-        Volts.per(RotationsPerSecond).ofNative(0.0);
-
-    public static final double frontFlywheelGearRatio = 3;
-    public static final double backFlywheelGearRatio = 3;
   }
 }

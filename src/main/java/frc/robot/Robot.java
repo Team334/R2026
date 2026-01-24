@@ -31,9 +31,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.FaultLogger;
 import frc.lib.FaultsTable.FaultType;
-import frc.lib.InputStream;
 import frc.robot.Constants.Ports;
-import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Shooter;
@@ -171,29 +169,29 @@ public class Robot extends TimedRobot {
   }
 
   private void configureDriverBindings() {
-    _swerve.setDefaultCommand(
-        _swerve
-            .drive(
-                InputStream.of(_driverController::getLeftY)
-                    .deadband(0.02, 1)
-                    .negate()
-                    .signedPow(2)
-                    .scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
-                InputStream.of(_driverController::getLeftX)
-                    .deadband(0.02, 1)
-                    .negate()
-                    .signedPow(2)
-                    .scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
-                InputStream.of(_driverController::getRightX)
-                    .deadband(0.02, 1)
-                    .negate()
-                    .signedPow(2)
-                    .scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
-            .beforeStarting(() -> _swerve.isOpenLoop = true));
+    // _swerve.setDefaultCommand(
+    //     _swerve
+    //         .drive(
+    //             InputStream.of(_driverController::getLeftY)
+    //                 .deadband(0.02, 1)
+    //                 .negate()
+    //                 .signedPow(2)
+    //                 .scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+    //             InputStream.of(_driverController::getLeftX)
+    //                 .deadband(0.02, 1)
+    //                 .negate()
+    //                 .signedPow(2)
+    //                 .scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+    //             InputStream.of(_driverController::getRightX)
+    //                 .deadband(0.02, 1)
+    //                 .negate()
+    //                 .signedPow(2)
+    //                 .scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
+    //         .beforeStarting(() -> _swerve.isOpenLoop = true));
 
-    _driverController.x().whileTrue(_swerve.brake());
-    _driverController.a().onTrue(_swerve.toggleFieldOriented());
-    _driverController.y().onTrue(_swerve.resetHeading());
+    // _driverController.x().whileTrue(_swerve.brake());
+    // _driverController.a().onTrue(_swerve.toggleFieldOriented());
+    // _driverController.y().onTrue(_swerve.resetHeading());
 
     _driverController.rightTrigger().whileTrue(_shooter.shoot());
   }
