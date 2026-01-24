@@ -21,8 +21,9 @@ import frc.robot.Constants.ShooterConstants;
 
 public class Shooter extends AdvancedSubsystem {
   private final TalonFX _frontMotor =
-      new TalonFX(ShooterConstants.frontMotorID, Constants.canivore);
-  private final TalonFX _backMotor = new TalonFX(ShooterConstants.backMotorID, Constants.canivore);
+      new TalonFX(ShooterConstants.frontMotorID, Constants.subsystemBus);
+  private final TalonFX _backMotor =
+      new TalonFX(ShooterConstants.backMotorID, Constants.subsystemBus);
 
   private final VelocityVoltage _frontVelocitySetter = new VelocityVoltage(0);
   private final VelocityVoltage _backVelocitySetter = new VelocityVoltage(0);

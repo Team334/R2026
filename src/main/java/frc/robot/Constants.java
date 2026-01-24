@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -35,7 +36,8 @@ import edu.wpi.first.units.measure.Voltage;
  */
 public final class Constants {
   public static final Frequency simNotifierFrequency = Hertz.of(200);
-  public static final String canivore = "rio";
+
+  public static final CANBus subsystemBus = new CANBus("");
 
   public static class Ports {
     public static final int driverController = 0;
