@@ -21,8 +21,8 @@ public class TunerConstants {
 
   // The steer motor uses any SwerveModule.SteerRequestType control request with the
   // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
-  private static final Slot0Configs steerGains =
-      new Slot0Configs()
+  private static final SlotConfigs steerGains =
+      new SlotConfigs()
           .withKP(120) // 60
           .withKI(0)
           .withKD(1.5) // 0.5
@@ -73,7 +73,11 @@ public class TunerConstants {
                   // low
                   // stator current limit to help avoid brownouts without impacting performance.
                   .withStatorCurrentLimit(Amps.of(60))
-                  .withStatorCurrentLimitEnable(true));
+                  .withStatorCurrentLimitEnable(true))
+          .withClosedLoopGeneral(
+              new ClosedLoopGeneralConfigs().withGainSchedErrorThreshold(Degrees.of(0.1)))
+          .withSlot1(Slot1Configs.from(steerGains).withKS(0)); // kS=0 at gear backlash range
+
   private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
   // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
   private static final Pigeon2Configuration pigeonConfigs = null;
@@ -121,7 +125,9 @@ public class TunerConstants {
               .withSteerMotorGearRatio(kSteerGearRatio)
               .withCouplingGearRatio(kCoupleRatio)
               .withWheelRadius(kWheelRadius)
-              .withSteerMotorGains(steerGains)
+              .withSteerMotorGains(
+                  Slot0Configs.from(steerGains)
+                      .withGainSchedBehavior(GainSchedBehaviorValue.UseSlot1))
               .withDriveMotorGains(driveGains)
               .withSteerMotorClosedLoopOutput(kSteerClosedLoopOutput)
               .withDriveMotorClosedLoopOutput(kDriveClosedLoopOutput)
