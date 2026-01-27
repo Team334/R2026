@@ -39,7 +39,7 @@ import edu.wpi.first.units.measure.Voltage;
 public final class Constants {
   public static final Frequency simNotifierFrequency = Hertz.of(200);
 
-  public static final CANBus subsystemBus = new CANBus("");
+  public static final CANBus subsystemBus = new CANBus("canivore");
 
   public static class Ports {
     public static final int driverController = 0;

@@ -40,14 +40,15 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Desired Back Speed")
   private final MutAngularVelocity _desiredBackSpeed = RotationsPerSecond.mutable(0);
 
-  private final double bangBangTolerance = 0.05;
+  private final double frontBangBangTolerance = 0.05;
+  private final double backBangBangTolerance = 0.15;
 
   public Shooter() {
     var frontMotorConfig = new TalonFXConfiguration();
     var backMotorConfig = new TalonFXConfiguration();
 
     // front motor configs
-    frontMotorConfig.CurrentLimits.StatorCurrentLimit = 80;
+    frontMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
     frontMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     frontMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
@@ -63,7 +64,7 @@ public class Shooter extends AdvancedSubsystem {
     frontMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.frontFlywheelGearRatio;
 
     // back motor configs
-    backMotorConfig.CurrentLimits.StatorCurrentLimit = 80;
+    backMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
     backMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     backMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
@@ -87,18 +88,18 @@ public class Shooter extends AdvancedSubsystem {
         () ->
             BaseStatusSignal.setUpdateFrequencyForAll(
                 100,
-                _frontMotor.getPosition(),
-                _frontMotor.getVelocity(),
-                _frontMotor.getMotorVoltage()),
+                _frontVelocityGetter,
+                _frontMotor.getSupplyCurrent(),
+                _frontMotor.getStatorCurrent()),
         _frontMotor);
 
     CTREUtil.attempt(
         () ->
             BaseStatusSignal.setUpdateFrequencyForAll(
                 100,
-                _backMotor.getPosition(),
-                _backMotor.getVelocity(),
-                _backMotor.getMotorVoltage()),
+                _backVelocityGetter,
+                _backMotor.getSupplyCurrent(),
+                _backMotor.getStatorCurrent()),
         _backMotor);
 
     FaultLogger.register(_frontMotor);
@@ -138,7 +139,7 @@ public class Shooter extends AdvancedSubsystem {
    */
   private void setSpeed(AngularVelocity desiredFrontSpeed, AngularVelocity desiredBackSpeed) {
     // front motor
-    if (getFrontSpeed().isNear(desiredFrontSpeed, bangBangTolerance)) {
+    if (getFrontSpeed().isNear(desiredFrontSpeed, frontBangBangTolerance)) {
       _frontMotor.setControl(_velocitySetter.withVelocity(desiredFrontSpeed));
     } else {
       double signedDutyCycle =
@@ -148,7 +149,7 @@ public class Shooter extends AdvancedSubsystem {
     }
 
     // back motor
-    if (getBackSpeed().isNear(desiredBackSpeed, bangBangTolerance)) {
+    if (getBackSpeed().isNear(desiredBackSpeed, backBangBangTolerance)) {
       _backMotor.setControl(_velocitySetter.withVelocity(desiredBackSpeed));
     } else {
       double signedDutyCycle =
