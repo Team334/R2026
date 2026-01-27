@@ -52,6 +52,7 @@ import frc.lib.InputStream;
 import frc.lib.SelfChecked;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Robot;
 import frc.robot.generated.TunerConstants;
@@ -548,7 +549,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
     return Commands.runOnce(
             () -> {
-              DCMotor driveMotor = SwerveConstants.krakenX60;
+              DCMotor driveMotor = MotorConstants.krakenX60;
 
               double chassisTorque =
                   (driveMotor.getTorque(driveMotor.getCurrent(0, angularkA.get()))
@@ -568,7 +569,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   public Command calculateWheelCOF() {
     return Commands.runOnce(
             () -> {
-              DCMotor driveMotor = SwerveConstants.krakenX60;
+              DCMotor driveMotor = MotorConstants.krakenX60;
 
               double totalFrictionForce =
                   (driveMotor.getTorque(TunerConstants.FrontLeft.SlipCurrent)
@@ -594,7 +595,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
     return Commands.runOnce(
             () -> {
-              DCMotor driveMotor = SwerveConstants.krakenX60;
+              DCMotor driveMotor = MotorConstants.krakenX60;
 
               double maxSpeed =
                   Units.radiansPerSecondToRotationsPerMinute(

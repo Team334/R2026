@@ -45,6 +45,11 @@ public final class Constants {
     public static final int driverController = 0;
   }
 
+  public static class MotorConstants {
+    public static final DCMotor krakenX60 =
+        new DCMotor(12, 7.16, 374.4, 3, Units.rotationsPerMinuteToRadiansPerSecond(6065), 1);
+  }
+
   public static class FieldConstants {
     public static final AprilTagFieldLayout tagLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
@@ -100,9 +105,6 @@ public final class Constants {
 
     public static final Mass mass = Pounds.of(136.38);
     public static final MomentOfInertia moi = KilogramSquareMeters.of(0);
-
-    public static final DCMotor krakenX60 =
-        new DCMotor(12, 7.16, 374.4, 3, Units.rotationsPerMinuteToRadiansPerSecond(6065), 1);
 
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
     public static final AngularVelocity driverAngularVelocity = RadiansPerSecond.of(Math.PI);
