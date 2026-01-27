@@ -6,14 +6,15 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
@@ -27,14 +28,19 @@ public class Shooter extends AdvancedSubsystem {
   private final TalonFX _backMotor =
       new TalonFX(ShooterConstants.backMotorID, Constants.subsystemBus);
 
-  private final VelocityVoltage _frontVelocitySetter = new VelocityVoltage(0);
-  private final VelocityVoltage _backVelocitySetter = new VelocityVoltage(0);
+  private final VelocityVoltage _velocitySetter = new VelocityVoltage(0);
+  private final DutyCycleOut _dutyCycleSetter = new DutyCycleOut(0);
 
   private final StatusSignal<AngularVelocity> _frontVelocityGetter = _frontMotor.getVelocity();
   private final StatusSignal<AngularVelocity> _backVelocityGetter = _backMotor.getVelocity();
 
-  private final DoubleSubscriber _frontSpeed = DogLog.tunable("Front Speed RPS", 0.0);
-  private final DoubleSubscriber _backSpeed = DogLog.tunable("Back Speed RPS", 0.0);
+  @Logged(name = "Desired Front Speed")
+  private final MutAngularVelocity _desiredFrontSpeed = RotationsPerSecond.mutable(0);
+
+  @Logged(name = "Desired Back Speed")
+  private final MutAngularVelocity _desiredBackSpeed = RotationsPerSecond.mutable(0);
+
+  private final double bangBangTolerance = 0.05;
 
   public Shooter() {
     var frontMotorConfig = new TalonFXConfiguration();
@@ -43,6 +49,8 @@ public class Shooter extends AdvancedSubsystem {
     // front motor configs
     frontMotorConfig.CurrentLimits.StatorCurrentLimit = 80;
     frontMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
+    frontMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
 
     frontMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     frontMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -57,6 +65,8 @@ public class Shooter extends AdvancedSubsystem {
     // back motor configs
     backMotorConfig.CurrentLimits.StatorCurrentLimit = 80;
     backMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
+    backMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
 
     backMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
@@ -94,44 +104,73 @@ public class Shooter extends AdvancedSubsystem {
     FaultLogger.register(_frontMotor);
     FaultLogger.register(_backMotor);
 
-    // setDefaultCommand(setSpeed(RotationsPerSecond.zero(), RotationsPerSecond.zero()));
+    // EVERYTHING BELOW IS TEMPORARY
+    DogLog.tunable(
+        "Desired Front Speed RPS", 0.0, newRps -> _desiredFrontSpeed.mut_setMagnitude(newRps));
+    DogLog.tunable(
+        "Desired Back Speed RPS", 0.0, newRps -> _desiredBackSpeed.mut_setMagnitude(newRps));
 
-    final CoastOut frontCoast = new CoastOut();
-    final CoastOut backCoast = new CoastOut();
+    final CoastOut coast = new CoastOut();
 
     setDefaultCommand(
         run(
             () -> {
-              _frontMotor.setControl(frontCoast);
-              _backMotor.setControl(backCoast);
+              _frontMotor.setControl(coast);
+              _backMotor.setControl(coast);
             }));
   }
 
-  private Command setSpeed(AngularVelocity frontSpeed, AngularVelocity backSpeed) {
-    return run(
-        () -> {
-          _frontMotor.setControl(_frontVelocitySetter.withVelocity(frontSpeed));
-          _backMotor.setControl(_backVelocitySetter.withVelocity(backSpeed));
-        });
+  /**
+   * Control Strategy:
+   *
+   * <p>100% duty cycle bang-bang controller when the velocity error is above the {@link
+   * #bangBangTolerance}. This is the best for fast windup / fast recovery as 100% duty cycle will
+   * provide maximum torque, and once within the {@link #bangBangTolerance}, acceleration is cut off
+   * and VelocityVoltage is done instead, with FF control and a small kP.
+   *
+   * <p>100% duty cycle means that supply current will be equal to stator current during windup /
+   * recovery. It should only briefly be at the stator current limit, as the avaliable voltage going
+   * into torque will quickly go down as velocity quickly goes up. Also, recovering from a higher
+   * velocity, it'll be recovering at a stator current well below the limit.
+   *
+   * @param desiredFrontSpeed Desired front flywheel speed.
+   * @param desiredBackSpeed Desired back flywheel speed.
+   */
+  private void setSpeed(AngularVelocity desiredFrontSpeed, AngularVelocity desiredBackSpeed) {
+    // front motor
+    if (getFrontSpeed().isNear(desiredFrontSpeed, bangBangTolerance)) {
+      _frontMotor.setControl(_velocitySetter.withVelocity(desiredFrontSpeed));
+    } else {
+      double signedDutyCycle =
+          Math.signum(
+              desiredFrontSpeed.in(RotationsPerSecond) - getFrontSpeed().in(RotationsPerSecond));
+      _frontMotor.setControl(_dutyCycleSetter.withOutput(signedDutyCycle));
+    }
+
+    // back motor
+    if (getBackSpeed().isNear(desiredBackSpeed, bangBangTolerance)) {
+      _backMotor.setControl(_velocitySetter.withVelocity(desiredBackSpeed));
+    } else {
+      double signedDutyCycle =
+          Math.signum(
+              desiredBackSpeed.in(RotationsPerSecond) - getBackSpeed().in(RotationsPerSecond));
+      _backMotor.setControl(_dutyCycleSetter.withOutput(signedDutyCycle));
+    }
   }
 
   /** Shoot. */
   public Command shoot() {
-    return run(() -> {
-          _frontMotor.setControl(_frontVelocitySetter.withVelocity(_frontSpeed.get()));
-          _backMotor.setControl(_backVelocitySetter.withVelocity(_backSpeed.get()));
-        })
-        .withName("Shoot");
+    return run(() -> setSpeed(_desiredFrontSpeed, _desiredBackSpeed)).withName("Shoot");
   }
 
   @Logged(name = "Front Speed")
-  public double getFrontSpeed() {
-    return _frontVelocityGetter.refresh().getValue().in(RadiansPerSecond);
+  public AngularVelocity getFrontSpeed() {
+    return _frontVelocityGetter.refresh().getValue();
   }
 
   @Logged(name = "Back Speed")
-  public double getBackSpeed() {
-    return _backVelocityGetter.refresh().getValue().in(RadiansPerSecond);
+  public AngularVelocity getBackSpeed() {
+    return _backVelocityGetter.refresh().getValue();
   }
 
   @Override

@@ -81,9 +81,6 @@ public final class Constants {
     public static final int frontMotorID = 0;
     public static final int backMotorID = 9;
 
-    public static final AngularVelocity frontSpeed = RotationsPerSecond.of(10);
-    public static final AngularVelocity backSpeed = RotationsPerSecond.of(5);
-
     public static final Voltage frontFlywheelkS = Volts.of(0.39);
     public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkV =
         Volts.per(RotationsPerSecond).ofNative(0.27);
