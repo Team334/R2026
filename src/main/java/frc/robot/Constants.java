@@ -14,10 +14,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.LinearVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Frequency;
@@ -126,5 +128,25 @@ public final class Constants {
 
     public static LinearVelocity translationalDeadband = MetersPerSecond.of(0.01);
     public static AngularVelocity rotationalDeadband = RadiansPerSecond.of(0.01);
+  }
+
+  public static class ClimbConstants {
+    // Change ALL values here after testing
+    public static final int climbMotorID = 20;
+
+    public static final Voltage climbkS = Volts.of(0);
+    public static final Voltage climbkG = Volts.of(0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> climbkV = 
+      Volts.per(RotationsPerSecond).ofNative(0);
+    public static final Per<VoltageUnit, AngularAccelerationUnit> climbkA =
+      Volts.per(RotationsPerSecondPerSecond).ofNative(0);
+
+    public static final Per<VoltageUnit, AngleUnit> climbkP = 
+      Volts.per(Rotations).ofNative(0);
+    
+    public static final Angle minElevatorHeight = Radians.of(0);
+    public static final Angle maxElevatorHeight = Radians.of(90);
+    
+    public static final double climbGearRatio = 0;
   }
 }
