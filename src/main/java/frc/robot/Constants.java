@@ -14,12 +14,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.LinearVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -95,6 +98,42 @@ public final class Constants {
 
     public static final double frontFlywheelGearRatio = 3;
     public static final double backFlywheelGearRatio = 3;
+  }
+
+  public static class IntakeConstants {
+    public static final int feedMotorID = 0;
+    public static final int pivotMotorID = 1;
+
+    public static final Voltage feedkS = Volts.of(0);
+
+    public static final Per<VoltageUnit, AngularVelocityUnit> feedkV =
+        Volts.per(RotationsPerSecond).ofNative(0);
+
+    public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
+        Volts.per(RotationsPerSecond).ofNative(0);
+
+    public static final Voltage pivotkG = Volts.of(0);
+    public static final Voltage pivotkS = Volts.of(0);
+
+    public static final Per<VoltageUnit, AngularVelocityUnit> pivotkV =
+        Volts.per(RotationsPerSecond).ofNative(0);
+    public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
+        Volts.per(RotationsPerSecondPerSecond).ofNative(0);
+
+    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(0);
+
+    public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(2);
+    public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(5);
+
+    public static final double feedGearRatio = 1.5;
+    public static final double pivotGearRatio = 20;
+
+    public static final Distance intakeLength = Inches.of(11);
+
+    public static final Angle pivotStowed = Radians.of(0);
+    public static final Angle pivotOut = Radians.of(3 * Math.PI / 2);
+
+    public static final AngularVelocity feedSpeed = RadiansPerSecond.of(30);
   }
 
   public static class SwerveConstants {
