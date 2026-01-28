@@ -101,26 +101,26 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final int feedMotorID = 0;
-    public static final int pivotMotorID = 1;
+    public static final int feedMotorID = 10;
+    public static final int pivotMotorID = 11;
 
-    public static final Voltage feedkS = Volts.of(0);
+    public static final Voltage feedkS = Volts.of(0.3);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkV =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(0.2);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(0.6);
 
-    public static final Voltage pivotkG = Volts.of(0);
-    public static final Voltage pivotkS = Volts.of(0);
+    public static final Voltage pivotkG = Volts.of(0.2);
+    public static final Voltage pivotkS = Volts.of(0.1);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> pivotkV =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(6);
     public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
-        Volts.per(RotationsPerSecondPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecondPerSecond).ofNative(0.1);
 
-    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(0);
+    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(3);
 
     public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(2);
     public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(5);
@@ -131,7 +131,7 @@ public final class Constants {
     public static final Distance intakeLength = Inches.of(11);
 
     public static final Angle pivotStowed = Radians.of(0);
-    public static final Angle pivotOut = Radians.of(3 * Math.PI / 2);
+    public static final Angle pivotOut = Radians.of(2.3);
 
     public static final AngularVelocity feedSpeed = RadiansPerSecond.of(30);
   }
