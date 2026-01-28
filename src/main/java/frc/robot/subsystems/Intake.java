@@ -21,7 +21,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -44,7 +43,6 @@ import frc.lib.FaultLogger;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Robot;
-
 
 public class Intake extends AdvancedSubsystem {
   private final TalonFX _feedMotor = new TalonFX(IntakeConstants.feedMotorID, "canivore");
@@ -216,10 +214,8 @@ public class Intake extends AdvancedSubsystem {
   private Command set(double pivotAngle, double feedSpeed) {
     return run(
         () -> {
-          _pivotMotor.setControl(
-            _pivotSetter.withPosition(Units.radiansToRotations(pivotAngle)));
-          _feedMotor.setControl(
-            _feedSetter.withVelocity(Units.radiansToRotations(feedSpeed)));
+          _pivotMotor.setControl(_pivotSetter.withPosition(Units.radiansToRotations(pivotAngle)));
+          _feedMotor.setControl(_feedSetter.withVelocity(Units.radiansToRotations(feedSpeed)));
         });
   }
 
