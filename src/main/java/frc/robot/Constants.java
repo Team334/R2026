@@ -22,6 +22,7 @@ import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -136,17 +137,19 @@ public final class Constants {
 
     public static final Voltage climbkS = Volts.of(0);
     public static final Voltage climbkG = Volts.of(0);
-    public static final Per<VoltageUnit, AngularVelocityUnit> climbkV = 
-      Volts.per(RotationsPerSecond).ofNative(0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> climbkV =
+        Volts.per(RotationsPerSecond).ofNative(0);
     public static final Per<VoltageUnit, AngularAccelerationUnit> climbkA =
-      Volts.per(RotationsPerSecondPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecondPerSecond).ofNative(0);
 
-    public static final Per<VoltageUnit, AngleUnit> climbkP = 
-      Volts.per(Rotations).ofNative(0);
-    
+    public static final Per<VoltageUnit, AngleUnit> climbkP = Volts.per(Rotations).ofNative(0);
+
     public static final Angle minElevatorHeight = Radians.of(0);
     public static final Angle maxElevatorHeight = Radians.of(90);
-    
-    public static final double climbGearRatio = 0;
+
+    public static final double climbGearRatio = 25;
+    public static final double threadedGearRatio = 8;
+    public static final Distance drumRadius = Inches.of(1.5);
+    public static final Distance drumCircumference = Inches.of(3.0 * Math.PI);
   }
 }

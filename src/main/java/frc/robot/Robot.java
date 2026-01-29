@@ -33,6 +33,7 @@ import frc.lib.FaultsTable.FaultType;
 import frc.robot.Constants.Ports;
 import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import java.lang.reflect.Field;
@@ -54,6 +55,9 @@ public class Robot extends TimedRobot {
 
   @Logged(name = "Shooter")
   private final Shooter _shooter = new Shooter();
+
+  @Logged(name = "Climb")
+  private final Climb _climb = new Climb();
 
   private final Autos _autos = new Autos(_swerve);
 
@@ -193,6 +197,8 @@ public class Robot extends TimedRobot {
     // _driverController.y().onTrue(_swerve.resetHeading());
 
     _driverController.rightTrigger().whileTrue(_shooter.shoot());
+    _driverController.leftTrigger().onTrue(_climb.extend());
+    _driverController.leftBumper().onTrue(_climb.retract());
   }
 
   /**
