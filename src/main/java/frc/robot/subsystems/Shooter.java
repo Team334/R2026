@@ -46,8 +46,8 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Back Is Duty Cycle")
   private boolean _backIsDutyCycle = false;
 
-  private final AngularVelocity threshold = RotationsPerSecond.of(1);
-  private final AngularVelocity smallerThreshold = RotationsPerSecond.of(0.08);
+  @Logged(name = "Velocity Threshold")
+  private final AngularVelocity velocityThreshold = RotationsPerSecond.of(3);
 
   public Shooter() {
     var frontMotorConfig = new TalonFXConfiguration();
@@ -130,28 +130,20 @@ public class Shooter extends AdvancedSubsystem {
   private void setFrontSpeed(AngularVelocity desiredFrontSpeed) {
     double errorRps = desiredFrontSpeed.minus(getFrontSpeed()).in(RotationsPerSecond);
 
-    if (!_frontIsDutyCycle && Math.abs(errorRps) > threshold.in(RotationsPerSecond)) {
+    if (Math.abs(errorRps) > velocityThreshold.in(RotationsPerSecond)) {
       _frontMotor.setControl(_dutyCycleSetter.withOutput(Math.signum(errorRps)));
-      _frontIsDutyCycle = true;
-    }
-
-    if (_frontIsDutyCycle && Math.abs(errorRps) < smallerThreshold.in(RotationsPerSecond)) {
+    } else {
       _frontMotor.setControl(_velocitySetter.withVelocity(desiredFrontSpeed));
-      _frontIsDutyCycle = false;
     }
   }
 
   private void setBackSpeed(AngularVelocity desiredBackSpeed) {
     double errorRps = desiredBackSpeed.minus(getBackSpeed()).in(RotationsPerSecond);
 
-    if (!_backIsDutyCycle && Math.abs(errorRps) > threshold.in(RotationsPerSecond)) {
+    if (Math.abs(errorRps) > velocityThreshold.in(RotationsPerSecond)) {
       _backMotor.setControl(_dutyCycleSetter.withOutput(Math.signum(errorRps)));
-      _backIsDutyCycle = true;
-    }
-
-    if (_backIsDutyCycle && Math.abs(errorRps) < smallerThreshold.in(RotationsPerSecond)) {
+    } else {
       _backMotor.setControl(_velocitySetter.withVelocity(desiredBackSpeed));
-      _backIsDutyCycle = false;
     }
   }
 
