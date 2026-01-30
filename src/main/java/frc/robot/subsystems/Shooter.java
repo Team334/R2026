@@ -40,12 +40,6 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Desired Back Speed")
   private final MutAngularVelocity _desiredBackSpeed = RotationsPerSecond.mutable(0);
 
-  @Logged(name = "Front Is Duty Cycle")
-  private boolean _frontIsDutyCycle = false;
-
-  @Logged(name = "Back Is Duty Cycle")
-  private boolean _backIsDutyCycle = false;
-
   @Logged(name = "Velocity Threshold")
   private final AngularVelocity velocityThreshold = RotationsPerSecond.of(3);
 
