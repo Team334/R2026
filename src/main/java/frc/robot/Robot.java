@@ -36,7 +36,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import java.lang.reflect.Field;
-
+import frc.robot.subsystems.Hopper;
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the package after creating
@@ -60,6 +60,9 @@ public class Robot extends TimedRobot {
   private final NetworkTableInstance _ntInst;
 
   private boolean _fileOnlySet = false;
+
+    @Logged(name = "Hopper")
+  private final Hopper _hopper = new Hopper();
 
   /**
    * This function is run when the robot is first started up and should be used for any
