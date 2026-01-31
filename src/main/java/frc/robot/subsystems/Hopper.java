@@ -74,13 +74,13 @@ public class Hopper extends AdvancedSubsystem {
             }));
   }
 
-  /** Feed fuel into the shooter. */
-  public Command feed() {
+  /** Index fuel into the shooter. */
+  public Command index() {
     return run(() -> {
-          _feedMotor.setControl(_feedVelocitySetter.withVelocity(0));
-          _rollerMotor.setControl(_rollerVelocitySetter.withVelocity(0));
+          _feedMotor.setControl(_feedVelocitySetter.withVelocity(HopperConstants.feedIndexSpeed.in(RotationsPerSecond)));
+          _rollerMotor.setControl(_rollerVelocitySetter.withVelocity(HopperConstants.rollerIndexSpeed.in(RotationsPerSecond)));
         })
-        .withName("Feed");
+        .withName("Index");
   }
 
   @Logged(name = "Roller Speed")
