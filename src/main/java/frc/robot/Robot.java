@@ -36,6 +36,7 @@ import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import java.lang.reflect.Field;
@@ -61,6 +62,9 @@ public class Robot extends TimedRobot {
 
   @Logged(name = "Shooter")
   private final Shooter _shooter = new Shooter();
+
+  @Logged(name = "Intake")
+  private final Intake _intake = new Intake();
 
   // @Logged(name = "Hopper")
   // private final Hopper _hopper = new Hopper();
@@ -200,6 +204,8 @@ public class Robot extends TimedRobot {
 
     // _driverController.leftTrigger().whileTrue(_hopper.feed());
     _driverController.rightTrigger().whileTrue(_shooter.shoot());
+    _driverController.leftTrigger().whileTrue(_intake.intake());
+    _driverController.leftBumper().whileTrue(_intake.outtake());
   }
 
   /**
@@ -243,5 +249,6 @@ public class Robot extends TimedRobot {
 
     _swerve.close();
     _shooter.close();
+    _intake.close();
   }
 }
