@@ -97,6 +97,26 @@ public final class Constants {
     public static final double backFlywheelGearRatio = 3;
   }
 
+  public static class HopperConstants {
+    public static final int floorMotorID = 20;
+    public static final int feedMotorID = 21;
+
+    public static final Voltage floorkS = Volts.of(0.39);
+    public static final Per<VoltageUnit, AngularVelocityUnit> floorkV =
+        Volts.per(RotationsPerSecond).ofNative(0.27);
+    public static final Per<VoltageUnit, AngularVelocityUnit> floorkP =
+        Volts.per(RotationsPerSecond).ofNative(1.3);
+
+    public static final Voltage feedkS = Volts.of(0.47);
+    public static final Per<VoltageUnit, AngularVelocityUnit> feedkV =
+        Volts.per(RotationsPerSecond).ofNative(0.3);
+    public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
+        Volts.per(RotationsPerSecond).ofNative(1);
+
+    public static final double floorGearRatio = 3;
+    public static final double feedGearRatio = 3;
+  }
+
   public static class SwerveConstants {
     public static final Frequency odometryFrequency = Hertz.of(250);
 

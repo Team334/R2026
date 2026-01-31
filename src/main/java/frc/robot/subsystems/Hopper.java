@@ -1,0 +1,101 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.subsystems;
+
+import static edu.wpi.first.units.Units.*;
+
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.AdvancedSubsystem;
+import frc.lib.CTREUtil;
+import frc.lib.FaultLogger;
+import frc.robot.Constants;
+import frc.robot.Constants.HopperConstants;
+
+public class Hopper extends AdvancedSubsystem {
+  private final TalonFX _floorMotor =
+      new TalonFX(HopperConstants.floorMotorID, Constants.subsystemBus);
+
+  private final TalonFX _feedMotor =
+      new TalonFX(HopperConstants.feedMotorID, Constants.subsystemBus);
+
+  private final VelocityVoltage _floorVelocitySetter = new VelocityVoltage(0);
+  private final VelocityVoltage _feedVelocitySetter = new VelocityVoltage(0);
+
+  private final StatusSignal<AngularVelocity> _floorVelocityGetter = _floorMotor.getVelocity();
+  private final StatusSignal<AngularVelocity> _feedVelocityGetter = _feedMotor.getVelocity();
+
+  public Hopper() {
+    var floorMotorConfig = new TalonFXConfiguration();
+    var feedMotorConfig = new TalonFXConfiguration();
+
+    // floor motor configs
+    floorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    floorMotorConfig.Slot0.kS = HopperConstants.floorkS.in(Volts);
+    floorMotorConfig.Slot0.kV = HopperConstants.floorkV.in(Volts.per(RotationsPerSecond));
+
+    floorMotorConfig.Slot0.kP = HopperConstants.floorkP.in(Volts.per(RotationsPerSecond));
+
+    floorMotorConfig.Feedback.SensorToMechanismRatio = HopperConstants.floorGearRatio;
+
+    // feed motor configs
+    feedMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    feedMotorConfig.Slot0.kS = HopperConstants.feedkS.in(Volts);
+    feedMotorConfig.Slot0.kV = HopperConstants.feedkV.in(Volts.per(RotationsPerSecond));
+
+    feedMotorConfig.Slot0.kP = HopperConstants.feedkP.in(Volts.per(RotationsPerSecond));
+
+    feedMotorConfig.Feedback.SensorToMechanismRatio = HopperConstants.feedGearRatio;
+
+    CTREUtil.attempt(() -> _floorMotor.getConfigurator().apply(floorMotorConfig), _floorMotor);
+    CTREUtil.attempt(() -> _feedMotor.getConfigurator().apply(feedMotorConfig), _feedMotor);
+
+    CTREUtil.attempt(() -> _floorMotor.optimizeBusUtilization(), _floorMotor);
+    CTREUtil.attempt(() -> _feedMotor.optimizeBusUtilization(), _feedMotor);
+
+    FaultLogger.register(_floorMotor);
+    FaultLogger.register(_feedMotor);
+
+    setDefaultCommand(
+        run(
+            () -> {
+              _feedMotor.setControl(_feedVelocitySetter.withVelocity(0));
+              _floorMotor.setControl(_floorVelocitySetter.withVelocity(0));
+            }));
+  }
+
+  /** Feed fuel into the shooter. */
+  public Command feed() {
+    return run(() -> {
+          _feedMotor.setControl(_feedVelocitySetter.withVelocity(0));
+          _floorMotor.setControl(_floorVelocitySetter.withVelocity(0));
+        })
+        .withName("Feed");
+  }
+
+  @Logged(name = "Floor Speed")
+  public AngularVelocity getFloorSpeed() {
+    return _floorVelocityGetter.refresh().getValue();
+  }
+
+  @Logged(name = "Feed Speed")
+  public AngularVelocity getFeedSpeed() {
+    return _feedVelocityGetter.refresh().getValue();
+  }
+
+  @Override
+  public void close() {
+    _floorMotor.close();
+    _feedMotor.close();
+  }
+}
