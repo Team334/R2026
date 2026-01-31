@@ -16,7 +16,6 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -28,148 +27,99 @@ import frc.lib.FaultLogger;
 import frc.robot.Constants;
 import frc.robot.Constants.DoubleShooterConstants;
 
-
 public class DoubleShooter extends AdvancedSubsystem {
-private final TalonFX _frontMotor =
-      new TalonFX(DoubleShooterConstants.frontMotorID, Constants.subsystemBus);
-  private final TalonFX _backMotor =
-      new TalonFX(DoubleShooterConstants.backMotorID, Constants.subsystemBus);
+  private final TalonFX _flywheelMotor =
+      new TalonFX(DoubleShooterConstants.flywheelMotorID, Constants.subsystemBus);
 
   private final VelocityVoltage _velocitySetter = new VelocityVoltage(0);
   private final DutyCycleOut _dutyCycleSetter = new DutyCycleOut(0);
 
-  private final StatusSignal<AngularVelocity> _frontVelocityGetter = _frontMotor.getVelocity();
-  private final StatusSignal<AngularVelocity> _backVelocityGetter = _backMotor.getVelocity();
+  private final StatusSignal<AngularVelocity> _flywheelVelocityGetter =
+      _flywheelMotor.getVelocity();
 
-  @Logged(name = "Desired Front Speed")
-  private final MutAngularVelocity _desiredFrontSpeed = RotationsPerSecond.mutable(0);
-
-  @Logged(name = "Desired Back Speed")
-  private final MutAngularVelocity _desiredBackSpeed = RotationsPerSecond.mutable(0);
+  @Logged(name = "Desired Flywheel Speed")
+  private final MutAngularVelocity _desiredFlywheelSpeed = RotationsPerSecond.mutable(0);
 
   @Logged(name = "Velocity Threshold")
   private final AngularVelocity velocityThreshold = RotationsPerSecond.of(3);
 
   public DoubleShooter() {
-    var frontMotorConfig = new TalonFXConfiguration();
-    var backMotorConfig = new TalonFXConfiguration();
+    var flywheelMotorConfig = new TalonFXConfiguration();
 
     // front motor configs
-    frontMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
-    frontMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    flywheelMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
+    flywheelMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    frontMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
+    flywheelMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
 
-    frontMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    frontMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    flywheelMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    flywheelMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-    frontMotorConfig.Slot0.kS = DoubleShooterConstants.frontFlywheelkS.in(Volts);
-    frontMotorConfig.Slot0.kV = DoubleShooterConstants.frontFlywheelkV.in(Volts.per(RotationsPerSecond));
+    flywheelMotorConfig.Slot0.kS = DoubleShooterConstants.flywheelkS.in(Volts);
+    flywheelMotorConfig.Slot0.kV =
+        DoubleShooterConstants.flywheelkV.in(Volts.per(RotationsPerSecond));
 
-    frontMotorConfig.Slot0.kP = DoubleShooterConstants.frontFlywheelkP.in(Volts.per(RotationsPerSecond));
+    flywheelMotorConfig.Slot0.kP =
+        DoubleShooterConstants.flywheelkP.in(Volts.per(RotationsPerSecond));
 
-    frontMotorConfig.Feedback.SensorToMechanismRatio = DoubleShooterConstants.frontFlywheelGearRatio;
+    flywheelMotorConfig.Feedback.SensorToMechanismRatio = DoubleShooterConstants.flywheelGearRatio;
 
-    // back motor configs
-    backMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
-    backMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    CTREUtil.attempt(
+        () -> _flywheelMotor.getConfigurator().apply(flywheelMotorConfig), _flywheelMotor);
 
-    backMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
-
-    backMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-
-    backMotorConfig.Slot0.kS = DoubleShooterConstants.backFlywheelkS.in(Volts);
-    backMotorConfig.Slot0.kV = DoubleShooterConstants.backFlywheelkV.in(Volts.per(RotationsPerSecond));
-
-    backMotorConfig.Slot0.kP = DoubleShooterConstants.backFlywheelkP.in(Volts.per(RotationsPerSecond));
-
-    backMotorConfig.Feedback.SensorToMechanismRatio = DoubleShooterConstants.backFlywheelGearRatio;
-
-    CTREUtil.attempt(() -> _frontMotor.getConfigurator().apply(frontMotorConfig), _frontMotor);
-    CTREUtil.attempt(() -> _backMotor.getConfigurator().apply(backMotorConfig), _backMotor);
-
-    CTREUtil.attempt(() -> _frontMotor.optimizeBusUtilization(), _frontMotor);
-    CTREUtil.attempt(() -> _backMotor.optimizeBusUtilization(), _backMotor);
+    CTREUtil.attempt(() -> _flywheelMotor.optimizeBusUtilization(), _flywheelMotor);
 
     CTREUtil.attempt(
         () ->
             BaseStatusSignal.setUpdateFrequencyForAll(
                 100,
-                _frontVelocityGetter,
-                _frontMotor.getSupplyCurrent(),
-                _frontMotor.getStatorCurrent()),
-        _frontMotor);
+                _flywheelVelocityGetter,
+                _flywheelMotor.getSupplyCurrent(),
+                _flywheelMotor.getStatorCurrent()),
+        _flywheelMotor);
 
-    CTREUtil.attempt(
-        () ->
-            BaseStatusSignal.setUpdateFrequencyForAll(
-                100,
-                _backVelocityGetter,
-                _backMotor.getSupplyCurrent(),
-                _backMotor.getStatorCurrent()),
-        _backMotor);
-
-    FaultLogger.register(_frontMotor);
-    FaultLogger.register(_backMotor);
+    FaultLogger.register(_flywheelMotor);
 
     // EVERYTHING BELOW IS TEMPORARY
     DogLog.tunable(
-        "Desired Front Speed RPS", 0.0, newRps -> _desiredFrontSpeed.mut_setMagnitude(newRps));
-    DogLog.tunable(
-        "Desired Back Speed RPS", 0.0, newRps -> _desiredBackSpeed.mut_setMagnitude(newRps));
+        "Desired Flywheel Speed RPS",
+        0.0,
+        newRps -> _desiredFlywheelSpeed.mut_setMagnitude(newRps));
 
     final CoastOut coast = new CoastOut();
 
     setDefaultCommand(
         run(
             () -> {
-              _frontMotor.setControl(coast);
-              _backMotor.setControl(coast);
+              _flywheelMotor.setControl(coast);
             }));
   }
 
-  private void setFrontSpeed(AngularVelocity desiredFrontSpeed) {
+  private void setFlywheelSpeed(AngularVelocity desiredFrontSpeed) {
     double errorRps = desiredFrontSpeed.minus(getFrontSpeed()).in(RotationsPerSecond);
 
     if (Math.abs(errorRps) > velocityThreshold.in(RotationsPerSecond)) {
-      _frontMotor.setControl(_dutyCycleSetter.withOutput(Math.signum(errorRps)));
+      _flywheelMotor.setControl(_dutyCycleSetter.withOutput(Math.signum(errorRps)));
     } else {
-      _frontMotor.setControl(_velocitySetter.withVelocity(desiredFrontSpeed));
-    }
-  }
-
-  private void setBackSpeed(AngularVelocity desiredBackSpeed) {
-    double errorRps = desiredBackSpeed.minus(getBackSpeed()).in(RotationsPerSecond);
-
-    if (Math.abs(errorRps) > velocityThreshold.in(RotationsPerSecond)) {
-      _backMotor.setControl(_dutyCycleSetter.withOutput(Math.signum(errorRps)));
-    } else {
-      _backMotor.setControl(_velocitySetter.withVelocity(desiredBackSpeed));
+      _flywheelMotor.setControl(_velocitySetter.withVelocity(desiredFrontSpeed));
     }
   }
 
   /** Shoot. */
   public Command shoot() {
     return run(() -> {
-          setFrontSpeed(_desiredFrontSpeed);
-          setBackSpeed(_desiredBackSpeed);
+          setFlywheelSpeed(_desiredFlywheelSpeed);
         })
         .withName("Shoot");
   }
 
   @Logged(name = "Front Speed")
   public AngularVelocity getFrontSpeed() {
-    return _frontVelocityGetter.refresh().getValue();
-  }
-
-  @Logged(name = "Back Speed")
-  public AngularVelocity getBackSpeed() {
-    return _backVelocityGetter.refresh().getValue();
+    return _flywheelVelocityGetter.refresh().getValue();
   }
 
   @Override
   public void close() {
-    _frontMotor.close();
-    _backMotor.close();
+    _flywheelMotor.close();
   }
 }

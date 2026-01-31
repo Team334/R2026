@@ -4,18 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.CANBus;
-
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.AngleUnit;
-import edu.wpi.first.units.AngularVelocityUnit;
-import edu.wpi.first.units.DistanceUnit;
-import edu.wpi.first.units.LinearVelocityUnit;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meter;
@@ -27,6 +15,18 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+
+import com.ctre.phoenix6.CANBus;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.AngularVelocityUnit;
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.LinearVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -120,23 +120,15 @@ public final class Constants {
   }
 
   public static class DoubleShooterConstants {
-    public static final int  frontMotorID = 22;
-    public static final int backMotorID = 23;
+    public static final int flywheelMotorID = 22;
 
-    public static final Voltage frontFlywheelkS = Volts.of(0.0);
-    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkV =
+    public static final Voltage flywheelkS = Volts.of(0.0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkV =
         Volts.per(RotationsPerSecond).ofNative(0.0);
-    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkP =
+    public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkP =
         Volts.per(RotationsPerSecond).ofNative(0);
 
-    public static final Voltage backFlywheelkS = Volts.of(0.0);
-    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkV =
-        Volts.per(RotationsPerSecond).ofNative(0.0);
-    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkP =
-        Volts.per(RotationsPerSecond).ofNative(0);
-
-    public static final double frontFlywheelGearRatio = 3;
-    public static final double backFlywheelGearRatio = 3;
+    public static final double flywheelGearRatio = 3;
   }
 
   public static class SwerveConstants {
