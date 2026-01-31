@@ -88,13 +88,13 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkV =
         Volts.per(RotationsPerSecond).ofNative(0.27);
     public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkP =
-        Volts.per(RotationsPerSecond).ofNative(0.2);
+        Volts.per(RotationsPerSecond).ofNative(1.3);
 
     public static final Voltage backFlywheelkS = Volts.of(0.47);
     public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkV =
         Volts.per(RotationsPerSecond).ofNative(0.3);
     public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkP =
-        Volts.per(RotationsPerSecond).ofNative(0.1);
+        Volts.per(RotationsPerSecond).ofNative(1);
 
     public static final double frontFlywheelGearRatio = 3;
     public static final double backFlywheelGearRatio = 3;

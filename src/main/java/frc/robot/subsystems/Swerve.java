@@ -225,10 +225,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     } else {
       _visionSystemSim = null;
     }
-
-    final Idle idle = new Idle();
-
-    setDefaultCommand(run(() -> setControl(idle)));
   }
 
   // COPIED FROM ADVANCED SUBSYSTEM
