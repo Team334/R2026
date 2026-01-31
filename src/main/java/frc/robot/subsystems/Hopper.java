@@ -21,31 +21,16 @@ import frc.robot.Constants;
 import frc.robot.Constants.HopperConstants;
 
 public class Hopper extends AdvancedSubsystem {
-  private final TalonFX _floorMotor =
-      new TalonFX(HopperConstants.floorMotorID, Constants.subsystemBus);
 
   private final TalonFX _feedMotor =
       new TalonFX(HopperConstants.feedMotorID, Constants.subsystemBus);
 
-  private final VelocityVoltage _floorVelocitySetter = new VelocityVoltage(0);
   private final VelocityVoltage _feedVelocitySetter = new VelocityVoltage(0);
 
-  private final StatusSignal<AngularVelocity> _floorVelocityGetter = _floorMotor.getVelocity();
   private final StatusSignal<AngularVelocity> _feedVelocityGetter = _feedMotor.getVelocity();
 
   public Hopper() {
-    var floorMotorConfig = new TalonFXConfiguration();
     var feedMotorConfig = new TalonFXConfiguration();
-
-    // floor motor configs
-    floorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
-    floorMotorConfig.Slot0.kS = HopperConstants.floorkS.in(Volts);
-    floorMotorConfig.Slot0.kV = HopperConstants.floorkV.in(Volts.per(RotationsPerSecond));
-
-    floorMotorConfig.Slot0.kP = HopperConstants.floorkP.in(Volts.per(RotationsPerSecond));
-
-    floorMotorConfig.Feedback.SensorToMechanismRatio = HopperConstants.floorGearRatio;
 
     // feed motor configs
     feedMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -57,20 +42,16 @@ public class Hopper extends AdvancedSubsystem {
 
     feedMotorConfig.Feedback.SensorToMechanismRatio = HopperConstants.feedGearRatio;
 
-    CTREUtil.attempt(() -> _floorMotor.getConfigurator().apply(floorMotorConfig), _floorMotor);
     CTREUtil.attempt(() -> _feedMotor.getConfigurator().apply(feedMotorConfig), _feedMotor);
 
-    CTREUtil.attempt(() -> _floorMotor.optimizeBusUtilization(), _floorMotor);
     CTREUtil.attempt(() -> _feedMotor.optimizeBusUtilization(), _feedMotor);
 
-    FaultLogger.register(_floorMotor);
     FaultLogger.register(_feedMotor);
 
     setDefaultCommand(
         run(
             () -> {
               _feedMotor.setControl(_feedVelocitySetter.withVelocity(0));
-              _floorMotor.setControl(_floorVelocitySetter.withVelocity(0));
             }));
   }
 
@@ -78,14 +59,8 @@ public class Hopper extends AdvancedSubsystem {
   public Command feed() {
     return run(() -> {
           _feedMotor.setControl(_feedVelocitySetter.withVelocity(0));
-          _floorMotor.setControl(_floorVelocitySetter.withVelocity(0));
         })
         .withName("Feed");
-  }
-
-  @Logged(name = "Floor Speed")
-  public AngularVelocity getFloorSpeed() {
-    return _floorVelocityGetter.refresh().getValue();
   }
 
   @Logged(name = "Feed Speed")
@@ -95,7 +70,6 @@ public class Hopper extends AdvancedSubsystem {
 
   @Override
   public void close() {
-    _floorMotor.close();
     _feedMotor.close();
   }
 }
