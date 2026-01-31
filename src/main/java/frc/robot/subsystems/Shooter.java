@@ -28,8 +28,11 @@ public class Shooter extends AdvancedSubsystem {
   private final TalonFX _backMotor =
       new TalonFX(ShooterConstants.backMotorID, Constants.subsystemBus);
 
-  private final VelocityVoltage _velocitySetter = new VelocityVoltage(0);
-  private final DutyCycleOut _dutyCycleSetter = new DutyCycleOut(0);
+  private final VelocityVoltage _frontVelocitySetter = new VelocityVoltage(0);
+  private final DutyCycleOut _frontDutyCycleSetter = new DutyCycleOut(0);
+
+  private final VelocityVoltage _backVelocitySetter = new VelocityVoltage(0);
+  private final DutyCycleOut _backDutyCycleSetter = new DutyCycleOut(0);
 
   private final StatusSignal<AngularVelocity> _frontVelocityGetter = _frontMotor.getVelocity();
   private final StatusSignal<AngularVelocity> _backVelocityGetter = _backMotor.getVelocity();
@@ -125,9 +128,9 @@ public class Shooter extends AdvancedSubsystem {
     double errorRps = desiredFrontSpeed.minus(getFrontSpeed()).in(RotationsPerSecond);
 
     if (Math.abs(errorRps) > velocityThreshold.in(RotationsPerSecond)) {
-      _frontMotor.setControl(_dutyCycleSetter.withOutput(Math.signum(errorRps)));
+      _frontMotor.setControl(_frontDutyCycleSetter.withOutput(Math.signum(errorRps)));
     } else {
-      _frontMotor.setControl(_velocitySetter.withVelocity(desiredFrontSpeed));
+      _frontMotor.setControl(_frontVelocitySetter.withVelocity(desiredFrontSpeed));
     }
   }
 
@@ -135,9 +138,9 @@ public class Shooter extends AdvancedSubsystem {
     double errorRps = desiredBackSpeed.minus(getBackSpeed()).in(RotationsPerSecond);
 
     if (Math.abs(errorRps) > velocityThreshold.in(RotationsPerSecond)) {
-      _backMotor.setControl(_dutyCycleSetter.withOutput(Math.signum(errorRps)));
+      _backMotor.setControl(_backDutyCycleSetter.withOutput(Math.signum(errorRps)));
     } else {
-      _backMotor.setControl(_velocitySetter.withVelocity(desiredBackSpeed));
+      _backMotor.setControl(_backVelocitySetter.withVelocity(desiredBackSpeed));
     }
   }
 

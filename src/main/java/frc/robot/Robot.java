@@ -33,10 +33,11 @@ import frc.lib.FaultsTable.FaultType;
 import frc.robot.Constants.Ports;
 import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import java.lang.reflect.Field;
-import frc.robot.subsystems.Hopper;
+
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the package after creating
@@ -44,6 +45,10 @@ import frc.robot.subsystems.Hopper;
  */
 @Logged(strategy = Strategy.OPT_IN)
 public class Robot extends TimedRobot {
+  private final NetworkTableInstance _ntInst;
+
+  private boolean _fileOnlySet = false;
+
   // controllers
   private final CommandXboxController _driverController =
       new CommandXboxController(Ports.driverController);
@@ -55,14 +60,10 @@ public class Robot extends TimedRobot {
   @Logged(name = "Shooter")
   private final Shooter _shooter = new Shooter();
 
-  private final Autos _autos = new Autos(_swerve);
-
-  private final NetworkTableInstance _ntInst;
-
-  private boolean _fileOnlySet = false;
-
-    @Logged(name = "Hopper")
+  @Logged(name = "Hopper")
   private final Hopper _hopper = new Hopper();
+
+  private final Autos _autos = new Autos(_swerve);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -195,6 +196,7 @@ public class Robot extends TimedRobot {
     // _driverController.a().onTrue(_swerve.toggleFieldOriented());
     // _driverController.y().onTrue(_swerve.resetHeading());
 
+    _driverController.leftTrigger().whileTrue(_hopper.feed());
     _driverController.rightTrigger().whileTrue(_shooter.shoot());
   }
 
