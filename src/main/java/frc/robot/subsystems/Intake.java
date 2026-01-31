@@ -1,22 +1,13 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Hertz;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -45,15 +36,17 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.Robot;
 
 public class Intake extends AdvancedSubsystem {
-  private final TalonFX _feedMotor = new TalonFX(IntakeConstants.feedMotorID, "canivore");
+  private final TalonFX _feedMotor =
+      new TalonFX(IntakeConstants.feedMotorID, Constants.subsystemBus);
 
-  private final TalonFX _pivotMotor = new TalonFX(IntakeConstants.pivotMotorID, "canivore");
+  private final TalonFX _pivotMotor =
+      new TalonFX(IntakeConstants.pivotMotorID, Constants.subsystemBus);
 
   private final MotionMagicVoltage _pivotSetter = new MotionMagicVoltage(0);
   private final VelocityVoltage _feedSetter = new VelocityVoltage(0);
 
-  private final VoltageOut _pivotVoltageSetter = new VoltageOut(0);
-  private final VoltageOut _feedVoltageSetter = new VoltageOut(0);
+  // private final VoltageOut _pivotVoltageSetter = new VoltageOut(0);
+  // private final VoltageOut _feedVoltageSetter = new VoltageOut(0);
 
   private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
   private final StatusSignal<AngularVelocity> _feedVelocityGetter = _feedMotor.getVelocity();
@@ -62,13 +55,13 @@ public class Intake extends AdvancedSubsystem {
   private final MechanismRoot2d _root = _mech.getRoot("intake", 0.5, 0.1);
   private final MechanismLigament2d _intake =
       _root.append(new MechanismLigament2d("intake", 0.5, 0, 3, new Color8Bit(Color.kBlue)));
+
   private SingleJointedArmSim _pivotSim;
+
   private Notifier _simNotifier;
   private double _lastSimTime;
 
   public Intake() {
-    setDefaultCommand(stow());
-
     var feedMotorConfigs = new TalonFXConfiguration();
     var pivotMotorConfigs = new TalonFXConfiguration();
 
@@ -117,26 +110,28 @@ public class Intake extends AdvancedSubsystem {
     CTREUtil.attempt(() -> _feedMotor.optimizeBusUtilization(), _feedMotor);
     CTREUtil.attempt(() -> _pivotMotor.optimizeBusUtilization(), _pivotMotor);
 
-    CTREUtil.attempt(
-        () ->
-            BaseStatusSignal.setUpdateFrequencyForAll(
-                100,
-                _feedMotor.getPosition(),
-                _feedMotor.getVelocity(),
-                _feedMotor.getMotorVoltage()),
-        _feedMotor);
+    // CTREUtil.attempt(
+    //     () ->
+    //         BaseStatusSignal.setUpdateFrequencyForAll(
+    //             100,
+    //             _feedMotor.getPosition(),
+    //             _feedMotor.getVelocity(),
+    //             _feedMotor.getMotorVoltage()),
+    //     _feedMotor);
 
-    CTREUtil.attempt(
-        () ->
-            BaseStatusSignal.setUpdateFrequencyForAll(
-                100,
-                _pivotMotor.getPosition(),
-                _pivotMotor.getVelocity(),
-                _pivotMotor.getMotorVoltage()),
-        _pivotMotor);
+    // CTREUtil.attempt(
+    //     () ->
+    //         BaseStatusSignal.setUpdateFrequencyForAll(
+    //             100,
+    //             _pivotMotor.getPosition(),
+    //             _pivotMotor.getVelocity(),
+    //             _pivotMotor.getMotorVoltage()),
+    //     _pivotMotor);
 
     FaultLogger.register(_feedMotor);
     FaultLogger.register(_pivotMotor);
+
+    setDefaultCommand(stow());
 
     // sim
     if (Robot.isSimulation()) {
@@ -202,47 +197,46 @@ public class Intake extends AdvancedSubsystem {
   }
 
   @Logged(name = "Angle")
-  public double getAngle() {
-    return _pivotAngleGetter.refresh().getValue().in(Radians);
+  public Angle getAngle() {
+    return _pivotAngleGetter.refresh().getValue();
   }
 
   @Logged(name = "Speed")
-  public double getSpeed() {
-    return _feedVelocityGetter.refresh().getValue().in(RadiansPerSecond);
+  public AngularVelocity getSpeed() {
+    return _feedVelocityGetter.refresh().getValue();
   }
 
-  private Command set(double pivotAngle, double feedSpeed) {
+  private Command set(Angle pivotAngle, AngularVelocity feedSpeed) {
     return run(
         () -> {
-          _pivotMotor.setControl(_pivotSetter.withPosition(Units.radiansToRotations(pivotAngle)));
-          _feedMotor.setControl(_feedSetter.withVelocity(Units.radiansToRotations(feedSpeed)));
+          _pivotMotor.setControl(_pivotSetter.withPosition(pivotAngle));
+          _feedMotor.setControl(_feedSetter.withVelocity(feedSpeed));
         });
   }
 
+  /** Stow in the robot. */
   public Command stow() {
-    return set(IntakeConstants.pivotStowed.in(Radians), 0).withName("Stow");
+    return set(IntakeConstants.pivotStowed, RotationsPerSecond.zero()).withName("Stow");
   }
 
+  /** Intake Fuel */
   public Command intake() {
-    return set(IntakeConstants.pivotOut.in(Radians), IntakeConstants.feedSpeed.in(RadiansPerSecond))
-        .withName("Intake");
+    return set(IntakeConstants.pivotOut, IntakeConstants.feedSpeed).withName("Intake");
   }
 
   /** Outtake onto the ground. */
   public Command outtake() {
-    return set(
-            IntakeConstants.pivotOut.in(Radians),
-            IntakeConstants.feedSpeed.unaryMinus().in(RadiansPerSecond))
+    return set(IntakeConstants.pivotOut, IntakeConstants.feedSpeed.unaryMinus())
         .withName("Outtake");
   }
 
-  private void setPivotVoltage(double volts) {
-    _pivotMotor.setControl(_pivotVoltageSetter.withOutput(volts));
-  }
+  // private void setPivotVoltage(double volts) {
+  //   _pivotMotor.setControl(_pivotVoltageSetter.withOutput(volts));
+  // }
 
-  private void setFeedVoltage(double volts) {
-    _feedMotor.setControl(_feedVoltageSetter.withOutput(volts));
-  }
+  // private void setFeedVoltage(double volts) {
+  //   _feedMotor.setControl(_feedVoltageSetter.withOutput(volts));
+  // }
 
   @Override
   public void periodic() {
@@ -257,7 +251,7 @@ public class Intake extends AdvancedSubsystem {
   public void simulationPeriodic() {
     super.simulationPeriodic();
 
-    _intake.setAngle(Math.toDegrees(getAngle()));
+    _intake.setAngle(getAngle().in(Degrees));
   }
 
   @Override

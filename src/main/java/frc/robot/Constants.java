@@ -130,8 +130,8 @@ public final class Constants {
 
     public static final Distance intakeLength = Inches.of(11);
 
-    public static final Angle pivotStowed = Radians.of(0);
-    public static final Angle pivotOut = Radians.of(2.3);
+    public static final Angle pivotStowed = Degrees.of(90);
+    public static final Angle pivotOut = Degrees.of(200);
 
     public static final AngularVelocity feedSpeed = RadiansPerSecond.of(30);
   }
