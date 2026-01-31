@@ -37,7 +37,7 @@ public class Hopper extends AdvancedSubsystem {
     var rollerMotorConfig = new TalonFXConfiguration();
     var feedMotorConfig = new TalonFXConfiguration();
 
-    // floor motor configs
+    // Roller motor configs
     rollerMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     rollerMotorConfig.Slot0.kS = HopperConstants.rollerkS.in(Volts);
@@ -84,7 +84,7 @@ public class Hopper extends AdvancedSubsystem {
   }
 
   @Logged(name = "Roller Speed")
-  public AngularVelocity getFloorSpeed() {
+  public AngularVelocity getRollerSpeed() {
     return _rollerVelocityGetter.refresh().getValue();
   }
 
