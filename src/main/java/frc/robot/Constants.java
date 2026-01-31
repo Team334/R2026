@@ -4,9 +4,8 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.CANBus;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,6 +16,17 @@ import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.LinearVelocityUnit;
+import static edu.wpi.first.units.Units.Hertz;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Radian;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -115,6 +125,26 @@ public final class Constants {
 
     public static final double floorGearRatio = 3;
     public static final double feedGearRatio = 3;
+  }
+
+  public static class DoubleShooterConstants {
+    public static final int  frontMotorID = 22;
+    public static final int backMotorID = 23;
+
+    public static final Voltage frontFlywheelkS = Volts.of(0.0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkV =
+        Volts.per(RotationsPerSecond).ofNative(0.0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkP =
+        Volts.per(RotationsPerSecond).ofNative(0);
+
+    public static final Voltage backFlywheelkS = Volts.of(0.0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkV =
+        Volts.per(RotationsPerSecond).ofNative(0.0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkP =
+        Volts.per(RotationsPerSecond).ofNative(0);
+
+    public static final double frontFlywheelGearRatio = 3;
+    public static final double backFlywheelGearRatio = 3;
   }
 
   public static class SwerveConstants {
