@@ -77,8 +77,12 @@ public class Hopper extends AdvancedSubsystem {
   /** Index fuel into the shooter. */
   public Command index() {
     return run(() -> {
-          _feedMotor.setControl(_feedVelocitySetter.withVelocity(HopperConstants.feedIndexSpeed.in(RotationsPerSecond)));
-          _rollerMotor.setControl(_rollerVelocitySetter.withVelocity(HopperConstants.rollerIndexSpeed.in(RotationsPerSecond)));
+          _feedMotor.setControl(
+              _feedVelocitySetter.withVelocity(
+                  HopperConstants.feedIndexSpeed.in(RotationsPerSecond)));
+          _rollerMotor.setControl(
+              _rollerVelocitySetter.withVelocity(
+                  HopperConstants.rollerIndexSpeed.in(RotationsPerSecond)));
         })
         .withName("Index");
   }

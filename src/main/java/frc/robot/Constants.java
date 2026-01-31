@@ -100,6 +100,29 @@ public final class Constants {
     public static final double backFlywheelGearRatio = 3;
   }
 
+  public static class HopperConstants {
+    public static final int rollerMotorID = 20;
+    public static final int feedMotorID = 21;
+
+    public static final AngularVelocity feedIndexSpeed = RotationsPerSecond.of(0);
+    public static final AngularVelocity rollerIndexSpeed = RotationsPerSecond.of(0);
+
+    public static final Voltage rollerkS = Volts.of(0.39);
+    public static final Per<VoltageUnit, AngularVelocityUnit> rollerkV =
+        Volts.per(RotationsPerSecond).ofNative(0.27);
+    public static final Per<VoltageUnit, AngularVelocityUnit> rollerkP =
+        Volts.per(RotationsPerSecond).ofNative(1.3);
+
+    public static final Voltage feedkS = Volts.of(0.47);
+    public static final Per<VoltageUnit, AngularVelocityUnit> feedkV =
+        Volts.per(RotationsPerSecond).ofNative(0.3);
+    public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
+        Volts.per(RotationsPerSecond).ofNative(1);
+
+    public static final double rollerGearRatio = 3;
+    public static final double feedGearRatio = 3;
+  }
+
   public static class IntakeConstants {
     public static final int feedMotorID = 10;
     public static final int pivotMotorID = 11;
