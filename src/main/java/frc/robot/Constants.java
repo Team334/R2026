@@ -100,7 +100,10 @@ public final class Constants {
         new VisionPoseEstimatorConstants(
             leftArducamName,
             new Transform3d(
-                new Translation3d(Inches.of(8.875).in(Meters), Inches.of(8.875).in(Meters), 0.2), // change.  first values: 0.3,1,0.2
+                new Translation3d(
+                    Inches.of(8.875).in(Meters),
+                    Inches.of(8.875).in(Meters),
+                    0.2), // change.  first values: 0.3,1,0.2
                 new Rotation3d(
                     0, -Units.degreesToRadians(20), Units.degreesToRadians(5))), // change
             0.1,
@@ -111,7 +114,10 @@ public final class Constants {
         new VisionPoseEstimatorConstants(
             rightArducamName,
             new Transform3d(
-                new Translation3d(Inches.of(8.875).in(Meters), Inches.of(-8.875).in(Meters), 0.2), // change first values: -0.3,1,0.2
+                new Translation3d(
+                    Inches.of(8.875).in(Meters),
+                    Inches.of(-8.875).in(Meters),
+                    0.2), // change first values: -0.3,1,0.2
                 new Rotation3d(
                     0, -Units.degreesToRadians(20), -Units.degreesToRadians(5))), // change
             0.1,
