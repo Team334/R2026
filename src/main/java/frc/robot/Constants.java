@@ -57,6 +57,16 @@ public final class Constants {
     public static final AprilTagFieldLayout tagLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
+    public static final Distance FIELD_LENTH = Inches.of(650.12);
+    public static final Distance FIELD_WIDTH = Inches.of(316.64);
+
+    public static final Distance allianceZone = Inches.of(156.06);
+    public static final Translation3d blueHub =
+        new Translation3d(Inches.of(181.56), FIELD_WIDTH.div(2), Inches.of(56.4));
+    public static final Translation3d redHub =
+        new Translation3d(
+            FIELD_LENTH.minus(Inches.of(181.56)), FIELD_WIDTH.div(2), Inches.of(56.4));
+
     // uncomment if using the test tag layout
     // public static final AprilTagFieldLayout tagLayout;
 

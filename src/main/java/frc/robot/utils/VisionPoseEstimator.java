@@ -225,6 +225,7 @@ public class VisionPoseEstimator implements AutoCloseable {
       cameraProps.setCalibError(0.01, 0.001);
 
       _cameraSim = new PhotonCameraSim(_camera, cameraProps, fieldLayout);
+      // _cameraSim.enableDrawWireframe(true); // requires a lot of process power
     } else {
       _cameraSim = null;
     }
