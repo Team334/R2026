@@ -10,6 +10,8 @@ import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -31,6 +33,7 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.utils.VisionPoseEstimator.VisionPoseEstimatorConstants;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -89,6 +92,31 @@ public final class Constants {
     public static final double xBoundMargin = 0.01;
     public static final double yBoundMargin = 0.01;
     public static final double zBoundMargin = 0.01;
+
+    public static final String leftArducamName = "left-arducam";
+    public static final String rightArducamName = "right-arducam";
+
+    public static final VisionPoseEstimatorConstants leftArducam =
+        new VisionPoseEstimatorConstants(
+            leftArducamName,
+            new Transform3d(
+                new Translation3d(0.3, 0.3, 0.2), // change.  first values: 0.3,1,0.2
+                new Rotation3d(
+                    0, -Units.degreesToRadians(20), Units.degreesToRadians(5))), // change
+            0.1,
+            3,
+            4.5);
+
+    public static final VisionPoseEstimatorConstants rightArducam =
+        new VisionPoseEstimatorConstants(
+            rightArducamName,
+            new Transform3d(
+                new Translation3d(0.3, -0.3, 0.2), // change first values: -0.3,1,0.2
+                new Rotation3d(
+                    0, -Units.degreesToRadians(20), -Units.degreesToRadians(5))), // change
+            0.1,
+            3,
+            4.5);
   }
 
   public static class ShooterConstants {
