@@ -63,11 +63,11 @@ public class Robot extends TimedRobot {
   @Logged(name = "Shooter")
   private final Shooter _shooter = new Shooter();
 
-  @Logged(name = "Intake")
-  private final Intake _intake = new Intake();
-
   // @Logged(name = "Hopper")
   // private final Hopper _hopper = new Hopper();
+
+  @Logged(name = "Intake")
+  private final Intake _intake = new Intake();
 
   private final Autos _autos = new Autos(_swerve);
 
@@ -204,8 +204,9 @@ public class Robot extends TimedRobot {
 
     // _driverController.leftTrigger().whileTrue(_hopper.feed());
     _driverController.rightTrigger().whileTrue(_shooter.shoot());
-    _driverController.leftTrigger().toggleOnTrue(_intake.intake());
+
     _driverController.leftBumper().whileTrue(_intake.outtake());
+    _driverController.leftTrigger().toggleOnTrue(_intake.intake());
   }
 
   /**
@@ -249,6 +250,7 @@ public class Robot extends TimedRobot {
 
     _swerve.close();
     _shooter.close();
+    // _hopper.close();
     _intake.close();
   }
 }
