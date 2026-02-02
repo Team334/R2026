@@ -22,7 +22,6 @@ import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -152,9 +151,6 @@ public final class Constants {
     public static final Angle retracted = Rotations.of(0);
     public static final Angle extended = Rotations.of(10);
 
-    public static final double climbGearRatio = 25;
-    public static final double threadedGearRatio = 8;
-    public static final Distance drumRadius = Inches.of(1.5);
-    public static final Distance drumCircumference = Inches.of(3.0 * Math.PI);
+    public static final double climbGearRatio = 3;
   }
 }
