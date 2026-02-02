@@ -22,6 +22,7 @@ import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -87,16 +88,75 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkV =
         Volts.per(RotationsPerSecond).ofNative(0.27);
     public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkP =
-        Volts.per(RotationsPerSecond).ofNative(0.2);
+        Volts.per(RotationsPerSecond).ofNative(1.3);
 
     public static final Voltage backFlywheelkS = Volts.of(0.47);
     public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkV =
         Volts.per(RotationsPerSecond).ofNative(0.3);
     public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkP =
-        Volts.per(RotationsPerSecond).ofNative(0.1);
+        Volts.per(RotationsPerSecond).ofNative(1);
 
     public static final double frontFlywheelGearRatio = 3;
     public static final double backFlywheelGearRatio = 3;
+  }
+
+  public static class HopperConstants {
+    public static final int rollerMotorID = 20;
+    public static final int feedMotorID = 21;
+
+    public static final AngularVelocity feedIndexSpeed = RotationsPerSecond.of(0);
+    public static final AngularVelocity rollerIndexSpeed = RotationsPerSecond.of(0);
+
+    public static final Voltage rollerkS = Volts.of(0.39);
+    public static final Per<VoltageUnit, AngularVelocityUnit> rollerkV =
+        Volts.per(RotationsPerSecond).ofNative(0.27);
+    public static final Per<VoltageUnit, AngularVelocityUnit> rollerkP =
+        Volts.per(RotationsPerSecond).ofNative(1.3);
+
+    public static final Voltage feedkS = Volts.of(0.47);
+    public static final Per<VoltageUnit, AngularVelocityUnit> feedkV =
+        Volts.per(RotationsPerSecond).ofNative(0.3);
+    public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
+        Volts.per(RotationsPerSecond).ofNative(1);
+
+    public static final double rollerGearRatio = 3;
+    public static final double feedGearRatio = 3;
+  }
+
+  public static class IntakeConstants {
+    public static final int feedMotorID = 10;
+    public static final int pivotMotorID = 11;
+
+    public static final Voltage feedkS = Volts.of(0.3);
+
+    public static final Per<VoltageUnit, AngularVelocityUnit> feedkV =
+        Volts.per(RotationsPerSecond).ofNative(0.2);
+
+    public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
+        Volts.per(RotationsPerSecond).ofNative(0.6);
+
+    public static final Voltage pivotkG = Volts.of(0.2);
+    public static final Voltage pivotkS = Volts.of(0.1);
+
+    public static final Per<VoltageUnit, AngularVelocityUnit> pivotkV =
+        Volts.per(RotationsPerSecond).ofNative(6);
+    public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
+        Volts.per(RotationsPerSecondPerSecond).ofNative(0.1);
+
+    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(3);
+
+    public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(2);
+    public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(5);
+
+    public static final double feedGearRatio = 1.5;
+    public static final double pivotGearRatio = 20;
+
+    public static final Distance intakeLength = Inches.of(11);
+
+    public static final Angle pivotStowed = Degrees.of(90);
+    public static final Angle pivotOut = Degrees.of(200);
+
+    public static final AngularVelocity feedSpeed = RadiansPerSecond.of(30);
   }
 
   public static class SwerveConstants {

@@ -28,8 +28,11 @@ public class Shooter extends AdvancedSubsystem {
   private final TalonFX _backMotor =
       new TalonFX(ShooterConstants.backMotorID, Constants.subsystemBus);
 
-  private final VelocityVoltage _velocitySetter = new VelocityVoltage(0);
-  private final DutyCycleOut _dutyCycleSetter = new DutyCycleOut(0);
+  private final VelocityVoltage _frontVelocitySetter = new VelocityVoltage(0);
+  private final DutyCycleOut _frontDutyCycleSetter = new DutyCycleOut(0);
+
+  private final VelocityVoltage _backVelocitySetter = new VelocityVoltage(0);
+  private final DutyCycleOut _backDutyCycleSetter = new DutyCycleOut(0);
 
   private final StatusSignal<AngularVelocity> _frontVelocityGetter = _frontMotor.getVelocity();
   private final StatusSignal<AngularVelocity> _backVelocityGetter = _backMotor.getVelocity();
@@ -40,8 +43,8 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Desired Back Speed")
   private final MutAngularVelocity _desiredBackSpeed = RotationsPerSecond.mutable(0);
 
-  private final double frontBangBangTolerance = 0.05;
-  private final double backBangBangTolerance = 0.15;
+  @Logged(name = "Velocity Threshold")
+  private final AngularVelocity velocityThreshold = RotationsPerSecond.of(3);
 
   public Shooter() {
     var frontMotorConfig = new TalonFXConfiguration();
@@ -121,47 +124,33 @@ public class Shooter extends AdvancedSubsystem {
             }));
   }
 
-  /**
-   * Control Strategy:
-   *
-   * <p>100% duty cycle bang-bang controller when the velocity error is above the {@link
-   * #bangBangTolerance}. This is the best for fast windup / fast recovery as 100% duty cycle will
-   * provide maximum torque, and once within the {@link #bangBangTolerance}, acceleration is cut off
-   * and VelocityVoltage is done instead, with FF control and a small kP.
-   *
-   * <p>100% duty cycle means that supply current will be equal to stator current during windup /
-   * recovery. It should only briefly be at the stator current limit, as the avaliable voltage going
-   * into torque will quickly go down as velocity quickly goes up. Also, recovering from a higher
-   * velocity, it'll be recovering at a stator current well below the limit.
-   *
-   * @param desiredFrontSpeed Desired front flywheel speed.
-   * @param desiredBackSpeed Desired back flywheel speed.
-   */
-  private void setSpeed(AngularVelocity desiredFrontSpeed, AngularVelocity desiredBackSpeed) {
-    // front motor
-    if (getFrontSpeed().isNear(desiredFrontSpeed, frontBangBangTolerance)) {
-      _frontMotor.setControl(_velocitySetter.withVelocity(desiredFrontSpeed));
-    } else {
-      double signedDutyCycle =
-          Math.signum(
-              desiredFrontSpeed.in(RotationsPerSecond) - getFrontSpeed().in(RotationsPerSecond));
-      _frontMotor.setControl(_dutyCycleSetter.withOutput(signedDutyCycle));
-    }
+  private void setFrontSpeed(AngularVelocity desiredFrontSpeed) {
+    double errorRps = desiredFrontSpeed.minus(getFrontSpeed()).in(RotationsPerSecond);
 
-    // back motor
-    if (getBackSpeed().isNear(desiredBackSpeed, backBangBangTolerance)) {
-      _backMotor.setControl(_velocitySetter.withVelocity(desiredBackSpeed));
+    if (Math.abs(errorRps) > velocityThreshold.in(RotationsPerSecond)) {
+      _frontMotor.setControl(_frontDutyCycleSetter.withOutput(Math.signum(errorRps)));
     } else {
-      double signedDutyCycle =
-          Math.signum(
-              desiredBackSpeed.in(RotationsPerSecond) - getBackSpeed().in(RotationsPerSecond));
-      _backMotor.setControl(_dutyCycleSetter.withOutput(signedDutyCycle));
+      _frontMotor.setControl(_frontVelocitySetter.withVelocity(desiredFrontSpeed));
+    }
+  }
+
+  private void setBackSpeed(AngularVelocity desiredBackSpeed) {
+    double errorRps = desiredBackSpeed.minus(getBackSpeed()).in(RotationsPerSecond);
+
+    if (Math.abs(errorRps) > velocityThreshold.in(RotationsPerSecond)) {
+      _backMotor.setControl(_backDutyCycleSetter.withOutput(Math.signum(errorRps)));
+    } else {
+      _backMotor.setControl(_backVelocitySetter.withVelocity(desiredBackSpeed));
     }
   }
 
   /** Shoot. */
   public Command shoot() {
-    return run(() -> setSpeed(_desiredFrontSpeed, _desiredBackSpeed)).withName("Shoot");
+    return run(() -> {
+          setFrontSpeed(_desiredFrontSpeed);
+          setBackSpeed(_desiredBackSpeed);
+        })
+        .withName("Shoot");
   }
 
   @Logged(name = "Front Speed")
