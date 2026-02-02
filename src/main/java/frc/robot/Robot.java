@@ -64,14 +64,14 @@ public class Robot extends TimedRobot {
   @Logged(name = "Shooter")
   private final Shooter _shooter = new Shooter();
 
-  @Logged(name = "Climb")
-  private final Climb _climb = new Climb();
-
   // @Logged(name = "Hopper")
   // private final Hopper _hopper = new Hopper();
 
   @Logged(name = "Intake")
   private final Intake _intake = new Intake();
+
+  @Logged(name = "Climb")
+  private final Climb _climb = new Climb();
 
   private final Autos _autos = new Autos(_swerve);
 
@@ -256,5 +256,6 @@ public class Robot extends TimedRobot {
     _shooter.close();
     // _hopper.close();
     _intake.close();
+    _climb.close();
   }
 }

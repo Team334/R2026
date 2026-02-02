@@ -68,13 +68,6 @@ public class Climb extends AdvancedSubsystem {
     FaultLogger.register(_climbMotor);
   }
 
-  @Override
-  public void periodic() {
-    DogLog.time("Time/Climb/periodic()");
-    super.periodic();
-    DogLog.timeEnd("Time/Climb/periodic()");
-  }
-
   public Command extend() {
     return run(() ->
             _climbMotor.setControl(
@@ -99,6 +92,13 @@ public class Climb extends AdvancedSubsystem {
   @Logged(name = "Climb Height")
   public double getHeight() {
     return _heightGetter.refresh().getValue().in(Radians);
+  }
+
+  @Override
+  public void periodic() {
+    DogLog.time("Time/Climb/periodic()");
+    super.periodic();
+    DogLog.timeEnd("Time/Climb/periodic()");
   }
 
   @Override

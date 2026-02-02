@@ -11,6 +11,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -95,6 +96,13 @@ public class Hopper extends AdvancedSubsystem {
   @Logged(name = "Feed Speed")
   public AngularVelocity getFeedSpeed() {
     return _feedVelocityGetter.refresh().getValue();
+  }
+
+  @Override
+  public void periodic() {
+    DogLog.time("Timing/Hopper/periodic()");
+    super.periodic();
+    DogLog.timeEnd("Timing/Hopper/periodic()");
   }
 
   @Override

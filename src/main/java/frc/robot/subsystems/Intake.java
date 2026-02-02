@@ -241,9 +241,7 @@ public class Intake extends AdvancedSubsystem {
   @Override
   public void periodic() {
     DogLog.time("Time/Intake/periodic()");
-
     super.periodic();
-
     DogLog.timeEnd("Time/Intake/periodic()");
   }
 

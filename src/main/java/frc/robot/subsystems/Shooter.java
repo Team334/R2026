@@ -164,6 +164,13 @@ public class Shooter extends AdvancedSubsystem {
   }
 
   @Override
+  public void periodic() {
+    DogLog.time("Timing/Shooter/periodic()");
+    super.periodic();
+    DogLog.timeEnd("Timing/Shooter/periodic()");
+  }
+
+  @Override
   public void close() {
     _frontMotor.close();
     _backMotor.close();

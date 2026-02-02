@@ -525,6 +525,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
           });
     }
 
+    DogLog.log(getName() + "/Current Command", currentCommandName());
+    DogLog.log(getName() + "/Has Error", _hasError);
+
     DogLog.timeEnd("Timing/Swerve/periodic()");
   }
 
