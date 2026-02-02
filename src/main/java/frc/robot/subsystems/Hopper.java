@@ -38,7 +38,7 @@ public class Hopper extends AdvancedSubsystem {
     var rollerMotorConfig = new TalonFXConfiguration();
     var feedMotorConfig = new TalonFXConfiguration();
 
-    // Roller motor configs
+    // roller motor configs
     rollerMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     rollerMotorConfig.Slot0.kS = HopperConstants.rollerkS.in(Volts);
@@ -75,17 +75,17 @@ public class Hopper extends AdvancedSubsystem {
             }));
   }
 
-  /** Index fuel into the shooter. */
-  public Command index() {
+  /** Shoots fuel into shooter. */
+  public Command shoot() {
     return run(() -> {
           _feedMotor.setControl(
               _feedVelocitySetter.withVelocity(
-                  HopperConstants.feedIndexSpeed.in(RotationsPerSecond)));
+                  HopperConstants.feedShootSpeed.in(RotationsPerSecond)));
           _rollerMotor.setControl(
               _rollerVelocitySetter.withVelocity(
-                  HopperConstants.rollerIndexSpeed.in(RotationsPerSecond)));
+                  HopperConstants.rollerShootSpeed.in(RotationsPerSecond)));
         })
-        .withName("Index");
+        .withName("Shoot");
   }
 
   @Logged(name = "Roller Speed")

@@ -35,6 +35,7 @@ public class Climb extends AdvancedSubsystem {
     var climbMotorConfigs = new TalonFXConfiguration();
     var climbSlotConfigs = new SlotConfigs();
 
+    // climb motor configs
     climbSlotConfigs.kS = ClimbConstants.kS.in(Volts);
     climbSlotConfigs.kG = ClimbConstants.kG.in(Volts);
     climbSlotConfigs.kV = ClimbConstants.kV.in(Volts.per(RotationsPerSecond));
@@ -68,6 +69,7 @@ public class Climb extends AdvancedSubsystem {
     FaultLogger.register(_climbMotor);
   }
 
+  /** Extends the climb. */
   public Command extend() {
     return run(() ->
             _climbMotor.setControl(
@@ -75,6 +77,7 @@ public class Climb extends AdvancedSubsystem {
         .withName("Extend");
   }
 
+  /** Retracts the climb under no load. */
   public Command retract() {
     return run(() ->
             _climbMotor.setControl(
@@ -82,6 +85,7 @@ public class Climb extends AdvancedSubsystem {
         .withName("Retract");
   }
 
+  /** Retracts the climb under the robot's weight. */
   public Command climb() {
     return run(() ->
             _climbMotor.setControl(
@@ -90,8 +94,8 @@ public class Climb extends AdvancedSubsystem {
   }
 
   @Logged(name = "Climb Height")
-  public double getHeight() {
-    return _heightGetter.refresh().getValue().in(Radians);
+  public Angle getHeight() {
+    return _heightGetter.refresh().getValue();
   }
 
   @Override
