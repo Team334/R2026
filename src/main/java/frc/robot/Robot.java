@@ -36,6 +36,7 @@ import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
@@ -62,6 +63,9 @@ public class Robot extends TimedRobot {
 
   @Logged(name = "Shooter")
   private final Shooter _shooter = new Shooter();
+
+  @Logged(name = "Climb")
+  private final Climb _climb = new Climb();
 
   // @Logged(name = "Hopper")
   // private final Hopper _hopper = new Hopper();
