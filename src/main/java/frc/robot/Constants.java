@@ -135,17 +135,22 @@ public final class Constants {
     // Change ALL values here after testing
     public static final int climbMotorID = 20;
 
-    public static final Voltage climbkS = Volts.of(0);
-    public static final Voltage climbkG = Volts.of(0);
-    public static final Per<VoltageUnit, AngularVelocityUnit> climbkV =
+    public static final Voltage kS = Volts.of(0);
+    public static final Voltage kG = Volts.of(0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> kV =
         Volts.per(RotationsPerSecond).ofNative(0);
-    public static final Per<VoltageUnit, AngularAccelerationUnit> climbkA =
+    public static final Per<VoltageUnit, AngularAccelerationUnit> kA =
         Volts.per(RotationsPerSecondPerSecond).ofNative(0);
 
-    public static final Per<VoltageUnit, AngleUnit> climbkP = Volts.per(Rotations).ofNative(0);
+    public static final Per<VoltageUnit, AngleUnit> kP = Volts.per(Rotations).ofNative(0);
 
-    public static final Angle minElevatorHeight = Radians.of(0);
-    public static final Angle maxElevatorHeight = Radians.of(90);
+    public static final Voltage climbingkG = Volts.of(0);
+    public static final Per<VoltageUnit, AngularAccelerationUnit> climbingkA =
+        Volts.per(RotationsPerSecondPerSecond).ofNative(0);
+    public static final Per<VoltageUnit, AngleUnit> climbingkP = Volts.per(Rotations).ofNative(0);
+
+    public static final Angle retracted = Rotations.of(0);
+    public static final Angle extended = Rotations.of(10);
 
     public static final double climbGearRatio = 25;
     public static final double threadedGearRatio = 8;
