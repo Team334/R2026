@@ -204,7 +204,7 @@ public class Robot extends TimedRobot {
 
     // _driverController.leftTrigger().whileTrue(_hopper.feed());
     _driverController.rightTrigger().whileTrue(_shooter.shoot());
-    _driverController.leftTrigger().whileTrue(_intake.intake());
+    _driverController.leftTrigger().toggleOnTrue(_intake.intake());
     _driverController.leftBumper().whileTrue(_intake.outtake());
   }
 
