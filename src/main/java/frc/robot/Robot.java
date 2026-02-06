@@ -39,10 +39,10 @@ import frc.robot.commands.Superstructure;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.Intake.IntakeFeed;
-import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.intake.IntakeFeed;
+import frc.robot.subsystems.intake.IntakePivot;
 import java.lang.reflect.Field;
 
 /**
@@ -74,7 +74,7 @@ public class Robot extends TimedRobot {
   private final IntakePivot _intakePivot = new IntakePivot();
 
   @Logged(name = "IntakeFeed")
-  private final IntakeFeed _intakeFeed = new IntakeFeed();
+  private final IntakeFeed _intakeFeed = new IntakeFeed(_intakePivot.intakeLowered());
 
   @Logged(name = "Climb")
   private final Climb _climb = new Climb();
@@ -213,10 +213,7 @@ public class Robot extends TimedRobot {
     _driverController.rightTrigger().whileTrue(_superstructure.shoot());
     _driverController.rightBumper().whileTrue(_superstructure.spit());
 
-    _driverController
-        .leftTrigger()
-        .onTrue(_intakeFeed.feedIn())
-        .onFalse(_intakeFeed.feedStop()); // TODO: check that intake is lowered to feed
+    _driverController.leftTrigger().whileTrue(_intakeFeed.feedIn());
     _driverController.leftBumper().toggleOnTrue(_intakePivot.lower());
 
     _driverController.a().toggleOnTrue(_superstructure.climbRoutine());

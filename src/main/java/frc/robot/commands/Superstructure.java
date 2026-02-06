@@ -9,10 +9,10 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.Intake.IntakeFeed;
-import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.intake.IntakeFeed;
+import frc.robot.subsystems.intake.IntakePivot;
 
 /** All superstructure commands. */
 public class Superstructure {

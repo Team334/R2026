@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Intake;
+package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -11,8 +11,10 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
@@ -20,15 +22,18 @@ import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakePivot extends AdvancedSubsystem {
-
   private final TalonFX _pivotMotor =
       new TalonFX(IntakeConstants.pivotMotorID, Constants.subsystemBus);
 
   private final MotionMagicVoltage _pivotAngleSetter = new MotionMagicVoltage(0);
   private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
 
-  @Logged(name = "Intake Lowered")
-  private boolean _intakeLowered = false;
+  private Trigger _intakeLowered =
+      new Trigger(
+              () ->
+                  MathUtil.isNear(
+                      IntakeConstants.pivotLowered.in(Degrees), getAngle().in(Degrees), 2))
+          .debounce(0.5);
 
   public IntakePivot() {
     var pivotMotorConfigs = new TalonFXConfiguration();
@@ -72,6 +77,12 @@ public class IntakePivot extends AdvancedSubsystem {
     setDefaultCommand(raise());
   }
 
+  /** Intake is lowered trigger. */
+  @Logged(name = "Intake Lowered")
+  public Trigger intakeLowered() {
+    return _intakeLowered;
+  }
+
   @Logged(name = "Angle")
   public Angle getAngle() {
     return _pivotAngleGetter.refresh().getValue();
@@ -82,8 +93,6 @@ public class IntakePivot extends AdvancedSubsystem {
     return run(() -> {
           _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotRaised));
         })
-        .until(() -> _pivotAngleGetter.isNear(IntakeConstants.pivotRaised.in(Rotations), 0.2))
-        .andThen(runOnce(() -> _intakeLowered = true))
         .withName("Raise");
   }
 
@@ -100,14 +109,12 @@ public class IntakePivot extends AdvancedSubsystem {
     return run(() -> {
           _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotLowered));
         })
-        .until(() -> _pivotAngleGetter.isNear(IntakeConstants.pivotLowered.in(Rotations), 0.2))
-        .andThen(runOnce(() -> _intakeLowered = true))
         .withName("Lower");
   }
 
   @Override
   public void periodic() {
-    DogLog.time("Time/intakePivot/periodic()");
+    DogLog.time("Time/IntakePivot/periodic()");
     super.periodic();
     DogLog.timeEnd("Time/IntakePivot/periodic()");
   }

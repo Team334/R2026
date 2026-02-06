@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.Intake;
+package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -19,6 +19,7 @@ import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
+import java.util.function.BooleanSupplier;
 
 public class IntakeFeed extends AdvancedSubsystem {
   private final TalonFX _feedMotor =
@@ -27,7 +28,11 @@ public class IntakeFeed extends AdvancedSubsystem {
   private final VelocityVoltage _feedVelocitySetter = new VelocityVoltage(0);
   private final StatusSignal<AngularVelocity> _feedVelocityGetter = _feedMotor.getVelocity();
 
-  public IntakeFeed() {
+  private final BooleanSupplier _intakeLowered;
+
+  public IntakeFeed(BooleanSupplier intakeLowered) {
+    _intakeLowered = intakeLowered;
+
     var feedMotorConfigs = new TalonFXConfiguration();
 
     // feed motor configs
@@ -53,21 +58,25 @@ public class IntakeFeed extends AdvancedSubsystem {
 
   /** Runs the feed wheels inwards */
   public Command feedIn() {
-    return run(
-        () -> _feedMotor.setControl(_feedVelocitySetter.withVelocity(IntakeConstants.feedSpeed)));
+    return run(() ->
+            _feedMotor.setControl(_feedVelocitySetter.withVelocity(IntakeConstants.feedSpeed)))
+        .onlyIf(_intakeLowered)
+        .withName("Feed In");
   }
 
   /** Runs the feed wheels outwards */
   public Command feedOut() {
-    return run(
-        () ->
+    return run(() ->
             _feedMotor.setControl(
-                _feedVelocitySetter.withVelocity(IntakeConstants.feedSpeed.unaryMinus())));
+                _feedVelocitySetter.withVelocity(IntakeConstants.feedSpeed.unaryMinus())))
+        .onlyIf(_intakeLowered)
+        .withName("Feed Out");
   }
 
   /** Stops the feed wheels */
   public Command feedStop() {
-    return run(() -> _feedMotor.setControl(_feedVelocitySetter.withVelocity(0)));
+    return run(() -> _feedMotor.setControl(_feedVelocitySetter.withVelocity(0)))
+        .withName("Feed Stop");
   }
 
   @Override
