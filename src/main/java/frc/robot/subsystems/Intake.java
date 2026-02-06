@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
@@ -42,14 +43,17 @@ public class Intake extends AdvancedSubsystem {
   private final TalonFX _pivotMotor =
       new TalonFX(IntakeConstants.pivotMotorID, Constants.subsystemBus);
 
-  private final MotionMagicVoltage _pivotSetter = new MotionMagicVoltage(0);
-  private final VelocityVoltage _feedSetter = new VelocityVoltage(0);
+  private final MotionMagicVoltage _pivotAngleSetter = new MotionMagicVoltage(0);
+  private final VelocityVoltage _feedVelocitySetter = new VelocityVoltage(0);
 
   // private final VoltageOut _pivotVoltageSetter = new VoltageOut(0);
   // private final VoltageOut _feedVoltageSetter = new VoltageOut(0);
 
   private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
   private final StatusSignal<AngularVelocity> _feedVelocityGetter = _feedMotor.getVelocity();
+
+  @Logged(name = "Intake Lowered")
+  private boolean _intakeLowered = false;
 
   private final Mechanism2d _mech = new Mechanism2d(1.85, 1);
   private final MechanismRoot2d _root = _mech.getRoot("intake", 0.5, 0.1);
@@ -113,7 +117,7 @@ public class Intake extends AdvancedSubsystem {
     FaultLogger.register(_feedMotor);
     FaultLogger.register(_pivotMotor);
 
-    setDefaultCommand(stow());
+    setDefaultCommand(raise());
 
     // sim
     if (Robot.isSimulation()) {
@@ -188,28 +192,41 @@ public class Intake extends AdvancedSubsystem {
     return _feedVelocityGetter.refresh().getValue();
   }
 
-  private Command set(Angle pivotAngle, AngularVelocity feedSpeed) {
-    return run(
-        () -> {
-          _pivotMotor.setControl(_pivotSetter.withPosition(pivotAngle));
-          _feedMotor.setControl(_feedSetter.withVelocity(feedSpeed));
-        });
+  /** Raises the intake. Command runs forever. */
+  public Command raise() {
+    return run(() -> {
+          _pivotMotor.setControl(_pivotAngleSetter.withPosition(0));
+        })
+        .beforeStarting(runOnce(() -> _intakeLowered = false))
+        .withName("Raise");
   }
 
-  /** Stow in the robot. */
-  public Command stow() {
-    return set(IntakeConstants.pivotStowed, RotationsPerSecond.zero()).withName("Stow");
+  /** Lowers the intake. Command ends once intake is lowered. */
+  public Command lower() {
+    return run(() -> {
+          _pivotMotor.setControl(_pivotAngleSetter.withPosition(0));
+        })
+        .until(() -> true)
+        .andThen(runOnce(() -> _intakeLowered = true))
+        .withName("Lower");
   }
 
-  /** Intake fuel. */
-  public Command intake() {
-    return set(IntakeConstants.pivotOut, IntakeConstants.feedSpeed).withName("Intake");
+  /** Runs the feed wheels inwards, waiting for the intake to be lowered first. */
+  public Command feedIn() {
+    return Commands.runOnce(() -> _feedMotor.setControl(_feedVelocitySetter.withVelocity(0)))
+        .onlyIf(() -> _intakeLowered);
   }
 
-  /** Outtake onto the ground. */
-  public Command outtake() {
-    return set(IntakeConstants.pivotOut, IntakeConstants.feedSpeed.unaryMinus())
-        .withName("Outtake");
+  /** Runs the feed wheels outwards, waiting for the intake to be lowered first. */
+  public Command feedOut() {
+    return Commands.runOnce(() -> _feedMotor.setControl(_feedVelocitySetter.withVelocity(0)))
+        .onlyIf(() -> _intakeLowered);
+  }
+
+  /** Stops the feed wheels, waiting for the intake to be lowered first. */
+  public Command feedStop() {
+    return Commands.runOnce(() -> _feedMotor.setControl(_feedVelocitySetter.withVelocity(0)))
+        .onlyIf(() -> _intakeLowered);
   }
 
   @Override

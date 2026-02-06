@@ -93,7 +93,7 @@ public class Climb extends AdvancedSubsystem {
         .withName("Climb");
   }
 
-  @Logged(name = "Climb Height")
+  @Logged(name = "Height")
   public Angle getHeight() {
     return _heightGetter.refresh().getValue();
   }

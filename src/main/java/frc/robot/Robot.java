@@ -35,8 +35,10 @@ import frc.lib.InputStream;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.Superstructure;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climb;
+import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
@@ -64,8 +66,8 @@ public class Robot extends TimedRobot {
   @Logged(name = "Shooter")
   private final Shooter _shooter = new Shooter();
 
-  // @Logged(name = "Hopper")
-  // private final Hopper _hopper = new Hopper();
+  @Logged(name = "Hopper")
+  private final Hopper _hopper = new Hopper();
 
   @Logged(name = "Intake")
   private final Intake _intake = new Intake();
@@ -74,6 +76,8 @@ public class Robot extends TimedRobot {
   private final Climb _climb = new Climb();
 
   private final Autos _autos = new Autos(_swerve);
+  private final Superstructure _superstructure =
+      new Superstructure(_shooter, _hopper, _intake, _climb, _swerve);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -202,15 +206,13 @@ public class Robot extends TimedRobot {
                     .scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
             .beforeStarting(() -> _swerve.isOpenLoop = true));
 
-    _driverController.x().whileTrue(_swerve.brake());
-    _driverController.a().onTrue(_swerve.toggleFieldOriented());
-    _driverController.y().onTrue(_swerve.resetHeading());
+    _driverController.rightTrigger().whileTrue(_superstructure.shoot());
+    _driverController.rightBumper().whileTrue(_superstructure.spit());
 
-    // _driverController.leftTrigger().whileTrue(_hopper.feed());
-    _driverController.rightTrigger().whileTrue(_shooter.shoot());
+    _driverController.leftTrigger().onTrue(_intake.feedIn()).onFalse(_intake.feedStop());
+    _driverController.leftBumper().toggleOnTrue(_intake.lower());
 
-    _driverController.leftBumper().whileTrue(_intake.outtake());
-    _driverController.leftTrigger().toggleOnTrue(_intake.intake());
+    _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
   }
 
   /**
@@ -254,7 +256,7 @@ public class Robot extends TimedRobot {
 
     _swerve.close();
     _shooter.close();
-    // _hopper.close();
+    _hopper.close();
     _intake.close();
     _climb.close();
   }
