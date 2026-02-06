@@ -39,7 +39,8 @@ import frc.robot.commands.Superstructure;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Intake.IntakeFeed;
+import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import java.lang.reflect.Field;
@@ -69,15 +70,18 @@ public class Robot extends TimedRobot {
   @Logged(name = "Hopper")
   private final Hopper _hopper = new Hopper();
 
-  @Logged(name = "Intake")
-  private final Intake _intake = new Intake();
+  @Logged(name = "IntakePivot")
+  private final IntakePivot _intakePivot = new IntakePivot();
+
+  @Logged(name = "IntakeFeed")
+  private final IntakeFeed _intakeFeed = new IntakeFeed();
 
   @Logged(name = "Climb")
   private final Climb _climb = new Climb();
 
   private final Autos _autos = new Autos(_swerve);
   private final Superstructure _superstructure =
-      new Superstructure(_shooter, _hopper, _intake, _climb, _swerve);
+      new Superstructure(_shooter, _hopper, _intakePivot, _intakeFeed, _climb, _swerve);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -209,8 +213,11 @@ public class Robot extends TimedRobot {
     _driverController.rightTrigger().whileTrue(_superstructure.shoot());
     _driverController.rightBumper().whileTrue(_superstructure.spit());
 
-    _driverController.leftTrigger().onTrue(_intake.feedIn()).onFalse(_intake.feedStop());
-    _driverController.leftBumper().toggleOnTrue(_intake.lower());
+    _driverController
+        .leftTrigger()
+        .onTrue(_intakeFeed.feedIn())
+        .onFalse(_intakeFeed.feedStop()); // TODO: check that intake is lowered to feed
+    _driverController.leftBumper().toggleOnTrue(_intakePivot.lower());
 
     _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
   }
@@ -257,7 +264,8 @@ public class Robot extends TimedRobot {
     _swerve.close();
     _shooter.close();
     _hopper.close();
-    _intake.close();
+    _intakePivot.close();
+    _intakeFeed.close();
     _climb.close();
   }
 }

@@ -9,13 +9,20 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Intake.IntakeFeed;
+import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 
 /** All superstructure commands. */
 public class Superstructure {
-  public Superstructure(Shooter shooter, Hopper hopper, Intake intake, Climb climb, Swerve swerve) {
+  public Superstructure(
+      Shooter shooter,
+      Hopper hopper,
+      IntakePivot intakePivot,
+      IntakeFeed intakeFeed,
+      Climb climb,
+      Swerve swerve) {
     //
   }
 

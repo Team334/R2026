@@ -153,10 +153,11 @@ public final class Constants {
 
     public static final Distance intakeLength = Inches.of(11);
 
-    public static final Angle pivotStowed = Degrees.of(90);
-    public static final Angle pivotOut = Degrees.of(200);
+    public static final Angle pivotRaised = Rotations.of(0);
+    public static final Angle pivotTucked = Rotations.of(0);
+    public static final Angle pivotLowered = Rotations.of(0);
 
-    public static final AngularVelocity feedSpeed = RadiansPerSecond.of(30);
+    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(30);
   }
 
   public static class ClimbConstants {
