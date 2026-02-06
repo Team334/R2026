@@ -80,6 +80,7 @@ public class Robot extends TimedRobot {
   private final Climb _climb = new Climb();
 
   private final Autos _autos = new Autos(_swerve);
+
   private final Superstructure _superstructure =
       new Superstructure(_shooter, _hopper, _intakePivot, _intakeFeed, _climb, _swerve);
 
