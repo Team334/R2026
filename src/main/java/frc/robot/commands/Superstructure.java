@@ -28,12 +28,12 @@ public class Superstructure {
 
   /** Scores / ferries depending on robot position. */
   public Command shoot() {
-    return run(null);
+    return run(() -> {});
   }
 
   /** Spits fuel at a short range without aiming. */
   public Command spit() {
-    return run(null);
+    return run(() -> {});
   }
 
   /**
@@ -41,6 +41,6 @@ public class Superstructure {
    * drives to L1 before climbing.
    */
   public Command climbRoutine() {
-    return run(null);
+    return run(() -> {});
   }
 }

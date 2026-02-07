@@ -51,6 +51,9 @@ public final class Constants {
   public static class MotorConstants {
     public static final DCMotor krakenX60 =
         new DCMotor(12, 7.16, 374.4, 3, Units.rotationsPerMinuteToRadiansPerSecond(6065), 1);
+
+    public static final DCMotor krakenX44 =
+        new DCMotor(12, 4.11, 279.1, 3, Units.rotationsPerMinuteToRadiansPerSecond(7758), 1);
   }
 
   public static class FieldConstants {
@@ -153,9 +156,9 @@ public final class Constants {
 
     public static final Distance intakeLength = Inches.of(11);
 
-    public static final Angle pivotRaised = Rotations.of(0);
-    public static final Angle pivotTucked = Rotations.of(0);
-    public static final Angle pivotLowered = Rotations.of(0);
+    public static final Angle pivotRaised = Rotations.of(0.25);
+    public static final Angle pivotTucked = Rotations.of(0.5);
+    public static final Angle pivotLowered = Rotations.of(0.6);
 
     public static final AngularVelocity feedSpeed = RotationsPerSecond.of(30);
   }

@@ -7,19 +7,26 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
-import java.util.function.BooleanSupplier;
+import frc.robot.Constants.MotorConstants;
+import frc.robot.Robot;
 
 public class IntakeFeed extends AdvancedSubsystem {
   private final TalonFX _feedMotor =
@@ -28,9 +35,14 @@ public class IntakeFeed extends AdvancedSubsystem {
   private final VelocityVoltage _feedVelocitySetter = new VelocityVoltage(0);
   private final StatusSignal<AngularVelocity> _feedVelocityGetter = _feedMotor.getVelocity();
 
-  private final BooleanSupplier _intakeLowered;
+  private final Trigger _intakeLowered;
 
-  public IntakeFeed(BooleanSupplier intakeLowered) {
+  private DCMotorSim _feedSim;
+
+  private Notifier _simNotifier;
+  private double _lastSimTime;
+
+  public IntakeFeed(Trigger intakeLowered) {
     _intakeLowered = intakeLowered;
 
     var feedMotorConfigs = new TalonFXConfiguration();
@@ -48,7 +60,50 @@ public class IntakeFeed extends AdvancedSubsystem {
 
     FaultLogger.register(_feedMotor);
 
+    if (Robot.isSimulation()) {
+      _feedSim =
+          new DCMotorSim(
+              LinearSystemId.createDCMotorSystem(
+                  MotorConstants.krakenX44, 0.01, IntakeConstants.feedGearRatio),
+              MotorConstants.krakenX44);
+
+      _feedVelocitySetter.withUpdateFreqHz(Hertz.of(1000));
+      _feedVelocityGetter.setUpdateFrequency(Hertz.of(1000));
+
+      startSimThread();
+    }
+
     setDefaultCommand(feedStop());
+  }
+
+  private void startSimThread() {
+    _lastSimTime = Utils.getCurrentTimeSeconds();
+
+    _simNotifier =
+        new Notifier(
+            () -> {
+              final double batteryVolts = RobotController.getBatteryVoltage();
+
+              final double currentTime = Utils.getCurrentTimeSeconds();
+              final double deltaTime = currentTime - _lastSimTime;
+
+              var feedMotorSimState = _feedMotor.getSimState();
+
+              feedMotorSimState.setSupplyVoltage(batteryVolts);
+
+              _feedSim.setInputVoltage(feedMotorSimState.getMotorVoltageMeasure().in(Volts));
+              _feedSim.update(deltaTime);
+
+              feedMotorSimState.setRawRotorPosition(
+                  _feedSim.getAngularPosition().times(IntakeConstants.feedGearRatio));
+              feedMotorSimState.setRotorVelocity(
+                  _feedSim.getAngularVelocity().times(IntakeConstants.feedGearRatio));
+
+              _lastSimTime = currentTime;
+            });
+
+    _simNotifier.setName("IntakeFeed Sim Thread");
+    _simNotifier.startPeriodic(1 / Constants.simNotifierFrequency.in(Hertz));
   }
 
   @Logged(name = "Speed")
@@ -61,6 +116,7 @@ public class IntakeFeed extends AdvancedSubsystem {
     return run(() ->
             _feedMotor.setControl(_feedVelocitySetter.withVelocity(IntakeConstants.feedSpeed)))
         .onlyIf(_intakeLowered)
+        .until(_intakeLowered.negate())
         .withName("Feed In");
   }
 
@@ -70,6 +126,7 @@ public class IntakeFeed extends AdvancedSubsystem {
             _feedMotor.setControl(
                 _feedVelocitySetter.withVelocity(IntakeConstants.feedSpeed.unaryMinus())))
         .onlyIf(_intakeLowered)
+        .until(_intakeLowered.negate())
         .withName("Feed Out");
   }
 
@@ -81,9 +138,9 @@ public class IntakeFeed extends AdvancedSubsystem {
 
   @Override
   public void periodic() {
-    DogLog.time("Time/IntakeFeed/periodic()");
+    DogLog.time("Timing/IntakeFeed/periodic()");
     super.periodic();
-    DogLog.timeEnd("Time/IntakeFeed/periodic()");
+    DogLog.timeEnd("Timing/IntakeFeed/periodic()");
   }
 
   @Override

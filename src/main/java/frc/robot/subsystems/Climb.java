@@ -100,9 +100,9 @@ public class Climb extends AdvancedSubsystem {
 
   @Override
   public void periodic() {
-    DogLog.time("Time/Climb/periodic()");
+    DogLog.time("Timing/Climb/periodic()");
     super.periodic();
-    DogLog.timeEnd("Time/Climb/periodic()");
+    DogLog.timeEnd("Timing/Climb/periodic()");
   }
 
   @Override
