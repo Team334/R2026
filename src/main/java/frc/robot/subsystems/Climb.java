@@ -56,9 +56,9 @@ public class Climb extends AdvancedSubsystem {
     climbMotorConfigs.Feedback.SensorToMechanismRatio = ClimbConstants.climbGearRatio;
 
     climbMotorConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-        ClimbConstants.extended.in(Rotations);
+        ClimbConstants.forwardSoftLimitThreshold.in(Rotations);
     climbMotorConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-        ClimbConstants.retracted.in(Rotations);
+        ClimbConstants.reverseSoftLimitThreshold.in(Rotations);
 
     climbMotorConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     climbMotorConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
@@ -93,16 +93,16 @@ public class Climb extends AdvancedSubsystem {
         .withName("Climb");
   }
 
-  @Logged(name = "Climb Height")
+  @Logged(name = "Height")
   public Angle getHeight() {
     return _heightGetter.refresh().getValue();
   }
 
   @Override
   public void periodic() {
-    DogLog.time("Time/Climb/periodic()");
+    DogLog.time("Timing/Climb/periodic()");
     super.periodic();
-    DogLog.timeEnd("Time/Climb/periodic()");
+    DogLog.timeEnd("Timing/Climb/periodic()");
   }
 
   @Override

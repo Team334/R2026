@@ -89,7 +89,7 @@ public class UnitTestingUtil {
   /**
    * Fasts forward in time by running CommandScheduler and updating timer.
    *
-   * @param time
+   * @param time The time to run for.
    */
   public static void fastForward(Time time) {
     fastForward((int) (time.in(Seconds) / TICK_RATE.in(Seconds)));
@@ -122,6 +122,17 @@ public class UnitTestingUtil {
   public static void run(Command command, int runs) {
     CommandScheduler.getInstance().schedule(command);
     fastForward(runs);
+  }
+
+  /**
+   * Schedule and runs a command.
+   *
+   * @param command The command to run.
+   * @param time The time to run it for.
+   */
+  public static void run(Command command, Time time) {
+    CommandScheduler.getInstance().schedule(command);
+    fastForward(time);
   }
 
   /**

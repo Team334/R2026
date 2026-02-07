@@ -22,7 +22,6 @@ import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -51,6 +50,9 @@ public final class Constants {
   public static class MotorConstants {
     public static final DCMotor krakenX60 =
         new DCMotor(12, 7.16, 374.4, 3, Units.rotationsPerMinuteToRadiansPerSecond(6065), 1);
+
+    public static final DCMotor krakenX44 =
+        new DCMotor(12, 4.11, 279.1, 3, Units.rotationsPerMinuteToRadiansPerSecond(7758), 1);
   }
 
   public static class FieldConstants {
@@ -130,7 +132,7 @@ public final class Constants {
     public static final Voltage feedkS = Volts.of(0.3);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkV =
-        Volts.per(RotationsPerSecond).ofNative(0.2);
+        Volts.per(RotationsPerSecond).ofNative(0.15);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
         Volts.per(RotationsPerSecond).ofNative(0.6);
@@ -139,11 +141,11 @@ public final class Constants {
     public static final Voltage pivotkS = Volts.of(0.1);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> pivotkV =
-        Volts.per(RotationsPerSecond).ofNative(6);
+        Volts.per(RotationsPerSecond).ofNative(1);
     public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
         Volts.per(RotationsPerSecondPerSecond).ofNative(0.1);
 
-    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(3);
+    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(0.8);
 
     public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(2);
     public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(5);
@@ -151,12 +153,14 @@ public final class Constants {
     public static final double feedGearRatio = 1.5;
     public static final double pivotGearRatio = 20;
 
-    public static final Distance intakeLength = Inches.of(11);
+    public static final Angle pivotRaised = Rotations.of(0.25);
+    public static final Angle pivotTucked = Rotations.of(0.5);
+    public static final Angle pivotLowered = Rotations.of(0.6);
 
-    public static final Angle pivotStowed = Degrees.of(90);
-    public static final Angle pivotOut = Degrees.of(200);
+    public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.7);
+    public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.2);
 
-    public static final AngularVelocity feedSpeed = RadiansPerSecond.of(30);
+    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(30);
   }
 
   public static class ClimbConstants {
@@ -179,6 +183,9 @@ public final class Constants {
 
     public static final Angle retracted = Rotations.of(0);
     public static final Angle extended = Rotations.of(10);
+
+    public static final Angle forwardSoftLimitThreshold = Rotations.of(11);
+    public static final Angle reverseSoftLimitThreshold = Rotations.of(-1);
 
     public static final double climbGearRatio = 3;
   }
