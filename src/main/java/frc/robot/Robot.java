@@ -19,6 +19,8 @@ import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -65,7 +67,7 @@ public class Robot extends TimedRobot {
   private final Swerve _swerve = TunerConstants.createDrivetrain();
 
   @Logged(name = "Shooter")
-  private final Shooter _shooter = new Shooter();
+  private final Shooter _shooter = new Shooter(this::shotPose);
 
   @Logged(name = "Hopper")
   private final Hopper _hopper = new Hopper();
@@ -218,6 +220,24 @@ public class Robot extends TimedRobot {
     _driverController.leftBumper().toggleOnTrue(_intakePivot.lower());
 
     _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
+  }
+
+  /**
+   * Predicts the robot's pose given the current chassis speeds and time needed for the fuel to go
+   * from the hopper and out of the shooter ({@link Constants#shotTimeScaler}).
+   */
+  @Logged(name = "Shot Pose")
+  public Pose2d shotPose() {
+    ChassisSpeeds deltaPose =
+        _swerve.getChassisSpeeds().times(Constants.shotTimeScaler.in(Seconds));
+
+    return _swerve
+        .getPose()
+        .plus(
+            new Transform2d(
+                deltaPose.vxMetersPerSecond,
+                deltaPose.vyMetersPerSecond,
+                Rotation2d.fromRadians(deltaPose.omegaRadiansPerSecond)));
   }
 
   /**

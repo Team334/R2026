@@ -35,15 +35,15 @@ public class IntakeFeed extends AdvancedSubsystem {
   private final VelocityVoltage _feedVelocitySetter = new VelocityVoltage(0);
   private final StatusSignal<AngularVelocity> _feedVelocityGetter = _feedMotor.getVelocity();
 
-  private final Trigger _intakeLowered;
+  private final Trigger _intakeLoweredSupplier;
 
   private DCMotorSim _feedSim;
 
   private Notifier _simNotifier;
   private double _lastSimTime;
 
-  public IntakeFeed(Trigger intakeLowered) {
-    _intakeLowered = intakeLowered;
+  public IntakeFeed(Trigger intakeLoweredSupplier) {
+    _intakeLoweredSupplier = intakeLoweredSupplier;
 
     var feedMotorConfigs = new TalonFXConfiguration();
 
@@ -123,8 +123,8 @@ public class IntakeFeed extends AdvancedSubsystem {
   public Command feedIn() {
     return run(() ->
             _feedMotor.setControl(_feedVelocitySetter.withVelocity(IntakeConstants.feedSpeed)))
-        .onlyIf(_intakeLowered)
-        .until(_intakeLowered.negate())
+        .onlyIf(_intakeLoweredSupplier)
+        .until(_intakeLoweredSupplier.negate())
         .withName("Feed In");
   }
 
@@ -133,8 +133,8 @@ public class IntakeFeed extends AdvancedSubsystem {
     return run(() ->
             _feedMotor.setControl(
                 _feedVelocitySetter.withVelocity(IntakeConstants.feedSpeed.unaryMinus())))
-        .onlyIf(_intakeLowered)
-        .until(_intakeLowered.negate())
+        .onlyIf(_intakeLoweredSupplier)
+        .until(_intakeLoweredSupplier.negate())
         .withName("Feed Out");
   }
 

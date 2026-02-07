@@ -16,6 +16,7 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,6 +25,7 @@ import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
+import java.util.function.Supplier;
 
 public class Shooter extends AdvancedSubsystem {
   private final TalonFX _frontMotor =
@@ -50,7 +52,11 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Velocity Threshold")
   private final AngularVelocity velocityThreshold = RotationsPerSecond.of(3);
 
-  public Shooter() {
+  private final Supplier<Pose2d> _shotPoseSupplier;
+
+  public Shooter(Supplier<Pose2d> shotPoseSupplier) {
+    _shotPoseSupplier = shotPoseSupplier;
+
     var frontMotorConfig = new TalonFXConfiguration();
     var frontFollowerMotorConfig = new TalonFXConfiguration();
     var backMotorConfig = new TalonFXConfiguration();
