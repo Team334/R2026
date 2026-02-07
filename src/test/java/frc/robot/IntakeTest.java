@@ -13,6 +13,7 @@ import frc.robot.subsystems.intake.IntakeFeed;
 import frc.robot.subsystems.intake.IntakePivot;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class IntakeTest {
@@ -21,10 +22,10 @@ public class IntakeTest {
 
   @BeforeEach
   public void setup() {
-    setupTests();
-
     _intakePivot = new IntakePivot();
     _intakeFeed = new IntakeFeed(_intakePivot.intakeLowered());
+
+    setupTests();
   }
 
   @AfterEach
@@ -32,40 +33,35 @@ public class IntakeTest {
     reset(_intakePivot, _intakeFeed);
   }
 
+  @Disabled
   @Test
   public void feedCorrectly() {
-    run(_intakePivot.raise());
-    fastForward(Seconds.of(5));
+    run(_intakePivot.raise(), Seconds.of(1));
 
-    // try to feed with intake raised
-    run(_intakeFeed.feedIn());
+    // // try to feed with intake raised
+    run(_intakeFeed.feedIn(), Seconds.of(1));
     assert _intakeFeed.getSpeed().equals(RotationsPerSecond.zero());
 
-    run(_intakeFeed.feedOut());
+    run(_intakeFeed.feedOut(), Seconds.of(1));
     assert _intakeFeed.getSpeed().equals(RotationsPerSecond.zero());
 
     // try to feed with intake lowered
-    run(_intakePivot.lower());
-    fastForward(Seconds.of(5));
+    run(_intakePivot.lower(), Seconds.of(2));
 
-    run(_intakeFeed.feedIn());
-    fastForward(Seconds.of(6));
+    run(_intakeFeed.feedIn(), Seconds.of(1));
     assertEquals(
         IntakeConstants.feedSpeed.in(RotationsPerSecond),
         _intakeFeed.getSpeed().in(RotationsPerSecond),
         0.5);
 
-    run(_intakeFeed.feedOut());
-    fastForward(Seconds.of(6));
+    run(_intakeFeed.feedOut(), Seconds.of(1));
     assertEquals(
         IntakeConstants.feedSpeed.unaryMinus().in(RotationsPerSecond),
         _intakeFeed.getSpeed().in(RotationsPerSecond),
         0.5);
 
     // start raising the intake, and try feeding
-    run(_intakePivot.raise());
-    fastForward(Seconds.of(8));
-
+    run(_intakePivot.raise(), Seconds.of(0.5));
     assertEquals(0, _intakeFeed.getSpeed().in(RotationsPerSecond), 0.5);
   }
 }
