@@ -52,8 +52,8 @@ public class IntakePivot extends AdvancedSubsystem {
     var pivotMotorConfigs = new TalonFXConfiguration();
 
     // pivot motor configs
-    pivotMotorConfigs.Slot0.kS = IntakeConstants.pivotkS.in(Volts);
-    pivotMotorConfigs.Slot0.kG = IntakeConstants.pivotkG.in(Volts);
+    // pivotMotorConfigs.Slot0.kS = IntakeConstants.pivotkS.in(Volts);
+    // pivotMotorConfigs.Slot0.kG = IntakeConstants.pivotkG.in(Volts);
     pivotMotorConfigs.Slot0.kV = IntakeConstants.pivotkV.in(Volts.per(RotationsPerSecond));
     pivotMotorConfigs.Slot0.kA = IntakeConstants.pivotkA.in(Volts.per(RotationsPerSecondPerSecond));
 
@@ -100,8 +100,8 @@ public class IntakePivot extends AdvancedSubsystem {
       _pivotSim =
           new DCMotorSim(
               LinearSystemId.createDCMotorSystem(
-                  IntakeConstants.pivotkV.in(Volts.per(RotationsPerSecond)),
-                  IntakeConstants.pivotkA.in(Volts.per(RotationsPerSecondPerSecond))),
+                  IntakeConstants.pivotkV.in(Volts.per(RadiansPerSecond)),
+                  IntakeConstants.pivotkA.in(Volts.per(RadiansPerSecondPerSecond))),
               MotorConstants.krakenX44);
 
       _pivotSim.setAngle(IntakeConstants.pivotRaised.in(Radians));

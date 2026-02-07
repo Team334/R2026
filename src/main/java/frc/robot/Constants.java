@@ -22,7 +22,6 @@ import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -142,19 +141,17 @@ public final class Constants {
     public static final Voltage pivotkS = Volts.of(0.1);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> pivotkV =
-        Volts.per(RotationsPerSecond).ofNative(6);
+        Volts.per(RotationsPerSecond).ofNative(0.5);
     public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
         Volts.per(RotationsPerSecondPerSecond).ofNative(0.1);
 
-    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(3);
+    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(0.8);
 
     public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(2);
     public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(5);
 
     public static final double feedGearRatio = 1.5;
     public static final double pivotGearRatio = 20;
-
-    public static final Distance intakeLength = Inches.of(11);
 
     public static final Angle pivotRaised = Rotations.of(0.25);
     public static final Angle pivotTucked = Rotations.of(0.5);

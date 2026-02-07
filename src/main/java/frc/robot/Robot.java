@@ -218,6 +218,8 @@ public class Robot extends TimedRobot {
     _driverController.leftBumper().toggleOnTrue(_intakePivot.lower());
 
     _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
+
+    SmartDashboard.putData(_intakePivot.lower());
   }
 
   /**
