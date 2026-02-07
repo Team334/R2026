@@ -121,9 +121,9 @@ public final class Constants {
 
   public static class HopperConstants {
     public static final int rollerMotorID = 20;
-    public static final int feedMotorID = 21;
+    public static final int floorMotorID = 21;
 
-    public static final AngularVelocity feedShootSpeed = RotationsPerSecond.of(0);
+    public static final AngularVelocity floorShootSpeed = RotationsPerSecond.of(0);
     public static final AngularVelocity rollerShootSpeed = RotationsPerSecond.of(0);
 
     public static final Voltage rollerkS = Volts.of(0.39);
@@ -132,14 +132,14 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkP =
         Volts.per(RotationsPerSecond).ofNative(1.3);
 
-    public static final Voltage feedkS = Volts.of(0.47);
-    public static final Per<VoltageUnit, AngularVelocityUnit> feedkV =
+    public static final Voltage floorkS = Volts.of(0.47);
+    public static final Per<VoltageUnit, AngularVelocityUnit> floorkV =
         Volts.per(RotationsPerSecond).ofNative(0.3);
-    public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
+    public static final Per<VoltageUnit, AngularVelocityUnit> floorkP =
         Volts.per(RotationsPerSecond).ofNative(1);
 
     public static final double rollerGearRatio = 3;
-    public static final double feedGearRatio = 3;
+    public static final double floorGearRatio = 3;
   }
 
   public static class IntakeConstants {
