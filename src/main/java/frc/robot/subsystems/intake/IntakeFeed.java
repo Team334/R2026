@@ -61,10 +61,18 @@ public class IntakeFeed extends AdvancedSubsystem {
     FaultLogger.register(_feedMotor);
 
     if (Robot.isSimulation()) {
+      var c = new TalonFXConfiguration();
+
+      _feedMotor.getConfigurator().refresh(c);
+
+      c.Slot0.kS = 0;
+
+      _feedMotor.getConfigurator().apply(c);
+
       _feedSim =
           new DCMotorSim(
               LinearSystemId.createDCMotorSystem(
-                  MotorConstants.krakenX44, 0.01, IntakeConstants.feedGearRatio),
+                  MotorConstants.krakenX44, 0.001, IntakeConstants.feedGearRatio),
               MotorConstants.krakenX44);
 
       _feedVelocitySetter.withUpdateFreqHz(Hertz.of(1000));

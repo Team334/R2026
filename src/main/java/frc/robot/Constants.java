@@ -132,7 +132,7 @@ public final class Constants {
     public static final Voltage feedkS = Volts.of(0.3);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkV =
-        Volts.per(RotationsPerSecond).ofNative(0.2);
+        Volts.per(RotationsPerSecond).ofNative(0.15);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
         Volts.per(RotationsPerSecond).ofNative(0.6);
@@ -141,7 +141,7 @@ public final class Constants {
     public static final Voltage pivotkS = Volts.of(0.1);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> pivotkV =
-        Volts.per(RotationsPerSecond).ofNative(0.5);
+        Volts.per(RotationsPerSecond).ofNative(1);
     public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
         Volts.per(RotationsPerSecondPerSecond).ofNative(0.1);
 
@@ -156,6 +156,9 @@ public final class Constants {
     public static final Angle pivotRaised = Rotations.of(0.25);
     public static final Angle pivotTucked = Rotations.of(0.5);
     public static final Angle pivotLowered = Rotations.of(0.6);
+
+    public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.7);
+    public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.2);
 
     public static final AngularVelocity feedSpeed = RotationsPerSecond.of(30);
   }
@@ -180,6 +183,9 @@ public final class Constants {
 
     public static final Angle retracted = Rotations.of(0);
     public static final Angle extended = Rotations.of(10);
+
+    public static final Angle forwardSoftLimitThreshold = Rotations.of(11);
+    public static final Angle reverseSoftLimitThreshold = Rotations.of(-1);
 
     public static final double climbGearRatio = 3;
   }

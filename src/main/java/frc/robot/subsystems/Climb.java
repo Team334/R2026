@@ -56,9 +56,9 @@ public class Climb extends AdvancedSubsystem {
     climbMotorConfigs.Feedback.SensorToMechanismRatio = ClimbConstants.climbGearRatio;
 
     climbMotorConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-        ClimbConstants.extended.in(Rotations);
+        ClimbConstants.forwardSoftLimitThreshold.in(Rotations);
     climbMotorConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-        ClimbConstants.retracted.in(Rotations);
+        ClimbConstants.reverseSoftLimitThreshold.in(Rotations);
 
     climbMotorConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     climbMotorConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;

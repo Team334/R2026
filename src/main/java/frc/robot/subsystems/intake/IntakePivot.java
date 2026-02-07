@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -40,7 +39,7 @@ public class IntakePivot extends AdvancedSubsystem {
       new Trigger(
               () ->
                   MathUtil.isNear(
-                      IntakeConstants.pivotLowered.in(Degrees), getAngle().in(Degrees), 2))
+                      IntakeConstants.pivotLowered.in(Degrees), getAngle().in(Degrees), 3))
           .debounce(0.5);
 
   private DCMotorSim _pivotSim;
@@ -52,8 +51,8 @@ public class IntakePivot extends AdvancedSubsystem {
     var pivotMotorConfigs = new TalonFXConfiguration();
 
     // pivot motor configs
-    // pivotMotorConfigs.Slot0.kS = IntakeConstants.pivotkS.in(Volts);
-    // pivotMotorConfigs.Slot0.kG = IntakeConstants.pivotkG.in(Volts);
+    pivotMotorConfigs.Slot0.kS = IntakeConstants.pivotkS.in(Volts);
+    pivotMotorConfigs.Slot0.kG = IntakeConstants.pivotkG.in(Volts);
     pivotMotorConfigs.Slot0.kV = IntakeConstants.pivotkV.in(Volts.per(RotationsPerSecond));
     pivotMotorConfigs.Slot0.kA = IntakeConstants.pivotkA.in(Volts.per(RotationsPerSecondPerSecond));
 
@@ -66,9 +65,9 @@ public class IntakePivot extends AdvancedSubsystem {
     pivotMotorConfigs.Feedback.SensorToMechanismRatio = IntakeConstants.pivotGearRatio;
 
     pivotMotorConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-        IntakeConstants.pivotLowered.in(Rotations);
+        IntakeConstants.pivotForwardSoftLimitThreshold.in(Rotations);
     pivotMotorConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-        IntakeConstants.pivotRaised.in(Rotations);
+        IntakeConstants.pivotReverseSoftLimitThreshold.in(Rotations);
 
     pivotMotorConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     pivotMotorConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
@@ -92,10 +91,16 @@ public class IntakePivot extends AdvancedSubsystem {
       _pivotMotor.setPosition(0);
 
       // prevent setRawMotor_ from negating physics sim output
-      var c = new MotorOutputConfigs();
+      var c = new TalonFXConfiguration();
 
       _pivotMotor.getConfigurator().refresh(c);
-      _pivotMotor.getConfigurator().apply(c.withInverted(InvertedValue.CounterClockwise_Positive));
+
+      c.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
+
+      c.Slot0.kS = 0;
+      c.Slot0.kG = 0;
+
+      _pivotMotor.getConfigurator().apply(c);
 
       _pivotSim =
           new DCMotorSim(
