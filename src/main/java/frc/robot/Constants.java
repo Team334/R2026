@@ -84,7 +84,9 @@ public final class Constants {
 
   public static class ShooterConstants {
     public static final int frontMotorID = 0;
+    public static final int frontFollowerMotorID = 99;
     public static final int backMotorID = 9;
+    public static final int hoodMotorID = 98;
 
     public static final Voltage frontFlywheelkS = Volts.of(0.39);
     public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkV =
@@ -98,8 +100,23 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkP =
         Volts.per(RotationsPerSecond).ofNative(1);
 
+    public static final Voltage hoodkS = Volts.of(0);
+    public static final Voltage hoodkG = Volts.of(0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> hoodkV =
+        Volts.per(RotationsPerSecond).ofNative(0);
+    public static final Per<VoltageUnit, AngularAccelerationUnit> hoodkA =
+        Volts.per(RotationsPerSecondPerSecond).ofNative(0);
+    public static final Per<VoltageUnit, AngleUnit> hoodkP = Volts.per(Rotations).ofNative(0);
+
+    public static final AngularVelocity hoodVelocity = RotationsPerSecond.of(2);
+    public static final AngularAcceleration hoodAcceleration = RotationsPerSecondPerSecond.of(5);
+
+    public static final Angle hoodForwardSoftLimitThreshold = Rotations.of(1);
+    public static final Angle hoodReverseSoftLimitThreshold = Rotations.of(0);
+
     public static final double frontFlywheelGearRatio = 3;
     public static final double backFlywheelGearRatio = 3;
+    public static final double hoodGearRatio = 3;
   }
 
   public static class HopperConstants {
