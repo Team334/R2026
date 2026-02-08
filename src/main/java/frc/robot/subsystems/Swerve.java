@@ -345,11 +345,12 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param heading The heading the chassis should drive at.
    */
   public Command driveFacing(InputStream velX, InputStream velY, Supplier<Rotation2d> heading) {
-    return drive(velX, velY, () -> _poseController.calculateOmega(heading.get(), getHeading()))
+    return drive(velX, velY, () -> _poseController.rotationCalculate(heading.get(), getHeading()))
         .beforeStarting(
             runOnce(
                 () ->
-                    _poseController.reset(getHeading(), getChassisSpeeds().omegaRadiansPerSecond)))
+                    _poseController.rotationReset(
+                        getHeading(), getChassisSpeeds().omegaRadiansPerSecond)))
         .withName("Drive Facing");
   }
 
