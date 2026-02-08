@@ -226,8 +226,9 @@ public class Robot extends TimedRobot {
   }
 
   /**
-   * Predicts the robot's pose given the current chassis speeds and time needed for the fuel to go
-   * from the hopper and out of the shooter ({@link Constants#shotTimeScaler}).
+   * Predicts the robot's translation given the current chassis speeds and time needed for the fuel
+   * to go from the hopper and out of the shooter ({@link Constants#shotTimeScaler}). Rotation is
+   * calculated based on future translation and the hub's location.
    */
   @Logged(name = "Shot Pose")
   public Pose2d shotPose() {

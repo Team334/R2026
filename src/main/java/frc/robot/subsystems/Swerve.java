@@ -16,7 +16,6 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.*;
 import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
 import dev.doglog.DogLog;
@@ -94,12 +93,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   private boolean _hasError = false;
 
-  private final SwerveRequest.SysIdSwerveTranslation _translationCharacterization =
-      new SwerveRequest.SysIdSwerveTranslation();
-  private final SwerveRequest.SysIdSwerveSteerGains _steerCharacterization =
-      new SwerveRequest.SysIdSwerveSteerGains();
-  private final SwerveRequest.SysIdSwerveRotation _rotationCharacterization =
-      new SwerveRequest.SysIdSwerveRotation();
+  private final SysIdSwerveTranslation _translationCharacterization = new SysIdSwerveTranslation();
+  private final SysIdSwerveSteerGains _steerCharacterization = new SysIdSwerveSteerGains();
+  private final SysIdSwerveRotation _rotationCharacterization = new SysIdSwerveRotation();
 
   private final SysIdRoutine _translationRoutine =
       new SysIdRoutine(

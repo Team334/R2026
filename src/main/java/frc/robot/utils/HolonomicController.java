@@ -40,7 +40,6 @@ public class HolonomicController {
   private Vector<N2> _translationDirection = VecBuilder.fill(0, 0);
 
   private Pose2d _startPose = Pose2d.kZero;
-  private double _goalHeading = 0;
 
   private final PIDController _xController =
       new PIDController(SwerveConstants.poseTranslationalkP.in(MetersPerSecond.per(Meter)), 0, 0);
@@ -121,6 +120,17 @@ public class HolonomicController {
     _translationDirection =
         VecBuilder.fill(goalPose.getX() - currentPose.getX(), goalPose.getY() - currentPose.getY());
 
+    if (_translationDirection.norm() == 0) {
+      // if the goal translation is the starting translation:
+      // 1) current speeds is not 0, direction is antiparallel to speeds
+      // 2) current speeds is 0, profile will also be empty, so an arbitrary direction is used
+      _translationDirection =
+          (currentSpeeds.vxMetersPerSecond == 0 && currentSpeeds.vyMetersPerSecond == 0)
+              ? VecBuilder.fill(1, 0)
+              : VecBuilder.fill(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond)
+                  .times(-1);
+    }
+
     _translationProfile.reset(
         0,
         _translationDirection.dot(
@@ -134,7 +144,19 @@ public class HolonomicController {
     reset();
 
     _startPose = currentPose;
-    _goalHeading = goalPose.getRotation().getRadians();
+  }
+
+  /**
+   * Resets the profiles and the PID controllers. To be used for a rotation-only profile.
+   *
+   * @param currentHeading The current chassis heading.
+   * @param currentOmega The current chassis omega in rad/s.
+   */
+  public void reset(Rotation2d currentHeading, double currentOmega) {
+    reset(
+        new Pose2d(Translation2d.kZero, currentHeading),
+        Pose2d.kZero,
+        new ChassisSpeeds(0, 0, currentOmega));
   }
 
   /**
@@ -145,11 +167,9 @@ public class HolonomicController {
    * @return Field-relative speeds for the chassis.
    */
   public ChassisSpeeds calculate(Pose2d currentPose) {
-    _translationProfile.calculate(
-        0,
-        _translationDirection.norm()); // measurement doesn't matter, handled by xy PID controllers
+    _translationProfile.calculate(0); // measurement doesn't matter, handled by xy PID controllers
     _headingProfile.calculate(
-        currentPose.getRotation().getRadians(), _goalHeading); // TODO: why does measurement matter?
+        currentPose.getRotation().getRadians()); // measurement matters for cont input calculations
 
     Vector<N2> setpointPosition =
         _translationDirection.unit().times(_translationProfile.getSetpoint().position);
@@ -174,6 +194,20 @@ public class HolonomicController {
     _prevSetpointSpeeds = setpointSpeeds;
 
     return calculate(setpointSpeeds, setpointPose, currentPose);
+  }
+
+  /**
+   * Seperately calculates an omega if the profile only involves rotation. Requires an initial
+   * {@link #reset(Pose2d, Pose2d, ChassisSpeeds)} call.
+   *
+   * @param desiredHeading Desired chassis heading.
+   * @param currentHeading Current chassis heading.
+   * @return Omega in rad/s.
+   */
+  public double calculateOmega(Rotation2d desiredHeading, Rotation2d currentHeading) {
+    _headingProfile.setGoal(desiredHeading.getRadians());
+
+    return calculate(new Pose2d(Translation2d.kZero, currentHeading)).omegaRadiansPerSecond;
   }
 
   /**
