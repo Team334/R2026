@@ -200,17 +200,20 @@ public class Robot extends TimedRobot {
                     .deadband(0.02, 1)
                     .negate()
                     .signedPow(2)
-                    .scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+                    .scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond))
+                    .log("Swerve/Driver Speeds/vx"),
                 InputStream.of(_driverController::getLeftX)
                     .deadband(0.02, 1)
                     .negate()
                     .signedPow(2)
-                    .scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+                    .scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond))
+                    .log("Swerve/Driver Speeds/vy"),
                 InputStream.of(_driverController::getRightX)
                     .deadband(0.02, 1)
                     .negate()
                     .signedPow(2)
-                    .scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
+                    .scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond))
+                    .log("Swerve/Driver Speeds/omega"))
             .beforeStarting(() -> _swerve.isOpenLoop = true));
 
     _driverController.rightTrigger().whileTrue(_superstructure.shoot());

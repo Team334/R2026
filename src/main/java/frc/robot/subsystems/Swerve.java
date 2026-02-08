@@ -149,9 +149,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   @Logged(name = "Is Open Loop")
   public boolean isOpenLoop = true;
 
-  @Logged(name = "Driver Chassis Speeds")
-  private final ChassisSpeeds _driverChassisSpeeds = new ChassisSpeeds();
-
   @Logged(name = "Ignore Vision Estimates")
   private boolean _ignoreVisionEstimates = false;
 
@@ -366,10 +363,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param velOmega The rotational velocity in radians per second.
    */
   public void drive(double velX, double velY, double velOmega) {
-    _driverChassisSpeeds.vxMetersPerSecond = velX;
-    _driverChassisSpeeds.vyMetersPerSecond = velY;
-    _driverChassisSpeeds.omegaRadiansPerSecond = velOmega;
-
     if (isFieldOriented) {
       setControl(
           _fieldCentricRequest

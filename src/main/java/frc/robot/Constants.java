@@ -90,9 +90,9 @@ public final class Constants {
 
   public static class ShooterConstants {
     public static final int frontMotorID = 0;
-    public static final int frontFollowerMotorID = 99;
-    public static final int backMotorID = 9;
-    public static final int hoodMotorID = 98;
+    public static final int frontFollowerMotorID = 41;
+    public static final int backMotorID = 39;
+    public static final int hoodMotorID = 40;
 
     public static final Voltage frontFlywheelkS = Volts.of(0.39);
     public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkV =
