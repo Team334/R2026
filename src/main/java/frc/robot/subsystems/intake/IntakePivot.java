@@ -51,7 +51,7 @@ public class IntakePivot extends AdvancedSubsystem {
   private Notifier _simNotifier;
   private double _lastSimTime;
 
-  public IntakePivot() {
+  public IntakePivot(Supplier<Pose2d> pose) {
     var pivotMotorConfigs = new TalonFXConfiguration();
 
     // pivot motor configs
@@ -120,6 +120,8 @@ public class IntakePivot extends AdvancedSubsystem {
 
       startSimThread();
     }
+
+    setDefaultCommand(autoTuck(pose));
   }
 
   private void startSimThread() {

@@ -71,7 +71,7 @@ public class Robot extends TimedRobot {
   private final Hopper _hopper = new Hopper();
 
   @Logged(name = "IntakePivot")
-  private final IntakePivot _intakePivot = new IntakePivot();
+  private final IntakePivot _intakePivot = new IntakePivot(_swerve::getPose);
 
   @Logged(name = "IntakeFeed")
   private final IntakeFeed _intakeFeed = new IntakeFeed(_intakePivot.intakeLowered());
@@ -191,8 +191,6 @@ public class Robot extends TimedRobot {
   }
 
   private void configureDriverBindings() {
-    _intakePivot.setDefaultCommand(_intakePivot.autoTuck(_swerve::getPose));
-
     _swerve.setDefaultCommand(
         _swerve
             .drive(
