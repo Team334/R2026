@@ -337,17 +337,20 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   }
 
   /**
-   * Creates a new command that drives the chassis in teleop.
+   * Drives the chassis in teleop, with the chassis fixed at a supplied heading. Open loop / field
+   * oriented behavior is configured with {@link #isOpenLoop} and {@link #isFieldOriented}.
    *
    * @param velX The x velocity in meters per second.
    * @param velY The y velocity in meters per second.
-   * @param velOmega The rotational velocity in radians per second.
+   * @param heading The heading the chassis should drive at.
    */
-  public Command drive(InputStream velX, InputStream velY, InputStream velOmega) {
-    return run(() -> {
-          drive(velX.get(), velY.get(), velOmega.get());
-        })
-        .withName("Drive");
+  public Command driveFacing(InputStream velX, InputStream velY, Supplier<Rotation2d> heading) {
+    return drive(velX, velY, () -> _poseController.calculateOmega(heading.get(), getHeading()))
+        .beforeStarting(
+            runOnce(
+                () ->
+                    _poseController.reset(getHeading(), getChassisSpeeds().omegaRadiansPerSecond)))
+        .withName("Drive Facing");
   }
 
   /**
@@ -358,24 +361,27 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param velY The y velocity in meters per second.
    * @param velOmega The rotational velocity in radians per second.
    */
-  public void drive(double velX, double velY, double velOmega) {
-    if (isFieldOriented) {
-      setControl(
-          _fieldCentricRequest
-              .withVelocityX(velX)
-              .withVelocityY(velY)
-              .withRotationalRate(velOmega)
-              .withDriveRequestType(
-                  isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
-    } else {
-      setControl(
-          _robotCentricRequest
-              .withVelocityX(velX)
-              .withVelocityY(velY)
-              .withRotationalRate(velOmega)
-              .withDriveRequestType(
-                  isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
-    }
+  public Command drive(InputStream velX, InputStream velY, InputStream velOmega) {
+    return run(() -> {
+          if (isFieldOriented) {
+            setControl(
+                _fieldCentricRequest
+                    .withVelocityX(velX.get())
+                    .withVelocityY(velY.get())
+                    .withRotationalRate(velOmega.get())
+                    .withDriveRequestType(
+                        isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
+          } else {
+            setControl(
+                _robotCentricRequest
+                    .withVelocityX(velX.get())
+                    .withVelocityY(velY.get())
+                    .withRotationalRate(velOmega.get())
+                    .withDriveRequestType(
+                        isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
+          }
+        })
+        .withName("Drive");
   }
 
   /**

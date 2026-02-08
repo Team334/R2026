@@ -19,7 +19,7 @@ import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
@@ -232,16 +232,16 @@ public class Robot extends TimedRobot {
    */
   @Logged(name = "Shot Pose")
   public Pose2d shotPose() {
-    ChassisSpeeds deltaPose =
-        _swerve.getChassisSpeeds().times(Constants.shotTimeScaler.in(Seconds));
+    Pose2d chassisPose = _swerve.getPose();
+    ChassisSpeeds chassisSpeeds = _swerve.getChassisSpeeds();
 
-    return _swerve
-        .getPose()
-        .plus(
-            new Transform2d(
-                deltaPose.vxMetersPerSecond,
-                deltaPose.vyMetersPerSecond,
-                Rotation2d.fromRadians(deltaPose.omegaRadiansPerSecond)));
+    Translation2d deltaTranslation =
+        new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)
+            .times(Constants.shotTimeScaler.in(Seconds));
+
+    return new Pose2d(
+        chassisPose.getTranslation().plus(deltaTranslation),
+        Rotation2d.kZero); // TODO: calculate rotation
   }
 
   /**

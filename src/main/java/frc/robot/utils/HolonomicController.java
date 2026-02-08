@@ -198,7 +198,7 @@ public class HolonomicController {
 
   /**
    * Seperately calculates an omega if the profile only involves rotation. Requires an initial
-   * {@link #reset(Pose2d, Pose2d, ChassisSpeeds)} call.
+   * {@link #reset(Rotation2d, double)} call.
    *
    * @param desiredHeading Desired chassis heading.
    * @param currentHeading Current chassis heading.
