@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -22,6 +23,7 @@ import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -58,6 +60,29 @@ public final class Constants {
   public static class FieldConstants {
     public static final AprilTagFieldLayout tagLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+
+    public static final Distance FIELD_LENTH = Inches.of(650.12);
+    public static final Distance FIELD_WIDTH = Inches.of(316.64);
+
+    public static final Distance bumpZoneTolereance = Meters.of(1.25);
+
+    public static final Rectangle2d blueBumpZone =
+        new Rectangle2d(
+            new Translation2d(
+                Inches.of(157.48).minus(bumpZoneTolereance), Inches.of(65.65)),
+            new Translation2d(
+                Inches.of(204.48).plus(bumpZoneTolereance),
+                Inches.of(258.65))); // enclose both bumps and hub
+
+    public static final Rectangle2d redBumpZone =
+        new Rectangle2d(
+            new Translation2d(
+                FIELD_LENTH.minus(Inches.of(157.48).minus(bumpZoneTolereance)),
+                FIELD_WIDTH.minus(Inches.of(65.65))),
+            new Translation2d(
+                FIELD_LENTH.minus(Inches.of(204.48).plus(bumpZoneTolereance)),
+                FIELD_WIDTH.minus(Inches.of(258.65)))); // enclose both bumps and hub
+    
 
     // uncomment if using the test tag layout
     // public static final AprilTagFieldLayout tagLayout;

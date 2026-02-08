@@ -191,6 +191,8 @@ public class Robot extends TimedRobot {
   }
 
   private void configureDriverBindings() {
+    _intakePivot.setDefaultCommand(_intakePivot.autoTuck(_swerve::getPose));
+
     _swerve.setDefaultCommand(
         _swerve
             .drive(

@@ -13,6 +13,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Notifier;
@@ -24,9 +26,11 @@ import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
 import frc.robot.Constants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Robot;
+import java.util.function.Supplier;
 
 public class IntakePivot extends AdvancedSubsystem {
   private final TalonFX _pivotMotor =
@@ -116,8 +120,6 @@ public class IntakePivot extends AdvancedSubsystem {
 
       startSimThread();
     }
-
-    setDefaultCommand(raise());
   }
 
   private void startSimThread() {
@@ -183,6 +185,26 @@ public class IntakePivot extends AdvancedSubsystem {
           _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotLowered));
         })
         .withName("Lower");
+  }
+
+  /** Command that tucks the intake if in the bump zone, otherwise raises it. */
+  public Command autoTuck(Supplier<Pose2d> poseSupplier) {
+    return run(() -> {
+          if (checkInBumpZone(poseSupplier.get())) {
+            _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotTucked));
+          } else {
+            _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotRaised));
+          }
+        })
+        .withName("AutoTuck");
+  }
+
+  public static boolean checkInBumpZone(Pose2d pose) {
+    if (FieldConstants.blueBumpZone.contains(new Translation2d(pose.getX(), pose.getY())) || FieldConstants.redBumpZone.contains(new Translation2d(pose.getX(), pose.getY()))) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @Override
