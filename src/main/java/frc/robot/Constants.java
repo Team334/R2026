@@ -89,22 +89,15 @@ public final class Constants {
   }
 
   public static class ShooterConstants {
-    public static final int frontMotorID = 0;
-    public static final int frontFollowerMotorID = 41;
-    public static final int backMotorID = 39;
+    public static final int flywheelMotorID = 0;
+    public static final int flywheelFollowerMotorID = 41;
     public static final int hoodMotorID = 40;
 
-    public static final Voltage frontFlywheelkS = Volts.of(0.39);
-    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkV =
+    public static final Voltage flywheelkS = Volts.of(0.39);
+    public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkV =
         Volts.per(RotationsPerSecond).ofNative(0.27);
-    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkP =
+    public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkP =
         Volts.per(RotationsPerSecond).ofNative(1.3);
-
-    public static final Voltage backFlywheelkS = Volts.of(0.47);
-    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkV =
-        Volts.per(RotationsPerSecond).ofNative(0.3);
-    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkP =
-        Volts.per(RotationsPerSecond).ofNative(1);
 
     public static final Voltage hoodkS = Volts.of(0);
     public static final Voltage hoodkG = Volts.of(0);
@@ -120,8 +113,7 @@ public final class Constants {
     public static final Angle hoodForwardSoftLimitThreshold = Rotations.of(1);
     public static final Angle hoodReverseSoftLimitThreshold = Rotations.of(0);
 
-    public static final double frontFlywheelGearRatio = 3;
-    public static final double backFlywheelGearRatio = 3;
+    public static final double flywheelGearRatio = 3;
     public static final double hoodGearRatio = 3;
   }
 

@@ -28,25 +28,20 @@ import frc.robot.Constants.ShooterConstants;
 import java.util.function.Supplier;
 
 public class Shooter extends AdvancedSubsystem {
-  private final TalonFX _frontMotor =
-      new TalonFX(ShooterConstants.frontMotorID, Constants.subsystemBus);
-  private final TalonFX _frontFollowerMotor =
-      new TalonFX(ShooterConstants.frontFollowerMotorID, Constants.subsystemBus);
-  private final TalonFX _backMotor =
-      new TalonFX(ShooterConstants.backMotorID, Constants.subsystemBus);
+  private final TalonFX _flywheelMotor =
+      new TalonFX(ShooterConstants.flywheelMotorID, Constants.subsystemBus);
+  private final TalonFX _flywheelFollowerMotor =
+      new TalonFX(ShooterConstants.flywheelFollowerMotorID, Constants.subsystemBus);
   private final TalonFX _hoodMotor =
       new TalonFX(ShooterConstants.hoodMotorID, Constants.subsystemBus);
 
-  private final VelocityVoltage _frontVelocitySetter = new VelocityVoltage(0);
-  private final DutyCycleOut _frontDutyCycleSetter = new DutyCycleOut(0);
-
-  private final VelocityVoltage _backVelocitySetter = new VelocityVoltage(0);
-  private final DutyCycleOut _backDutyCycleSetter = new DutyCycleOut(0);
+  private final VelocityVoltage _flywheelVelocitySetter = new VelocityVoltage(0);
+  private final DutyCycleOut _flywheelDutyCycleSetter = new DutyCycleOut(0);
 
   private final MotionMagicVoltage _hoodAngleSetter = new MotionMagicVoltage(0);
 
-  private final StatusSignal<AngularVelocity> _frontVelocityGetter = _frontMotor.getVelocity();
-  private final StatusSignal<AngularVelocity> _backVelocityGetter = _backMotor.getVelocity();
+  private final StatusSignal<AngularVelocity> _flywheelVelocityGetter = _flywheelMotor.getVelocity();
+
   private final StatusSignal<Angle> _hoodAngleGetter = _hoodMotor.getPosition();
 
   @Logged(name = "Velocity Threshold")
@@ -57,49 +52,33 @@ public class Shooter extends AdvancedSubsystem {
   public Shooter(Supplier<Pose2d> shotPoseSupplier) {
     _shotPoseSupplier = shotPoseSupplier;
 
-    var frontMotorConfig = new TalonFXConfiguration();
-    var frontFollowerMotorConfig = new TalonFXConfiguration();
-    var backMotorConfig = new TalonFXConfiguration();
+    var flywheelMotorConfig = new TalonFXConfiguration();
+    var flywheelFollowerMotorConfig = new TalonFXConfiguration();
     var hoodMotorConfig = new TalonFXConfiguration();
 
     // front motor configs
-    frontMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
-    frontMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    flywheelMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
+    flywheelMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    frontMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
+    flywheelMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
 
-    frontMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    frontMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    flywheelMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    flywheelMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-    frontMotorConfig.Slot0.kS = ShooterConstants.frontFlywheelkS.in(Volts);
-    frontMotorConfig.Slot0.kV = ShooterConstants.frontFlywheelkV.in(Volts.per(RotationsPerSecond));
+    flywheelMotorConfig.Slot0.kS = ShooterConstants.flywheelkS.in(Volts);
+    flywheelMotorConfig.Slot0.kV = ShooterConstants.flywheelkV.in(Volts.per(RotationsPerSecond));
 
-    frontMotorConfig.Slot0.kP = ShooterConstants.frontFlywheelkP.in(Volts.per(RotationsPerSecond));
+    flywheelMotorConfig.Slot0.kP = ShooterConstants.flywheelkP.in(Volts.per(RotationsPerSecond));
 
-    frontMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.frontFlywheelGearRatio;
+    flywheelMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.flywheelGearRatio;
 
     // front follower motor configs
-    frontFollowerMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
-    frontFollowerMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    flywheelFollowerMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
+    flywheelFollowerMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    frontFollowerMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
+    flywheelFollowerMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
 
-    frontFollowerMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-
-    // back motor configs
-    backMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
-    backMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-
-    backMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
-
-    backMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-
-    backMotorConfig.Slot0.kS = ShooterConstants.backFlywheelkS.in(Volts);
-    backMotorConfig.Slot0.kV = ShooterConstants.backFlywheelkV.in(Volts.per(RotationsPerSecond));
-
-    backMotorConfig.Slot0.kP = ShooterConstants.backFlywheelkP.in(Volts.per(RotationsPerSecond));
-
-    backMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.backFlywheelGearRatio;
+    flywheelFollowerMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     // hood motor configs
     hoodMotorConfig.Slot0.kS = ShooterConstants.hoodkS.in(Volts);
@@ -128,62 +107,40 @@ public class Shooter extends AdvancedSubsystem {
     hoodMotorConfig.MotionMagic.MotionMagicAcceleration =
         ShooterConstants.hoodAcceleration.in(RotationsPerSecondPerSecond);
 
-    CTREUtil.attempt(() -> _frontMotor.getConfigurator().apply(frontMotorConfig), _frontMotor);
+    CTREUtil.attempt(() -> _flywheelMotor.getConfigurator().apply(flywheelMotorConfig), _flywheelMotor);
     CTREUtil.attempt(
-        () -> _frontFollowerMotor.getConfigurator().apply(frontFollowerMotorConfig),
-        _frontFollowerMotor);
-    CTREUtil.attempt(() -> _backMotor.getConfigurator().apply(backMotorConfig), _backMotor);
+        () -> _flywheelFollowerMotor.getConfigurator().apply(flywheelFollowerMotorConfig),
+        _flywheelFollowerMotor);
     CTREUtil.attempt(() -> _hoodMotor.getConfigurator().apply(hoodMotorConfig), _hoodMotor);
 
-    CTREUtil.attempt(() -> _frontMotor.optimizeBusUtilization(), _frontMotor);
-    CTREUtil.attempt(() -> _frontFollowerMotor.optimizeBusUtilization(), _frontFollowerMotor);
-    CTREUtil.attempt(() -> _backMotor.optimizeBusUtilization(), _backMotor);
+    CTREUtil.attempt(() -> _flywheelMotor.optimizeBusUtilization(), _flywheelMotor);
+    CTREUtil.attempt(() -> _flywheelFollowerMotor.optimizeBusUtilization(), _flywheelFollowerMotor);
     CTREUtil.attempt(() -> _hoodMotor.optimizeBusUtilization(), _hoodMotor);
 
     CTREUtil.attempt(
         () ->
             BaseStatusSignal.setUpdateFrequencyForAll(
                 100,
-                _frontVelocityGetter,
-                _frontMotor.getSupplyCurrent(),
-                _frontMotor.getStatorCurrent()),
-        _frontMotor);
+                _flywheelVelocityGetter,
+                _flywheelMotor.getSupplyCurrent(),
+                _flywheelMotor.getStatorCurrent()),
+        _flywheelMotor);
 
-    CTREUtil.attempt(
-        () ->
-            BaseStatusSignal.setUpdateFrequencyForAll(
-                100,
-                _backVelocityGetter,
-                _backMotor.getSupplyCurrent(),
-                _backMotor.getStatorCurrent()),
-        _backMotor);
-
-    FaultLogger.register(_frontMotor);
-    FaultLogger.register(_frontFollowerMotor);
-    FaultLogger.register(_backMotor);
+    FaultLogger.register(_flywheelMotor);
+    FaultLogger.register(_flywheelFollowerMotor);
     FaultLogger.register(_hoodMotor);
 
-    _frontFollowerMotor.setControl(
-        new Follower(ShooterConstants.frontMotorID, MotorAlignmentValue.Opposed));
+    _flywheelFollowerMotor.setControl(
+        new Follower(ShooterConstants.flywheelMotorID, MotorAlignmentValue.Opposed));
   }
 
-  private void setFrontSpeed(AngularVelocity desiredFrontSpeed) {
-    double errorRps = desiredFrontSpeed.minus(getFrontSpeed()).in(RotationsPerSecond);
+  private void setFlywheelSpeed(AngularVelocity desiredFrontSpeed) {
+    double errorRps = desiredFrontSpeed.minus(getFlywheelSpeed()).in(RotationsPerSecond);
 
     if (Math.abs(errorRps) > velocityThreshold.in(RotationsPerSecond)) {
-      _frontMotor.setControl(_frontDutyCycleSetter.withOutput(Math.signum(errorRps)));
+      _flywheelMotor.setControl(_flywheelDutyCycleSetter.withOutput(Math.signum(errorRps)));
     } else {
-      _frontMotor.setControl(_frontVelocitySetter.withVelocity(desiredFrontSpeed));
-    }
-  }
-
-  private void setBackSpeed(AngularVelocity desiredBackSpeed) {
-    double errorRps = desiredBackSpeed.minus(getBackSpeed()).in(RotationsPerSecond);
-
-    if (Math.abs(errorRps) > velocityThreshold.in(RotationsPerSecond)) {
-      _backMotor.setControl(_backDutyCycleSetter.withOutput(Math.signum(errorRps)));
-    } else {
-      _backMotor.setControl(_backVelocitySetter.withVelocity(desiredBackSpeed));
+      _flywheelMotor.setControl(_flywheelVelocitySetter.withVelocity(desiredFrontSpeed));
     }
   }
 
@@ -194,8 +151,7 @@ public class Shooter extends AdvancedSubsystem {
   /** Score. */
   public Command score() {
     return run(() -> {
-          setFrontSpeed(RotationsPerSecond.zero());
-          setBackSpeed(RotationsPerSecond.zero());
+          setFlywheelSpeed(RotationsPerSecond.zero());
           setHoodAngle(Rotations.zero());
         })
         .withName("Score");
@@ -205,8 +161,7 @@ public class Shooter extends AdvancedSubsystem {
   public Command ferry() {
     return run(
         () -> {
-          setFrontSpeed(RotationsPerSecond.zero());
-          setBackSpeed(RotationsPerSecond.zero());
+          setFlywheelSpeed(RotationsPerSecond.zero());
           setHoodAngle(Rotations.zero());
         });
   }
@@ -215,20 +170,14 @@ public class Shooter extends AdvancedSubsystem {
   public Command spit() {
     return run(
         () -> {
-          setFrontSpeed(RotationsPerSecond.zero());
-          setBackSpeed(RotationsPerSecond.zero());
+          setFlywheelSpeed(RotationsPerSecond.zero());
           setHoodAngle(Rotations.zero());
         });
   }
 
-  @Logged(name = "Front Speed")
-  public AngularVelocity getFrontSpeed() {
-    return _frontVelocityGetter.refresh().getValue();
-  }
-
-  @Logged(name = "Back Speed")
-  public AngularVelocity getBackSpeed() {
-    return _backVelocityGetter.refresh().getValue();
+  @Logged(name = "Flywheel Speed")
+  public AngularVelocity getFlywheelSpeed() {
+    return _flywheelVelocityGetter.refresh().getValue();
   }
 
   @Logged(name = "Hood Angle")
@@ -245,9 +194,8 @@ public class Shooter extends AdvancedSubsystem {
 
   @Override
   public void close() {
-    _frontMotor.close();
-    _frontFollowerMotor.close();
-    _backMotor.close();
+    _flywheelMotor.close();
+    _flywheelFollowerMotor.close();
     _hoodMotor.close();
   }
 }
