@@ -121,7 +121,9 @@ public class IntakePivot extends AdvancedSubsystem {
       startSimThread();
     }
 
-    setDefaultCommand(autoTuck(pose));
+    new Trigger(() -> checkInBumpZone(pose.get())).whileTrue(tuck()).whileFalse(raise());
+
+    setDefaultCommand(raise());
   }
 
   private void startSimThread() {
@@ -189,20 +191,9 @@ public class IntakePivot extends AdvancedSubsystem {
         .withName("Lower");
   }
 
-  /** Command that tucks the intake if in the bump zone, otherwise raises it. */
-  public Command autoTuck(Supplier<Pose2d> poseSupplier) {
-    return run(() -> {
-          if (checkInBumpZone(poseSupplier.get())) {
-            _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotTucked));
-          } else {
-            _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotRaised));
-          }
-        })
-        .withName("AutoTuck");
-  }
-
   public static boolean checkInBumpZone(Pose2d pose) {
-    if (FieldConstants.blueBumpZone.contains(new Translation2d(pose.getX(), pose.getY())) || FieldConstants.redBumpZone.contains(new Translation2d(pose.getX(), pose.getY()))) {
+    if (FieldConstants.blueBumpZone.contains(new Translation2d(pose.getX(), pose.getY()))
+        || FieldConstants.redBumpZone.contains(new Translation2d(pose.getX(), pose.getY()))) {
       return true;
     } else {
       return false;

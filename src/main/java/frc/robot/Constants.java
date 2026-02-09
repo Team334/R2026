@@ -68,8 +68,7 @@ public final class Constants {
 
     public static final Rectangle2d blueBumpZone =
         new Rectangle2d(
-            new Translation2d(
-                Inches.of(157.48).minus(bumpZoneTolereance), Inches.of(65.65)),
+            new Translation2d(Inches.of(157.48).minus(bumpZoneTolereance), Inches.of(65.65)),
             new Translation2d(
                 Inches.of(204.48).plus(bumpZoneTolereance),
                 Inches.of(258.65))); // enclose both bumps and hub
@@ -82,7 +81,6 @@ public final class Constants {
             new Translation2d(
                 FIELD_LENTH.minus(Inches.of(204.48).plus(bumpZoneTolereance)),
                 FIELD_WIDTH.minus(Inches.of(258.65)))); // enclose both bumps and hub
-    
 
     // uncomment if using the test tag layout
     // public static final AprilTagFieldLayout tagLayout;

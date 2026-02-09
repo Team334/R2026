@@ -22,7 +22,7 @@ public class IntakeTest {
 
   @BeforeEach
   public void setup() {
-    _intakePivot = new IntakePivot();
+    _intakePivot = new IntakePivot(null);
     _intakeFeed = new IntakeFeed(_intakePivot.intakeLowered());
 
     setupTests();
