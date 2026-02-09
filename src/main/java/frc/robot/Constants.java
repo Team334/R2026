@@ -65,6 +65,16 @@ public final class Constants {
     public static final AprilTagFieldLayout tagLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
+    public static final Translation2d blueHub =
+        new Translation2d(
+            tagLayout.getTagPose(26).get().getX() + Units.inchesToMeters(47.0) / 2.0,
+            tagLayout.getFieldWidth() / 2.0);
+
+    public static final Translation2d redHub =
+        blueHub.rotateAround(
+            new Translation2d(tagLayout.getFieldLength() / 2.0, tagLayout.getFieldWidth() / 2.0),
+            Rotation2d.k180deg);
+
     // uncomment if using the test tag layout
     // public static final AprilTagFieldLayout tagLayout;
 

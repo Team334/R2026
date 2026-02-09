@@ -25,6 +25,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Watchdog;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.FaultLogger;
 import frc.lib.FaultsTable.FaultType;
 import frc.lib.InputStream;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.Autos;
@@ -226,8 +228,14 @@ public class Robot extends TimedRobot {
    */
   @Logged(name = "Shot Pose")
   public Pose2d getShotPose() {
+    Translation2d hub =
+        DriverStation.getAlliance()
+            .map(a -> a == Alliance.Blue ? FieldConstants.blueHub : FieldConstants.redHub)
+            .orElse(FieldConstants.blueHub);
+
     Pose2d currentPose = _swerve.getPose();
-    ChassisSpeeds currentSpeeds = _swerve.getChassisSpeeds();
+    ChassisSpeeds currentSpeeds =
+        ChassisSpeeds.fromRobotRelativeSpeeds(_swerve.getChassisSpeeds(), _swerve.getHeading());
 
     Translation2d predictedTranslation =
         currentPose
@@ -236,7 +244,7 @@ public class Robot extends TimedRobot {
                 new Translation2d(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond)
                     .times(Constants.shotTimeScaler.in(Seconds)));
 
-    return new Pose2d(predictedTranslation, Rotation2d.kZero); // TODO: calculate rotation
+    return new Pose2d(predictedTranslation, hub.minus(predictedTranslation).getAngle());
   }
 
   /**
