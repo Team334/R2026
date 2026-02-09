@@ -86,7 +86,8 @@ public class Robot extends TimedRobot {
   private final Autos _autos = new Autos(_swerve);
 
   private final Superstructure _superstructure =
-      new Superstructure(_shooter, _hopper, _intakePivot, _intakeFeed, _climb, _swerve);
+      new Superstructure(
+          _shooter, _hopper, _intakePivot, _intakeFeed, _climb, _swerve, this::getShotPose);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -212,7 +213,15 @@ public class Robot extends TimedRobot {
                 baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
             .beforeStarting(() -> _swerve.isOpenLoop = true));
 
-    _driverController.rightTrigger().whileTrue(_superstructure.shoot());
+    _driverController
+        .rightTrigger()
+        .whileTrue(
+            _superstructure.shoot(
+                baseVelX.scale(
+                    SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+                baseVelY.scale(
+                    SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond))));
+
     _driverController.rightBumper().whileTrue(_superstructure.spit());
 
     _driverController.leftTrigger().whileTrue(_intakeFeed.feedIn());
@@ -222,9 +231,9 @@ public class Robot extends TimedRobot {
   }
 
   /**
-   * Predicts the robot's translation given the current chassis speeds and time needed for the fuel
-   * to go from the hopper and out of the shooter ({@link Constants#shotTimeScaler}). Rotation is
-   * calculated based on future translation and the hub's location.
+   * Predicts the robot's translation given the current chassis speeds and the ({@link
+   * Constants#shotTimeScaler}). Rotation is calculated based on future translation and the hub's
+   * location.
    */
   @Logged(name = "Shot Pose")
   public Pose2d getShotPose() {

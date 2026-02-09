@@ -4,13 +4,18 @@
 
 package frc.robot;
 
+import static edu.wpi.first.math.Nat.*;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.InterpolatingMatrixTreeMap;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.AngleUnit;
@@ -44,9 +49,6 @@ public final class Constants {
 
   public static final CANBus subsystemBus = new CANBus("canivore");
 
-  // scaler estimating the time needed for the fuel to go from the hopper and out of the shooter
-  // this assumes that the time for the shooter flywheels, shooter hood, and swerve heading is
-  // negligible
   public static final Time shotTimeScaler = Seconds.of(0.2);
 
   public static class Ports {
@@ -125,6 +127,24 @@ public final class Constants {
 
     public static final double flywheelGearRatio = 3;
     public static final double hoodGearRatio = 3;
+
+    // distanceMeters : <speedRps, angleRot>
+    public static InterpolatingMatrixTreeMap<Double, N2, N1> scoreTable =
+        new InterpolatingMatrixTreeMap<>();
+    public static InterpolatingMatrixTreeMap<Double, N2, N1> ferryTable =
+        new InterpolatingMatrixTreeMap<>();
+
+    private static Matrix<N2, N1> vec2d(double a, double b) {
+      return new Matrix<N2, N1>(N2(), N1(), new double[] {a, b});
+    }
+
+    static {
+      // score table
+      scoreTable.put(1.0, vec2d(1.0, 1.0));
+
+      // ferry table
+      ferryTable.put(1.0, vec2d(1.0, 1.0));
+    }
   }
 
   public static class HopperConstants {
@@ -223,6 +243,8 @@ public final class Constants {
 
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
     public static final AngularVelocity driverAngularVelocity = RadiansPerSecond.of(Math.PI);
+
+    public static final LinearVelocity driverTranslationalShootingVelocity = MetersPerSecond.of(2);
 
     public static final LinearVelocity profileTranslationalVelocity = MetersPerSecond.of(1);
     public static final LinearAcceleration profileTranslationalAcceleration =

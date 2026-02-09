@@ -16,9 +16,14 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
@@ -47,6 +52,12 @@ public class Shooter extends AdvancedSubsystem {
 
   @Logged(name = "Velocity Threshold")
   private final AngularVelocity velocityThreshold = RotationsPerSecond.of(3);
+
+  @Logged(name = "Desired Flywheel Velocity")
+  private final MutAngularVelocity _desiredFlywheelVelocity = RotationsPerSecond.mutable(0);
+
+  @Logged(name = "Desired Hood Angle")
+  private final MutAngle _desiredHoodAngle = Rotations.mutable(0);
 
   private final Supplier<Pose2d> _shotPoseSupplier;
 
@@ -134,6 +145,8 @@ public class Shooter extends AdvancedSubsystem {
 
     _flywheelFollowerMotor.setControl(
         new Follower(ShooterConstants.flywheelMotorID, MotorAlignmentValue.Opposed));
+
+    setDefaultCommand(idle());
   }
 
   private void setFlywheelSpeed(AngularVelocity desiredFrontSpeed) {
@@ -150,11 +163,25 @@ public class Shooter extends AdvancedSubsystem {
     _hoodMotor.setControl(_hoodAngleSetter.withPosition(angle));
   }
 
+  private void set(Matrix<N2, N1> desired) {
+    setFlywheelSpeed(_desiredFlywheelVelocity.mut_setMagnitude(desired.get(0, 0)));
+    setHoodAngle(_desiredHoodAngle.mut_setMagnitude(desired.get(1, 0)));
+  }
+
+  /** Set hood to shooting angle, flywheels to 50% shooting speed. */
+  public Command idle() {
+    return run(() -> {
+          Matrix<N2, N1> desired = ShooterConstants.scoreTable.get(0.0);
+          desired.set(0, 0, desired.get(0, 0) * 0.5);
+          set(desired);
+        })
+        .withName("Idle");
+  }
+
   /** Score. */
   public Command score() {
     return run(() -> {
-          setFlywheelSpeed(RotationsPerSecond.zero());
-          setHoodAngle(Rotations.zero());
+          set(ShooterConstants.scoreTable.get(0.0));
         })
         .withName("Score");
   }
