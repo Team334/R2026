@@ -364,20 +364,28 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    */
   public Command drive(InputStream velX, InputStream velY, InputStream velOmega) {
     return run(() -> {
+          double vx = velX.get();
+          double vy = velY.get();
+          double omega = velOmega.get();
+
+          DogLog.log("Swerve/Driver Speeds/vx", vx);
+          DogLog.log("Swerve/Driver Speeds/vy", vy);
+          DogLog.log("Swerve/Driver Speeds/omega", omega);
+
           if (isFieldOriented) {
             setControl(
                 _fieldCentricRequest
-                    .withVelocityX(velX.get())
-                    .withVelocityY(velY.get())
-                    .withRotationalRate(velOmega.get())
+                    .withVelocityX(vx)
+                    .withVelocityY(vy)
+                    .withRotationalRate(omega)
                     .withDriveRequestType(
                         isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
           } else {
             setControl(
                 _robotCentricRequest
-                    .withVelocityX(velX.get())
-                    .withVelocityY(velY.get())
-                    .withRotationalRate(velOmega.get())
+                    .withVelocityX(vx)
+                    .withVelocityY(vy)
+                    .withRotationalRate(omega)
                     .withDriveRequestType(
                         isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
           }

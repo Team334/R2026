@@ -54,8 +54,6 @@ public class HolonomicController {
 
   private ChassisSpeeds _prevSetpointSpeeds = new ChassisSpeeds();
 
-  private ChassisSpeeds _feedForward = new ChassisSpeeds();
-
   /**
    * Creates a new HolonomicController.
    *
@@ -72,15 +70,6 @@ public class HolonomicController {
   /** The wheel forces based on the acceleration of the profiles. */
   public Feedforwards getWheelForces() {
     return _wheelForces;
-  }
-
-  /**
-   * Adds a velocity feedforward to the speeds returned by the {@link #calculate(Pose2d)} and {@link
-   * #rotationCalculate(Rotation2d, Rotation2d)} methods. Note the translational feedforward
-   * component will be ignored when doing the rotation-only profile.
-   */
-  public void addFeedForward(ChassisSpeeds chassisSpeeds) {
-    _feedForward = chassisSpeeds;
   }
 
   /** Whether the profiles have been completed or not. */
@@ -138,8 +127,9 @@ public class HolonomicController {
 
     if (_translationDirection.norm() == 0) {
       // if the goal translation IS the starting translation:
-      // 1) if current speeds is not 0, direction is antiparallel to speeds
-      // 2) if current speeds is 0, profile will also be empty, so an arbitrary direction is used
+      // 1) if current translational speeds is not 0, direction is antiparallel to speeds
+      // 2) if current translational speeds is 0, profile will also be empty, so an arbitrary
+      // direction is used
       _translationDirection =
           (currentSpeeds.vxMetersPerSecond == 0 && currentSpeeds.vyMetersPerSecond == 0)
               ? VecBuilder.fill(1, 0)
@@ -158,8 +148,6 @@ public class HolonomicController {
         currentPose.getRotation().getRadians(), currentSpeeds.omegaRadiansPerSecond);
 
     _prevSetpointSpeeds = currentSpeeds;
-
-    _feedForward = new ChassisSpeeds();
 
     _startPose = currentPose;
 
@@ -208,8 +196,6 @@ public class HolonomicController {
             setpointVelocity.get(1),
             _headingProfile.getSetpoint().velocity);
 
-    setpointSpeeds = setpointSpeeds.plus(_feedForward);
-
     _wheelForces =
         _wheelForceCalculator.calculate(Robot.kDefaultPeriod, _prevSetpointSpeeds, setpointSpeeds);
 
@@ -246,6 +232,7 @@ public class HolonomicController {
     DogLog.log("Auto/Controller Actual Pose", currentPose);
 
     if (!SwerveConstants.ignorePoseTolerance) {
+      // if error is very small on a certain axis, don't move on that axis
       Translation2d translationError =
           desiredPose.getTranslation().minus(currentPose.getTranslation());
       Rotation2d rotationError = desiredPose.getRotation().minus(currentPose.getRotation());
