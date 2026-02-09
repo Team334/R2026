@@ -40,7 +40,8 @@ public class Shooter extends AdvancedSubsystem {
 
   private final MotionMagicVoltage _hoodAngleSetter = new MotionMagicVoltage(0);
 
-  private final StatusSignal<AngularVelocity> _flywheelVelocityGetter = _flywheelMotor.getVelocity();
+  private final StatusSignal<AngularVelocity> _flywheelVelocityGetter =
+      _flywheelMotor.getVelocity();
 
   private final StatusSignal<Angle> _hoodAngleGetter = _hoodMotor.getPosition();
 
@@ -107,7 +108,8 @@ public class Shooter extends AdvancedSubsystem {
     hoodMotorConfig.MotionMagic.MotionMagicAcceleration =
         ShooterConstants.hoodAcceleration.in(RotationsPerSecondPerSecond);
 
-    CTREUtil.attempt(() -> _flywheelMotor.getConfigurator().apply(flywheelMotorConfig), _flywheelMotor);
+    CTREUtil.attempt(
+        () -> _flywheelMotor.getConfigurator().apply(flywheelMotorConfig), _flywheelMotor);
     CTREUtil.attempt(
         () -> _flywheelFollowerMotor.getConfigurator().apply(flywheelFollowerMotorConfig),
         _flywheelFollowerMotor);
