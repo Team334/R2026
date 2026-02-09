@@ -19,6 +19,8 @@ import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -65,7 +67,7 @@ public class Robot extends TimedRobot {
   private final Swerve _swerve = TunerConstants.createDrivetrain();
 
   @Logged(name = "Shooter")
-  private final Shooter _shooter = new Shooter();
+  private final Shooter _shooter = new Shooter(this::getShotPose);
 
   @Logged(name = "Hopper")
   private final Hopper _hopper = new Hopper();
@@ -191,24 +193,21 @@ public class Robot extends TimedRobot {
   }
 
   private void configureDriverBindings() {
+    InputStream baseVelX =
+        InputStream.of(_driverController::getLeftY).deadband(0.02, 1).negate().signedPow(2);
+
+    InputStream baseVelY =
+        InputStream.of(_driverController::getLeftX).deadband(0.02, 1).negate().signedPow(2);
+
+    InputStream baseVelOmega =
+        InputStream.of(_driverController::getRightX).deadband(0.02, 1).negate().signedPow(2);
+
     _swerve.setDefaultCommand(
         _swerve
             .drive(
-                InputStream.of(_driverController::getLeftY)
-                    .deadband(0.02, 1)
-                    .negate()
-                    .signedPow(2)
-                    .scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
-                InputStream.of(_driverController::getLeftX)
-                    .deadband(0.02, 1)
-                    .negate()
-                    .signedPow(2)
-                    .scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
-                InputStream.of(_driverController::getRightX)
-                    .deadband(0.02, 1)
-                    .negate()
-                    .signedPow(2)
-                    .scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
+                baseVelX.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+                baseVelY.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+                baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
             .beforeStarting(() -> _swerve.isOpenLoop = true));
 
     _driverController.rightTrigger().whileTrue(_superstructure.shoot());
@@ -218,6 +217,26 @@ public class Robot extends TimedRobot {
     _driverController.leftBumper().toggleOnTrue(_intakePivot.lower());
 
     _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
+  }
+
+  /**
+   * Predicts the robot's translation given the current chassis speeds and time needed for the fuel
+   * to go from the hopper and out of the shooter ({@link Constants#shotTimeScaler}). Rotation is
+   * calculated based on future translation and the hub's location.
+   */
+  @Logged(name = "Shot Pose")
+  public Pose2d getShotPose() {
+    Pose2d currentPose = _swerve.getPose();
+    ChassisSpeeds currentSpeeds = _swerve.getChassisSpeeds();
+
+    Translation2d predictedTranslation =
+        currentPose
+            .getTranslation()
+            .plus(
+                new Translation2d(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond)
+                    .times(Constants.shotTimeScaler.in(Seconds)));
+
+    return new Pose2d(predictedTranslation, Rotation2d.kZero); // TODO: calculate rotation
   }
 
   /**
