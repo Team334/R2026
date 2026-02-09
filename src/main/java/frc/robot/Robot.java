@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
   private final Swerve _swerve = TunerConstants.createDrivetrain();
 
   @Logged(name = "Shooter")
-  private final Shooter _shooter = new Shooter(this::shotPose);
+  private final Shooter _shooter = new Shooter(this::getShotPose);
 
   @Logged(name = "Hopper")
   private final Hopper _hopper = new Hopper();
@@ -231,17 +231,18 @@ public class Robot extends TimedRobot {
    * calculated based on future translation and the hub's location.
    */
   @Logged(name = "Shot Pose")
-  public Pose2d shotPose() {
-    Pose2d chassisPose = _swerve.getPose();
-    ChassisSpeeds chassisSpeeds = _swerve.getChassisSpeeds();
+  public Pose2d getShotPose() {
+    Pose2d currentPose = _swerve.getPose();
+    ChassisSpeeds currentSpeeds = _swerve.getChassisSpeeds();
 
-    Translation2d deltaTranslation =
-        new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)
-            .times(Constants.shotTimeScaler.in(Seconds));
+    Translation2d predictedTranslation =
+        currentPose
+            .getTranslation()
+            .plus(
+                new Translation2d(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond)
+                    .times(Constants.shotTimeScaler.in(Seconds)));
 
-    return new Pose2d(
-        chassisPose.getTranslation().plus(deltaTranslation),
-        Rotation2d.kZero); // TODO: calculate rotation
+    return new Pose2d(predictedTranslation, Rotation2d.kZero); // TODO: calculate rotation
   }
 
   /**
