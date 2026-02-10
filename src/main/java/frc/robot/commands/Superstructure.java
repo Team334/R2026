@@ -46,7 +46,7 @@ public class Superstructure {
     _shotPoseSupplier = shotPoseSupplier;
   }
 
-  /** Scores / ferries depending on robot position. */
+  /** Scores / ferries depending on robot pose. */
   public Command shoot(InputStream velX, InputStream velY) {
     return parallel(_swerve.driveFacing(velX, velY, () -> _shotPoseSupplier.get().getRotation()));
   }
