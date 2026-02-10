@@ -48,12 +48,16 @@ public class Superstructure {
 
   /** Scores / ferries depending on robot pose. */
   public Command shoot(InputStream velX, InputStream velY) {
-    return parallel(_swerve.driveFacing(velX, velY, () -> _shotPoseSupplier.get().getRotation()));
+    return parallel(
+            _shooter.shoot(),
+            _hopper.feed(),
+            _swerve.driveFacing(velX, velY, () -> _shotPoseSupplier.get().getRotation()))
+        .withName("Shoot");
   }
 
   /** Spits fuel at a short range without aiming. */
   public Command spit() {
-    return run(() -> {});
+    return parallel(_shooter.spit(), _hopper.feed()).withName("Spit");
   }
 
   /**
@@ -61,6 +65,6 @@ public class Superstructure {
    * drives to L1 before climbing.
    */
   public Command climbRoutine() {
-    return run(() -> {});
+    return run(() -> {}).withName("Climb Routine");
   }
 }

@@ -75,17 +75,17 @@ public class Hopper extends AdvancedSubsystem {
             }));
   }
 
-  /** Shoots fuel into shooter. */
-  public Command shoot() {
+  /** Feeds fuel into shooter. */
+  public Command feed() {
     return run(() -> {
           _floorMotor.setControl(
               _floorVelocitySetter.withVelocity(
-                  HopperConstants.floorShootSpeed.in(RotationsPerSecond)));
+                  HopperConstants.floorFeedSpeed.in(RotationsPerSecond)));
           _rollerMotor.setControl(
               _rollerVelocitySetter.withVelocity(
-                  HopperConstants.rollerShootSpeed.in(RotationsPerSecond)));
+                  HopperConstants.rollerFeedSpeed.in(RotationsPerSecond)));
         })
-        .withName("Shoot");
+        .withName("Fee");
   }
 
   @Logged(name = "Roller Speed")

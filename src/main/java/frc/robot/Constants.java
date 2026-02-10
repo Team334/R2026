@@ -167,8 +167,8 @@ public final class Constants {
     public static final int rollerMotorID = 20;
     public static final int floorMotorID = 21;
 
-    public static final AngularVelocity floorShootSpeed = RotationsPerSecond.of(0);
-    public static final AngularVelocity rollerShootSpeed = RotationsPerSecond.of(0);
+    public static final AngularVelocity floorFeedSpeed = RotationsPerSecond.of(0);
+    public static final AngularVelocity rollerFeedSpeed = RotationsPerSecond.of(0);
 
     public static final Voltage rollerkS = Volts.of(0.39);
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkV =
