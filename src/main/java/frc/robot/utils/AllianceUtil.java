@@ -51,8 +51,8 @@ public class AllianceUtil {
     return getAlliance() == Alliance.Blue ? FieldConstants.blueHub : FieldConstants.redHub;
   }
 
-  /** Using the robot pose, finds the shooting target location (hub / ferry). */
-  public static Translation2d getShootingTarget(Pose2d robotPose) {
+  /** Using the robot pose, finds the shot target location (hub / ferry). */
+  public static Translation2d getShotTarget(Pose2d robotPose) {
     return inFerryZone(robotPose) ? getFerryTarget(robotPose) : getHubTarget();
   }
 
@@ -62,6 +62,6 @@ public class AllianceUtil {
         inFerryZone(robotPose) ? ShotPresets.ferryTable : ShotPresets.hubTable;
 
     return _shotPreset.set(
-        shotTable.get(shotPose.getTranslation().getDistance(getShootingTarget(robotPose))));
+        shotTable.get(shotPose.getTranslation().getDistance(getShotTarget(robotPose))));
   }
 }

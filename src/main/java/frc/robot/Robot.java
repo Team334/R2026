@@ -250,7 +250,7 @@ public class Robot extends TimedRobot {
 
     return new Pose2d(
         predictedTranslation,
-        AllianceUtil.getShootingTarget(currentPose).minus(predictedTranslation).getAngle());
+        AllianceUtil.getShotTarget(currentPose).minus(predictedTranslation).getAngle());
   }
 
   /**
@@ -275,6 +275,15 @@ public class Robot extends TimedRobot {
 
       _fileOnlySet = true;
     }
+
+    DogLog.log("Shot Target", AllianceUtil.getShotTarget(_swerve.getPose()));
+
+    DogLog.log(
+        "Shot Preset/Flywheel Speed",
+        AllianceUtil.getShotPreset(_swerve.getPose(), getShotPose()).getFlywheelSpeed());
+    DogLog.log(
+        "Shot Preset/Hood Angle",
+        AllianceUtil.getShotPreset(_swerve.getPose(), getShotPose()).getHoodAngle());
 
     DogLog.timeEnd("Timing/Robot/robotPeriodic()");
 
