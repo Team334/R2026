@@ -139,15 +139,18 @@ public final class Constants {
     public static final double flywheelGearRatio = 3;
     public static final double hoodGearRatio = 3;
 
-    // distanceMeters : <speedRps, angleRot>
+    private static Matrix<N2, N1> vec2d(double a, double b) {
+      return new Matrix<N2, N1>(N2(), N1(), new double[] {a, b});
+    }
+
+    // state = <speedRps, angleRot>
+    public static Matrix<N2, N1> spitState = vec2d(0, 0);
+
+    // distanceMeters : state
     public static InterpolatingMatrixTreeMap<Double, N2, N1> scoreTable =
         new InterpolatingMatrixTreeMap<>();
     public static InterpolatingMatrixTreeMap<Double, N2, N1> ferryTable =
         new InterpolatingMatrixTreeMap<>();
-
-    private static Matrix<N2, N1> vec2d(double a, double b) {
-      return new Matrix<N2, N1>(N2(), N1(), new double[] {a, b});
-    }
 
     static {
       // score table

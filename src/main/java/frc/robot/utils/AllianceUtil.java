@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.FieldConstants;
 
 public class AllianceUtil {
+  /** Gets the alliance from the DS. If the alliance can't be retreived, blue is used by default. */
   public static Alliance getAlliance() {
     var alliance = DriverStation.getAlliance();
 
@@ -17,6 +18,7 @@ public class AllianceUtil {
     return Alliance.Blue;
   }
 
+  /** Whether the supplied robot pose is in the ferry zone, depending on alliance. */
   public static boolean inFerryZone(Pose2d robotPose) {
     if (getAlliance() == Alliance.Blue) {
       return robotPose.getX() > FieldConstants.ferryXThresholdBlue;
@@ -25,6 +27,7 @@ public class AllianceUtil {
     return robotPose.getX() < FieldConstants.ferryXThresholdRed;
   }
 
+  /** Gets the correct ferry target location for shooting. */
   public static Translation2d getFerryTarget(Pose2d robotPose) {
     if (getAlliance() == Alliance.Blue) {
       return robotPose.getY() > FieldConstants.ferryYThreshold
@@ -37,10 +40,12 @@ public class AllianceUtil {
         : FieldConstants.redFerryBottom;
   }
 
+  /** Gets the correct hub target location for shooting. */
   public static Translation2d getHubTarget() {
     return getAlliance() == Alliance.Blue ? FieldConstants.blueHub : FieldConstants.redHub;
   }
 
+  /** Using the robot pose, finds the shooting target location (hub / ferry). */
   public static Translation2d getShootingTarget(Pose2d robotPose) {
     return inFerryZone(robotPose) ? getFerryTarget(robotPose) : getHubTarget();
   }

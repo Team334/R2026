@@ -53,6 +53,9 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Velocity Threshold")
   private final AngularVelocity velocityThreshold = RotationsPerSecond.of(3);
 
+  @Logged(name = "Idle Velocity Percentage")
+  private final double idleVelocityPercentage = 0.5;
+
   @Logged(name = "Desired Flywheel Velocity")
   private final MutAngularVelocity _desiredFlywheelVelocity = RotationsPerSecond.mutable(0);
 
@@ -166,45 +169,43 @@ public class Shooter extends AdvancedSubsystem {
     _hoodMotor.setControl(_hoodAngleSetter.withPosition(angle));
   }
 
-  private void set(Matrix<N2, N1> desired) {
-    setFlywheelSpeed(_desiredFlywheelVelocity.mut_setMagnitude(desired.get(0, 0)));
-    setHoodAngle(_desiredHoodAngle.mut_setMagnitude(desired.get(1, 0)));
+  private void setState(Matrix<N2, N1> state) {
+    setFlywheelSpeed(_desiredFlywheelVelocity.mut_setMagnitude(state.get(0, 0)));
+    setHoodAngle(_desiredHoodAngle.mut_setMagnitude(state.get(1, 0)));
   }
 
-  /** Set hood to shooting angle, flywheels to 50% shooting speed. */
+  /** Set hood to shooting angle, flywheels to {@link #idleVelocityPercentage} of shooting speed. */
   public Command idle() {
     return run(() -> {
-          Matrix<N2, N1> desired =
+          Matrix<N2, N1> state =
               _inFerryZoneSupplier.getAsBoolean()
                   ? ShooterConstants.ferryTable.get(_shootingTargetDistanceSupplier.get())
                   : ShooterConstants.scoreTable.get(_shootingTargetDistanceSupplier.get());
-          desired.set(0, 0, desired.get(0, 0) * 0.5);
-          set(desired);
+
+          state.set(0, 0, state.get(0, 0) * idleVelocityPercentage);
+
+          setState(state);
         })
         .withName("Idle");
   }
 
-  /** Score. */
-  public Command score() {
+  /** Scores / ferries depending on robot pose. */
+  public Command shoot() {
     return run(() -> {
-          set(ShooterConstants.scoreTable.get(_shootingTargetDistanceSupplier.get()));
+          Matrix<N2, N1> state =
+              _inFerryZoneSupplier.getAsBoolean()
+                  ? ShooterConstants.ferryTable.get(_shootingTargetDistanceSupplier.get())
+                  : ShooterConstants.scoreTable.get(_shootingTargetDistanceSupplier.get());
+
+          setState(state);
         })
-        .withName("Score");
+        .withName("Shoot");
   }
 
-  /** Ferry. */
-  public Command ferry() {
-    return run(() -> {
-          set(ShooterConstants.ferryTable.get(_shootingTargetDistanceSupplier.get()));
-        })
-        .withName("Ferry");
-  }
-
-  /** Spits the balls in front of the robot at a fixed angle. */
+  /** Spits the fuel in front of the robot at a fixed angle and speed. */
   public Command spit() {
     return run(() -> {
-          setFlywheelSpeed(RotationsPerSecond.zero());
-          setHoodAngle(Rotations.zero());
+          setState(ShooterConstants.spitState);
         })
         .withName("Spit");
   }
