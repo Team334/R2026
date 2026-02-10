@@ -25,7 +25,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Watchdog;
@@ -35,7 +34,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.FaultLogger;
 import frc.lib.FaultsTable.FaultType;
 import frc.lib.InputStream;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.Autos;
@@ -47,6 +45,7 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.intake.IntakeFeed;
 import frc.robot.subsystems.intake.IntakePivot;
+import frc.robot.utils.AllianceUtil;
 import java.lang.reflect.Field;
 
 /**
@@ -69,7 +68,13 @@ public class Robot extends TimedRobot {
   private final Swerve _swerve = TunerConstants.createDrivetrain();
 
   @Logged(name = "Shooter")
-  private final Shooter _shooter = new Shooter(this::getShotPose);
+  private final Shooter _shooter =
+      new Shooter(
+          () ->
+              getShotPose()
+                  .getTranslation()
+                  .getDistance(AllianceUtil.getShootingTarget(_swerve.getPose())),
+          () -> AllianceUtil.inFerryZone(_swerve.getPose()));
 
   @Logged(name = "Hopper")
   private final Hopper _hopper = new Hopper();
@@ -237,11 +242,6 @@ public class Robot extends TimedRobot {
    */
   @Logged(name = "Shot Pose")
   public Pose2d getShotPose() {
-    Translation2d hub =
-        DriverStation.getAlliance()
-            .map(a -> a == Alliance.Blue ? FieldConstants.blueHub : FieldConstants.redHub)
-            .orElse(FieldConstants.blueHub);
-
     Pose2d currentPose = _swerve.getPose();
     ChassisSpeeds currentSpeeds =
         ChassisSpeeds.fromRobotRelativeSpeeds(_swerve.getChassisSpeeds(), _swerve.getHeading());
@@ -253,7 +253,9 @@ public class Robot extends TimedRobot {
                 new Translation2d(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond)
                     .times(Constants.shotTimeScaler.in(Seconds)));
 
-    return new Pose2d(predictedTranslation, hub.minus(predictedTranslation).getAngle());
+    return new Pose2d(
+        predictedTranslation,
+        AllianceUtil.getShootingTarget(currentPose).minus(predictedTranslation).getAngle());
   }
 
   /**

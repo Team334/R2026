@@ -77,6 +77,17 @@ public final class Constants {
             new Translation2d(tagLayout.getFieldLength() / 2.0, tagLayout.getFieldWidth() / 2.0),
             Rotation2d.k180deg);
 
+    public static final Translation2d blueFerryBottom = new Translation2d();
+    public static final Translation2d blueFerryTop = new Translation2d();
+
+    public static final Translation2d redFerryBottom = new Translation2d();
+    public static final Translation2d redFerryTop = new Translation2d();
+
+    public static final double ferryXThresholdBlue = 3;
+    public static final double ferryXThresholdRed = 7;
+
+    public static final double ferryYThreshold = 6;
+
     // uncomment if using the test tag layout
     // public static final AprilTagFieldLayout tagLayout;
 

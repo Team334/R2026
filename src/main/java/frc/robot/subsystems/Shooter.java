@@ -17,7 +17,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.measure.Angle;
@@ -30,6 +29,7 @@ import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 public class Shooter extends AdvancedSubsystem {
@@ -59,10 +59,13 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Desired Hood Angle")
   private final MutAngle _desiredHoodAngle = Rotations.mutable(0);
 
-  private final Supplier<Pose2d> _shotPoseSupplier;
+  private final Supplier<Double> _shootingTargetDistanceSupplier;
+  private final BooleanSupplier _inFerryZoneSupplier;
 
-  public Shooter(Supplier<Pose2d> shotPoseSupplier) {
-    _shotPoseSupplier = shotPoseSupplier;
+  public Shooter(
+      Supplier<Double> shootingTargetDistanceSupplier, BooleanSupplier inFerryZoneSupplier) {
+    _shootingTargetDistanceSupplier = shootingTargetDistanceSupplier;
+    _inFerryZoneSupplier = inFerryZoneSupplier;
 
     var flywheelMotorConfig = new TalonFXConfiguration();
     var flywheelFollowerMotorConfig = new TalonFXConfiguration();
@@ -171,7 +174,10 @@ public class Shooter extends AdvancedSubsystem {
   /** Set hood to shooting angle, flywheels to 50% shooting speed. */
   public Command idle() {
     return run(() -> {
-          Matrix<N2, N1> desired = ShooterConstants.scoreTable.get(0.0);
+          Matrix<N2, N1> desired =
+              _inFerryZoneSupplier.getAsBoolean()
+                  ? ShooterConstants.ferryTable.get(_shootingTargetDistanceSupplier.get())
+                  : ShooterConstants.scoreTable.get(_shootingTargetDistanceSupplier.get());
           desired.set(0, 0, desired.get(0, 0) * 0.5);
           set(desired);
         })
@@ -181,27 +187,26 @@ public class Shooter extends AdvancedSubsystem {
   /** Score. */
   public Command score() {
     return run(() -> {
-          set(ShooterConstants.scoreTable.get(0.0));
+          set(ShooterConstants.scoreTable.get(_shootingTargetDistanceSupplier.get()));
         })
         .withName("Score");
   }
 
   /** Ferry. */
   public Command ferry() {
-    return run(
-        () -> {
-          setFlywheelSpeed(RotationsPerSecond.zero());
-          setHoodAngle(Rotations.zero());
-        });
+    return run(() -> {
+          set(ShooterConstants.ferryTable.get(_shootingTargetDistanceSupplier.get()));
+        })
+        .withName("Ferry");
   }
 
   /** Spits the balls in front of the robot at a fixed angle. */
   public Command spit() {
-    return run(
-        () -> {
+    return run(() -> {
           setFlywheelSpeed(RotationsPerSecond.zero());
           setHoodAngle(Rotations.zero());
-        });
+        })
+        .withName("Spit");
   }
 
   @Logged(name = "Flywheel Speed")
