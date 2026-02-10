@@ -69,12 +69,7 @@ public class Robot extends TimedRobot {
 
   @Logged(name = "Shooter")
   private final Shooter _shooter =
-      new Shooter(
-          () ->
-              getShotPose()
-                  .getTranslation()
-                  .getDistance(AllianceUtil.getShootingTarget(_swerve.getPose())),
-          () -> AllianceUtil.inFerryZone(_swerve.getPose()));
+      new Shooter(() -> AllianceUtil.getShotPreset(_swerve.getPose(), getShotPose()));
 
   @Logged(name = "Hopper")
   private final Hopper _hopper = new Hopper();

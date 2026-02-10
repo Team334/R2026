@@ -16,20 +16,16 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.MutAngle;
-import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
-import java.util.function.BooleanSupplier;
+import frc.robot.Constants.ShotPresets;
+import frc.robot.utils.ShotPreset;
 import java.util.function.Supplier;
 
 public class Shooter extends AdvancedSubsystem {
@@ -56,25 +52,16 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Idle Velocity Percentage")
   private final double idleVelocityPercentage = 0.5;
 
-  @Logged(name = "Desired Flywheel Velocity")
-  private final MutAngularVelocity _desiredFlywheelVelocity = RotationsPerSecond.mutable(0);
+  private final Supplier<ShotPreset> _shotPresetSupplier;
 
-  @Logged(name = "Desired Hood Angle")
-  private final MutAngle _desiredHoodAngle = Rotations.mutable(0);
-
-  private final Supplier<Double> _shootingTargetDistanceSupplier;
-  private final BooleanSupplier _inFerryZoneSupplier;
-
-  public Shooter(
-      Supplier<Double> shootingTargetDistanceSupplier, BooleanSupplier inFerryZoneSupplier) {
-    _shootingTargetDistanceSupplier = shootingTargetDistanceSupplier;
-    _inFerryZoneSupplier = inFerryZoneSupplier;
+  public Shooter(Supplier<ShotPreset> shotPresetSupplier) {
+    _shotPresetSupplier = shotPresetSupplier;
 
     var flywheelMotorConfig = new TalonFXConfiguration();
     var flywheelFollowerMotorConfig = new TalonFXConfiguration();
     var hoodMotorConfig = new TalonFXConfiguration();
 
-    // front motor configs
+    // flywheel motor configs
     flywheelMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
     flywheelMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
@@ -90,7 +77,7 @@ public class Shooter extends AdvancedSubsystem {
 
     flywheelMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.flywheelGearRatio;
 
-    // front follower motor configs
+    // flywheel follower motor configs
     flywheelFollowerMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
     flywheelFollowerMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
@@ -169,22 +156,13 @@ public class Shooter extends AdvancedSubsystem {
     _hoodMotor.setControl(_hoodAngleSetter.withPosition(angle));
   }
 
-  private void setState(Matrix<N2, N1> state) {
-    setFlywheelSpeed(_desiredFlywheelVelocity.mut_setMagnitude(state.get(0, 0)));
-    setHoodAngle(_desiredHoodAngle.mut_setMagnitude(state.get(1, 0)));
-  }
-
   /** Set hood to shooting angle, flywheels to {@link #idleVelocityPercentage} of shooting speed. */
   public Command idle() {
     return run(() -> {
-          Matrix<N2, N1> state =
-              _inFerryZoneSupplier.getAsBoolean()
-                  ? ShooterConstants.ferryTable.get(_shootingTargetDistanceSupplier.get())
-                  : ShooterConstants.scoreTable.get(_shootingTargetDistanceSupplier.get());
+          ShotPreset preset = _shotPresetSupplier.get();
 
-          state.set(0, 0, state.get(0, 0) * idleVelocityPercentage);
-
-          setState(state);
+          setFlywheelSpeed(preset.getFlywheelSpeed().times(idleVelocityPercentage));
+          setHoodAngle(preset.getHoodAngle());
         })
         .withName("Idle");
   }
@@ -192,12 +170,10 @@ public class Shooter extends AdvancedSubsystem {
   /** Scores / ferries depending on robot pose. */
   public Command shoot() {
     return run(() -> {
-          Matrix<N2, N1> state =
-              _inFerryZoneSupplier.getAsBoolean()
-                  ? ShooterConstants.ferryTable.get(_shootingTargetDistanceSupplier.get())
-                  : ShooterConstants.scoreTable.get(_shootingTargetDistanceSupplier.get());
+          ShotPreset preset = _shotPresetSupplier.get();
 
-          setState(state);
+          setFlywheelSpeed(preset.getFlywheelSpeed());
+          setHoodAngle(preset.getHoodAngle());
         })
         .withName("Shoot");
   }
@@ -205,7 +181,8 @@ public class Shooter extends AdvancedSubsystem {
   /** Spits the fuel in front of the robot at a fixed angle and speed. */
   public Command spit() {
     return run(() -> {
-          setState(ShooterConstants.spitState);
+          setFlywheelSpeed(ShotPresets.spitPreset.getFlywheelSpeed());
+          setHoodAngle(ShotPresets.spitPreset.getHoodAngle());
         })
         .withName("Spit");
   }
