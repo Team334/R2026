@@ -121,7 +121,7 @@ public class IntakePivot extends AdvancedSubsystem {
       startSimThread();
     }
 
-    new Trigger(() -> checkInBumpZone(pose.get())).whileTrue(tuck()).whileFalse(raise());
+    new Trigger(() -> checkInBumpZone(pose.get())).onTrue(tuck()).onFalse(raise());
 
     setDefaultCommand(raise());
   }
