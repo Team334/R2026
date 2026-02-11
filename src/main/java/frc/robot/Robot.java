@@ -280,7 +280,9 @@ public class Robot extends TimedRobot {
 
     DogLog.log(
         "Shot Preset/Flywheel Speed",
-        AllianceUtil.getShotPreset(_swerve.getPose(), getShotPose()).getFlywheelSpeed().in(RadiansPerSecond));
+        AllianceUtil.getShotPreset(_swerve.getPose(), getShotPose())
+            .getFlywheelSpeed()
+            .in(RadiansPerSecond));
     DogLog.log(
         "Shot Preset/Hood Angle",
         AllianceUtil.getShotPreset(_swerve.getPose(), getShotPose()).getHoodAngle().in(Radians));
