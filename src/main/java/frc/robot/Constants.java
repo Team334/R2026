@@ -133,6 +133,7 @@ public final class Constants {
     static {
       // score table
       hubTable.put(1.0, vec2d(1.0, 1.0));
+      hubTable.put(5.0, vec2d(5.0, 5.0));
 
       // ferry table
       ferryTable.put(1.0, vec2d(1.0, 1.0));
@@ -140,7 +141,7 @@ public final class Constants {
   }
 
   public static class ShooterConstants {
-    public static final int flywheelMotorID = 0;
+    public static final int flywheelMotorID = 42;
     public static final int flywheelFollowerMotorID = 41;
     public static final int hoodMotorID = 40;
 
@@ -153,9 +154,9 @@ public final class Constants {
     public static final Voltage hoodkS = Volts.of(0);
     public static final Voltage hoodkG = Volts.of(0);
     public static final Per<VoltageUnit, AngularVelocityUnit> hoodkV =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(1);
     public static final Per<VoltageUnit, AngularAccelerationUnit> hoodkA =
-        Volts.per(RotationsPerSecondPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecondPerSecond).ofNative(0.1);
     public static final Per<VoltageUnit, AngleUnit> hoodkP = Volts.per(Rotations).ofNative(0);
 
     public static final AngularVelocity hoodVelocity = RotationsPerSecond.of(2);

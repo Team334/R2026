@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
@@ -16,15 +17,21 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
 import frc.robot.Constants;
+import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShotPresets;
+import frc.robot.Robot;
 import frc.robot.utils.ShotPreset;
 import java.util.function.Supplier;
 
@@ -54,70 +61,76 @@ public class Shooter extends AdvancedSubsystem {
 
   private final Supplier<ShotPreset> _shotPresetSupplier;
 
+  private DCMotorSim _flywheelSim;
+  private DCMotorSim _hoodSim;
+
+  private Notifier _simNotifier;
+  private double _lastSimTime;
+
   public Shooter(Supplier<ShotPreset> shotPresetSupplier) {
     _shotPresetSupplier = shotPresetSupplier;
 
-    var flywheelMotorConfig = new TalonFXConfiguration();
-    var flywheelFollowerMotorConfig = new TalonFXConfiguration();
-    var hoodMotorConfig = new TalonFXConfiguration();
+    var flywheelMotorConfigs = new TalonFXConfiguration();
+    var flywheelFollowerMotorConfigs = new TalonFXConfiguration();
+    var hoodMotorConfigs = new TalonFXConfiguration();
 
     // flywheel motor configs
-    flywheelMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
-    flywheelMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    flywheelMotorConfigs.CurrentLimits.StatorCurrentLimit = 100;
+    flywheelMotorConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    flywheelMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
+    flywheelMotorConfigs.CurrentLimits.SupplyCurrentLimitEnable = false;
 
-    flywheelMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    flywheelMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    flywheelMotorConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    flywheelMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-    flywheelMotorConfig.Slot0.kS = ShooterConstants.flywheelkS.in(Volts);
-    flywheelMotorConfig.Slot0.kV = ShooterConstants.flywheelkV.in(Volts.per(RotationsPerSecond));
+    flywheelMotorConfigs.Slot0.kS = ShooterConstants.flywheelkS.in(Volts);
+    flywheelMotorConfigs.Slot0.kV = ShooterConstants.flywheelkV.in(Volts.per(RotationsPerSecond));
 
-    flywheelMotorConfig.Slot0.kP = ShooterConstants.flywheelkP.in(Volts.per(RotationsPerSecond));
+    flywheelMotorConfigs.Slot0.kP = ShooterConstants.flywheelkP.in(Volts.per(RotationsPerSecond));
 
-    flywheelMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.flywheelGearRatio;
+    flywheelMotorConfigs.Feedback.SensorToMechanismRatio = ShooterConstants.flywheelGearRatio;
 
     // flywheel follower motor configs
-    flywheelFollowerMotorConfig.CurrentLimits.StatorCurrentLimit = 100;
-    flywheelFollowerMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    flywheelFollowerMotorConfigs.CurrentLimits.StatorCurrentLimit = 100;
+    flywheelFollowerMotorConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    flywheelFollowerMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
+    flywheelFollowerMotorConfigs.CurrentLimits.SupplyCurrentLimitEnable = false;
 
-    flywheelFollowerMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    flywheelFollowerMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     // hood motor configs
-    hoodMotorConfig.Slot0.kS = ShooterConstants.hoodkS.in(Volts);
-    hoodMotorConfig.Slot0.kG = ShooterConstants.hoodkG.in(Volts);
-    hoodMotorConfig.Slot0.kV = ShooterConstants.hoodkV.in(Volts.per(RotationsPerSecond));
-    hoodMotorConfig.Slot0.kA = ShooterConstants.hoodkA.in(Volts.per(RotationsPerSecondPerSecond));
+    hoodMotorConfigs.Slot0.kS = ShooterConstants.hoodkS.in(Volts);
+    hoodMotorConfigs.Slot0.kG = ShooterConstants.hoodkG.in(Volts);
+    hoodMotorConfigs.Slot0.kV = ShooterConstants.hoodkV.in(Volts.per(RotationsPerSecond));
+    hoodMotorConfigs.Slot0.kA = ShooterConstants.hoodkA.in(Volts.per(RotationsPerSecondPerSecond));
 
-    hoodMotorConfig.Slot0.kP = ShooterConstants.hoodkP.in(Volts.per(Rotations));
+    hoodMotorConfigs.Slot0.kP = ShooterConstants.hoodkP.in(Volts.per(Rotations));
 
-    hoodMotorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+    hoodMotorConfigs.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
-    hoodMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    hoodMotorConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    hoodMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.hoodGearRatio;
+    hoodMotorConfigs.Feedback.SensorToMechanismRatio = ShooterConstants.hoodGearRatio;
 
-    hoodMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+    hoodMotorConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
         ShooterConstants.hoodForwardSoftLimitThreshold.in(Rotations);
-    hoodMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+    hoodMotorConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
         ShooterConstants.hoodReverseSoftLimitThreshold.in(Rotations);
 
-    hoodMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    hoodMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    hoodMotorConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+    hoodMotorConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
-    hoodMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
+    hoodMotorConfigs.MotionMagic.MotionMagicCruiseVelocity =
         ShooterConstants.hoodVelocity.in(RotationsPerSecond);
-    hoodMotorConfig.MotionMagic.MotionMagicAcceleration =
+    hoodMotorConfigs.MotionMagic.MotionMagicAcceleration =
         ShooterConstants.hoodAcceleration.in(RotationsPerSecondPerSecond);
 
     CTREUtil.attempt(
-        () -> _flywheelMotor.getConfigurator().apply(flywheelMotorConfig), _flywheelMotor);
+        () -> _flywheelMotor.getConfigurator().apply(flywheelMotorConfigs), _flywheelMotor);
     CTREUtil.attempt(
-        () -> _flywheelFollowerMotor.getConfigurator().apply(flywheelFollowerMotorConfig),
+        () -> _flywheelFollowerMotor.getConfigurator().apply(flywheelFollowerMotorConfigs),
         _flywheelFollowerMotor);
-    CTREUtil.attempt(() -> _hoodMotor.getConfigurator().apply(hoodMotorConfig), _hoodMotor);
+    CTREUtil.attempt(() -> _hoodMotor.getConfigurator().apply(hoodMotorConfigs), _hoodMotor);
 
     CTREUtil.attempt(() -> _flywheelMotor.optimizeBusUtilization(), _flywheelMotor);
     CTREUtil.attempt(() -> _flywheelFollowerMotor.optimizeBusUtilization(), _flywheelFollowerMotor);
@@ -140,6 +153,83 @@ public class Shooter extends AdvancedSubsystem {
         new Follower(ShooterConstants.flywheelMotorID, MotorAlignmentValue.Opposed));
 
     setDefaultCommand(idle());
+
+    if (Robot.isSimulation()) {
+      var flywheelMotorSimConfigs = new TalonFXConfiguration();
+      var hoodMotorSimConfigs = new TalonFXConfiguration();
+
+      _flywheelMotor.getConfigurator().refresh(flywheelMotorSimConfigs);
+      _hoodMotor.getConfigurator().refresh(hoodMotorSimConfigs);
+
+      flywheelMotorSimConfigs.Slot0.kS = 0;
+
+      hoodMotorSimConfigs.Slot0.kS = 0;
+      hoodMotorSimConfigs.Slot0.kG = 0;
+
+      _hoodMotor.setPosition(0);
+      hoodMotorSimConfigs.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
+
+      _flywheelMotor.getConfigurator().apply(flywheelMotorSimConfigs);
+      _hoodMotor.getConfigurator().apply(hoodMotorSimConfigs);
+
+      _flywheelSim =
+          new DCMotorSim(
+              LinearSystemId.createDCMotorSystem(
+                  MotorConstants.krakenX44, 0.001, ShooterConstants.flywheelGearRatio),
+              MotorConstants.krakenX44);
+
+      _hoodSim =
+          new DCMotorSim(
+              LinearSystemId.createDCMotorSystem(
+                  ShooterConstants.hoodkV.in(Volts.per(RadiansPerSecond)),
+                  ShooterConstants.hoodkA.in(Volts.per(RadiansPerSecondPerSecond))),
+              MotorConstants.krakenX44);
+
+      startSimThread();
+    }
+  }
+
+  private void startSimThread() {
+    _lastSimTime = Utils.getCurrentTimeSeconds();
+
+    _simNotifier =
+        new Notifier(
+            () -> {
+              final double batteryVolts = RobotController.getBatteryVoltage();
+
+              final double currentTime = Utils.getCurrentTimeSeconds();
+              final double deltaTime = currentTime - _lastSimTime;
+
+              var flywheelMotorSimState = _flywheelMotor.getSimState();
+
+              flywheelMotorSimState.setSupplyVoltage(batteryVolts);
+
+              _flywheelSim.setInputVoltage(
+                  flywheelMotorSimState.getMotorVoltageMeasure().in(Volts));
+              _flywheelSim.update(deltaTime);
+
+              flywheelMotorSimState.setRawRotorPosition(
+                  _flywheelSim.getAngularPosition().times(ShooterConstants.flywheelGearRatio));
+              flywheelMotorSimState.setRotorVelocity(
+                  _flywheelSim.getAngularVelocity().times(ShooterConstants.flywheelGearRatio));
+
+              var hoodMotorSimState = _hoodMotor.getSimState();
+
+              hoodMotorSimState.setSupplyVoltage(batteryVolts);
+
+              _hoodSim.setInputVoltage(hoodMotorSimState.getMotorVoltageMeasure().in(Volts));
+              _hoodSim.update(deltaTime);
+
+              hoodMotorSimState.setRawRotorPosition(
+                  _hoodSim.getAngularPosition().times(ShooterConstants.hoodGearRatio));
+              hoodMotorSimState.setRotorVelocity(
+                  _hoodSim.getAngularVelocity().times(ShooterConstants.hoodGearRatio));
+
+              _lastSimTime = currentTime;
+            });
+
+    _simNotifier.setName("Shooter Sim Thread");
+    _simNotifier.startPeriodic(1 / Constants.simNotifierFrequency.in(Hertz));
   }
 
   private void setFlywheelSpeed(AngularVelocity desiredFrontSpeed) {

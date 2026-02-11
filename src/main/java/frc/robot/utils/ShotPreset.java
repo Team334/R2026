@@ -18,8 +18,8 @@ public class ShotPreset {
   public ShotPreset() {}
 
   public ShotPreset(AngularVelocity flywheelSpeed, Angle hoodAngle) {
-    _flywheelSpeed.mut_replace(flywheelSpeed);
-    _hoodAngle.mut_replace(hoodAngle);
+    _flywheelSpeed.mut_setMagnitude(flywheelSpeed.in(RotationsPerSecond));
+    _hoodAngle.mut_setMagnitude(hoodAngle.in(Rotations));
   }
 
   public MutAngularVelocity getFlywheelSpeed() {
@@ -32,8 +32,8 @@ public class ShotPreset {
 
   // <flywheelRPS, hoodAngleRot>
   public ShotPreset set(Matrix<N2, N1> preset) {
-    _flywheelSpeed.mut_setBaseUnitMagnitude(preset.get(0, 0));
-    _hoodAngle.mut_setBaseUnitMagnitude(preset.get(1, 0));
+    _flywheelSpeed.mut_setMagnitude(preset.get(0, 0));
+    _hoodAngle.mut_setMagnitude(preset.get(1, 0));
 
     return this;
   }
