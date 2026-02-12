@@ -14,6 +14,7 @@ import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -130,13 +131,25 @@ public final class Constants {
     public static InterpolatingMatrixTreeMap<Double, N2, N1> ferryTable =
         new InterpolatingMatrixTreeMap<>();
 
-    static {
-      // score table
-      hubTable.put(1.0, vec2d(1.0, 1.0));
-      hubTable.put(5.0, vec2d(5.0, 5.0));
+    public static InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
+    public static InterpolatingDoubleTreeMap ferryTOFs = new InterpolatingDoubleTreeMap();
 
-      // ferry table
-      ferryTable.put(1.0, vec2d(1.0, 1.0));
+    static {
+        // hub table
+        hubTable.put(1.0, vec2d(1.0, 1.0));
+        hubTable.put(5.0, vec2d(5.0, 5.0));
+
+        // ferry table
+        ferryTable.put(1.0, vec2d(1.0, 1.0));
+        ferryTable.put(5.0, vec2d(5.0, 5.0));
+
+        // hub TOFs
+        hubTOFs.put(1.0, 1.0);
+        hubTOFs.put(5.0, 5.0);
+      
+        // ferry TOFs
+        ferryTOFs.put(1.0, 1.0);
+        ferryTOFs.put(5.0, 5.0);
     }
   }
 

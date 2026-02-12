@@ -3,7 +3,7 @@ import numpy as np
 from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
 
-projectile_velocity = 150
+projectile_velocity = 10
 
 def TOF(v: np.ndarray, g: np.ndarray, t: float) -> float:
     offset_g = g - (v * t)
@@ -11,7 +11,7 @@ def TOF(v: np.ndarray, g: np.ndarray, t: float) -> float:
 
     return distance / projectile_velocity
 
-v = np.array([0, 100])
+v = np.array([1, 1])
 g = np.array([0, 10])
 
 speed = np.linalg.norm(v)
