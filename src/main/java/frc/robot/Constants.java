@@ -118,30 +118,31 @@ public final class Constants {
     public static final double zBoundMargin = 0.01;
   }
 
-  public static class ShotPresets {
+  public static class ShotConstants {
     public static ShotPreset spitPreset = new ShotPreset(RotationsPerSecond.of(1), Rotations.of(1));
 
     private static Matrix<N2, N1> vec2d(double a, double b) {
       return new Matrix<N2, N1>(N2(), N1(), new double[] {a, b});
     }
 
-    // distanceMeter : <flywheelRPS, hoodAngleRot>
-    public static InterpolatingMatrixTreeMap<Double, N2, N1> hubTable =
+    // distanceMeters : <flywheelRPS, hoodAngleRots>
+    public static InterpolatingMatrixTreeMap<Double, N2, N1> hubPresets =
         new InterpolatingMatrixTreeMap<>();
-    public static InterpolatingMatrixTreeMap<Double, N2, N1> ferryTable =
+    public static InterpolatingMatrixTreeMap<Double, N2, N1> ferryPresets =
         new InterpolatingMatrixTreeMap<>();
 
+    // distanceMeters : TOFSecs
     public static InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
     public static InterpolatingDoubleTreeMap ferryTOFs = new InterpolatingDoubleTreeMap();
 
     static {
-        // hub table
-        hubTable.put(1.0, vec2d(1.0, 1.0));
-        hubTable.put(5.0, vec2d(5.0, 5.0));
+        // hub presets
+        hubPresets.put(1.0, vec2d(1.0, 1.0));
+        hubPresets.put(5.0, vec2d(5.0, 5.0));
 
-        // ferry table
-        ferryTable.put(1.0, vec2d(1.0, 1.0));
-        ferryTable.put(5.0, vec2d(5.0, 5.0));
+        // ferry presets
+        ferryPresets.put(1.0, vec2d(1.0, 1.0));
+        ferryPresets.put(5.0, vec2d(5.0, 5.0));
 
         // hub TOFs
         hubTOFs.put(1.0, 1.0);

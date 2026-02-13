@@ -3,6 +3,7 @@ package frc.robot.utils;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.measure.Angle;
@@ -13,8 +14,9 @@ import edu.wpi.first.units.measure.MutAngularVelocity;
 public class ShotPreset {
   private final MutAngularVelocity _flywheelSpeed = RotationsPerSecond.mutable(0);
   private final MutAngle _hoodAngle = Rotations.mutable(0);
+  private final Translation2d _virtualTarget = Translation2d.kZero;
 
-  private boolean _isValid = true;
+  public boolean isValid = true;
 
   public ShotPreset() {}
 
@@ -29,10 +31,6 @@ public class ShotPreset {
 
   public MutAngle getHoodAngle() {
     return _hoodAngle;
-  }
-
-  public boolean is_isValid() {
-    return _isValid;
   }
 
   // <flywheelRPS, hoodAngleRot>

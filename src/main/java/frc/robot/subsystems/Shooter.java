@@ -30,7 +30,7 @@ import frc.lib.FaultLogger;
 import frc.robot.Constants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.ShotPresets;
+import frc.robot.Constants.ShotConstants;
 import frc.robot.Robot;
 import frc.robot.utils.ShotPreset;
 import java.util.function.Supplier;
@@ -271,8 +271,8 @@ public class Shooter extends AdvancedSubsystem {
   /** Spits the fuel in front of the robot at a fixed angle and speed. */
   public Command spit() {
     return run(() -> {
-          setFlywheelSpeed(ShotPresets.spitPreset.getFlywheelSpeed());
-          setHoodAngle(ShotPresets.spitPreset.getHoodAngle());
+          setFlywheelSpeed(ShotConstants.spitPreset.getFlywheelSpeed());
+          setHoodAngle(ShotConstants.spitPreset.getHoodAngle());
         })
         .withName("Spit");
   }
