@@ -6,7 +6,7 @@ package frc.robot.commands;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.InputStream;
 import frc.robot.subsystems.Climb;
@@ -26,7 +26,7 @@ public class Superstructure {
   private final Climb _climb;
   private final Swerve _swerve;
 
-  private final Supplier<Pose2d> _shotPoseSupplier;
+  private final Supplier<Rotation2d> _shotHeadingSupplier;
 
   public Superstructure(
       Shooter shooter,
@@ -35,7 +35,7 @@ public class Superstructure {
       IntakeFeed intakeFeed,
       Climb climb,
       Swerve swerve,
-      Supplier<Pose2d> shotPoseSupplier) {
+      Supplier<Rotation2d> shotHeadingSupplier) {
     _shooter = shooter;
     _hopper = hopper;
     _intakePivot = intakePivot;
@@ -43,7 +43,7 @@ public class Superstructure {
     _climb = climb;
     _swerve = swerve;
 
-    _shotPoseSupplier = shotPoseSupplier;
+    _shotHeadingSupplier = shotHeadingSupplier;
   }
 
   /** Scores / ferries depending on robot pose. */
@@ -51,7 +51,7 @@ public class Superstructure {
     return parallel(
             _shooter.shoot(),
             _hopper.feed(),
-            _swerve.driveFacing(velX, velY, () -> _shotPoseSupplier.get().getRotation()))
+            _swerve.driveFacing(velX, velY, () -> _shotHeadingSupplier.get()))
         .withName("Shoot");
   }
 

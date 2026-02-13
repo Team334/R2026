@@ -36,7 +36,6 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.utils.ShotPreset;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -119,11 +118,8 @@ public final class Constants {
   }
 
   public static class ShotConstants {
-    public static ShotPreset spitPreset = new ShotPreset(RotationsPerSecond.of(1), Rotations.of(1));
-
-    private static Matrix<N2, N1> vec2d(double a, double b) {
-      return new Matrix<N2, N1>(N2(), N1(), new double[] {a, b});
-    }
+    public static final AngularVelocity spitFlywheelSpeed = RotationsPerSecond.of(5);
+    public static final Angle spitHoodAngle = Rotations.of(0.25);
 
     // distanceMeters : <flywheelRPS, hoodAngleRots>
     public static InterpolatingMatrixTreeMap<Double, N2, N1> hubPresets =
@@ -135,22 +131,26 @@ public final class Constants {
     public static InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
     public static InterpolatingDoubleTreeMap ferryTOFs = new InterpolatingDoubleTreeMap();
 
+    private static Matrix<N2, N1> vec2d(double a, double b) {
+      return new Matrix<N2, N1>(N2(), N1(), new double[] {a, b});
+    }
+
     static {
-        // hub presets
-        hubPresets.put(1.0, vec2d(1.0, 1.0));
-        hubPresets.put(5.0, vec2d(5.0, 5.0));
+      // hub presets
+      hubPresets.put(1.0, vec2d(1.0, 1.0));
+      hubPresets.put(5.0, vec2d(5.0, 5.0));
 
-        // ferry presets
-        ferryPresets.put(1.0, vec2d(1.0, 1.0));
-        ferryPresets.put(5.0, vec2d(5.0, 5.0));
+      // ferry presets
+      ferryPresets.put(1.0, vec2d(1.0, 1.0));
+      ferryPresets.put(5.0, vec2d(5.0, 5.0));
 
-        // hub TOFs
-        hubTOFs.put(1.0, 1.0);
-        hubTOFs.put(5.0, 5.0);
-      
-        // ferry TOFs
-        ferryTOFs.put(1.0, 1.0);
-        ferryTOFs.put(5.0, 5.0);
+      // hub TOFs
+      hubTOFs.put(1.0, 1.0);
+      hubTOFs.put(5.0, 5.0);
+
+      // ferry TOFs
+      ferryTOFs.put(1.0, 1.0);
+      ferryTOFs.put(5.0, 5.0);
     }
   }
 

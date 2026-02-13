@@ -19,7 +19,6 @@ import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
@@ -46,6 +45,7 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.intake.IntakeFeed;
 import frc.robot.subsystems.intake.IntakePivot;
 import frc.robot.utils.AllianceUtil;
+import frc.robot.utils.ShotParameters;
 import java.lang.reflect.Field;
 
 /**
@@ -59,6 +59,9 @@ public class Robot extends TimedRobot {
 
   private boolean _fileOnlySet = false;
 
+  @Logged(name = "Shot Parameters")
+  private ShotParameters _shotParameters = new ShotParameters();
+
   // controllers
   private final CommandXboxController _driverController =
       new CommandXboxController(Ports.driverController);
@@ -68,8 +71,7 @@ public class Robot extends TimedRobot {
   private final Swerve _swerve = TunerConstants.createDrivetrain();
 
   @Logged(name = "Shooter")
-  private final Shooter _shooter =
-      new Shooter(() -> AllianceUtil.getShotPreset(_swerve.getPose(), getShotPose()));
+  private final Shooter _shooter = new Shooter(() -> _shotParameters);
 
   @Logged(name = "Hopper")
   private final Hopper _hopper = new Hopper();
@@ -87,7 +89,13 @@ public class Robot extends TimedRobot {
 
   private final Superstructure _superstructure =
       new Superstructure(
-          _shooter, _hopper, _intakePivot, _intakeFeed, _climb, _swerve, this::getShotPose);
+          _shooter,
+          _hopper,
+          _intakePivot,
+          _intakeFeed,
+          _climb,
+          _swerve,
+          _shotParameters::getShotHeading);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -231,29 +239,6 @@ public class Robot extends TimedRobot {
   }
 
   /**
-   * Predicts the robot's translation given the current chassis speeds and the ({@link
-   * Constants#shotTimeScaler}). Rotation is calculated based on future translation and the hub's
-   * location.
-   */
-  @Logged(name = "Shot Pose")
-  public Pose2d getShotPose() {
-    Pose2d currentPose = _swerve.getPose();
-    ChassisSpeeds currentSpeeds =
-        ChassisSpeeds.fromRobotRelativeSpeeds(_swerve.getChassisSpeeds(), _swerve.getHeading());
-
-    Translation2d predictedTranslation =
-        currentPose
-            .getTranslation()
-            .plus(
-                new Translation2d(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond)
-                    .times(Constants.shotTimeScaler.in(Seconds)));
-
-    return new Pose2d(
-        predictedTranslation,
-        AllianceUtil.getShotTarget(currentPose).minus(predictedTranslation).getAngle());
-  }
-
-  /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
    * that you want ran during disabled, autonomous, teleoperated and test.
    *
@@ -263,6 +248,12 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     DogLog.time("Timing/Robot/robotPeriodic()");
+
+    _shotParameters =
+        AllianceUtil.getShotParameters(
+            _swerve.getPose(),
+            ChassisSpeeds.fromRobotRelativeSpeeds(
+                _swerve.getChassisSpeeds(), _swerve.getHeading()));
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
@@ -275,17 +266,6 @@ public class Robot extends TimedRobot {
 
       _fileOnlySet = true;
     }
-
-    DogLog.log("Shot Target", AllianceUtil.getShotTarget(_swerve.getPose()));
-
-    DogLog.log(
-        "Shot Preset/Flywheel Speed",
-        AllianceUtil.getShotPreset(_swerve.getPose(), getShotPose())
-            .getFlywheelSpeed()
-            .in(RadiansPerSecond));
-    DogLog.log(
-        "Shot Preset/Hood Angle",
-        AllianceUtil.getShotPreset(_swerve.getPose(), getShotPose()).getHoodAngle().in(Radians));
 
     DogLog.timeEnd("Timing/Robot/robotPeriodic()");
 

@@ -32,7 +32,7 @@ import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShotConstants;
 import frc.robot.Robot;
-import frc.robot.utils.ShotPreset;
+import frc.robot.utils.ShotParameters;
 import java.util.function.Supplier;
 
 public class Shooter extends AdvancedSubsystem {
@@ -59,7 +59,7 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Idle Velocity Percentage")
   private final double idleVelocityPercentage = 0.5;
 
-  private final Supplier<ShotPreset> _shotPresetSupplier;
+  private final Supplier<ShotParameters> _shotParametersSupplier;
 
   private DCMotorSim _flywheelSim;
   private DCMotorSim _hoodSim;
@@ -67,8 +67,8 @@ public class Shooter extends AdvancedSubsystem {
   private Notifier _simNotifier;
   private double _lastSimTime;
 
-  public Shooter(Supplier<ShotPreset> shotPresetSupplier) {
-    _shotPresetSupplier = shotPresetSupplier;
+  public Shooter(Supplier<ShotParameters> shotParametersSupplier) {
+    _shotParametersSupplier = shotParametersSupplier;
 
     var flywheelMotorConfigs = new TalonFXConfiguration();
     var flywheelFollowerMotorConfigs = new TalonFXConfiguration();
@@ -249,10 +249,12 @@ public class Shooter extends AdvancedSubsystem {
   /** Set hood to shooting angle, flywheels to {@link #idleVelocityPercentage} of shooting speed. */
   public Command idle() {
     return run(() -> {
-          ShotPreset preset = _shotPresetSupplier.get();
+          ShotParameters parameters = _shotParametersSupplier.get();
 
-          setFlywheelSpeed(preset.getFlywheelSpeed().times(idleVelocityPercentage));
-          setHoodAngle(preset.getHoodAngle());
+          if (!parameters.isValid) return;
+
+          setFlywheelSpeed(parameters.getFlywheelSpeed().times(idleVelocityPercentage));
+          setHoodAngle(parameters.getHoodAngle());
         })
         .withName("Idle");
   }
@@ -260,10 +262,12 @@ public class Shooter extends AdvancedSubsystem {
   /** Scores / ferries depending on robot pose. */
   public Command shoot() {
     return run(() -> {
-          ShotPreset preset = _shotPresetSupplier.get();
+          ShotParameters parameters = _shotParametersSupplier.get();
 
-          setFlywheelSpeed(preset.getFlywheelSpeed());
-          setHoodAngle(preset.getHoodAngle());
+          if (!parameters.isValid) return;
+
+          setFlywheelSpeed(parameters.getFlywheelSpeed());
+          setHoodAngle(parameters.getHoodAngle());
         })
         .withName("Shoot");
   }
@@ -271,8 +275,8 @@ public class Shooter extends AdvancedSubsystem {
   /** Spits the fuel in front of the robot at a fixed angle and speed. */
   public Command spit() {
     return run(() -> {
-          setFlywheelSpeed(ShotConstants.spitPreset.getFlywheelSpeed());
-          setHoodAngle(ShotConstants.spitPreset.getHoodAngle());
+          setFlywheelSpeed(ShotConstants.spitFlywheelSpeed);
+          setHoodAngle(ShotConstants.spitHoodAngle);
         })
         .withName("Spit");
   }

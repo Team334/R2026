@@ -13,7 +13,7 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShotConstants;
 
 public class AllianceUtil {
-  private static final ShotPreset _shotPreset = new ShotPreset();
+  private static final ShotParameters _shotParameters = new ShotParameters();
 
   // fpi constants
   private static final int maxIter = 10;
@@ -64,45 +64,49 @@ public class AllianceUtil {
   }
 
   /**
-   * Finds the shot target at the current robot pose, then uses fixed-point iteration to find
-   * the correct shot preset for the robot speeds.
+   * Finds the shot target at the current robot pose, then uses fixed-point iteration to find the
+   * correct shot parameters for the robot speeds.
    */
-  public static ShotPreset getShotPreset(Pose2d robotPose, ChassisSpeeds robotSpeeds) {
+  public static ShotParameters getShotParameters(Pose2d robotPose, ChassisSpeeds robotSpeeds) {
     InterpolatingMatrixTreeMap<Double, N2, N1> presets =
         inFerryZone(robotPose) ? ShotConstants.ferryPresets : ShotConstants.hubPresets;
 
-    InterpolatingDoubleTreeMap TOFs = inFerryZone(robotPose) ? ShotConstants.ferryTOFs : ShotConstants.hubTOFs;
+    InterpolatingDoubleTreeMap TOFs =
+        inFerryZone(robotPose) ? ShotConstants.ferryTOFs : ShotConstants.hubTOFs;
 
     Translation2d target = getShotTarget(robotPose);
 
     double t = 0;
     double prev_t = 0;
 
-    Translation2d robotSpeedsVec = new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
+    Translation2d robotSpeedsVec =
+        new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
 
     // fixed-point iteration
     for (int i = 0; i < maxIter; i++) {
       // t_n+1 = T(t_n)
-      double offsetTargetDistance = target.minus(robotSpeedsVec.times(t)).getDistance(robotPose.getTranslation());
-      double new_t = TOFs.get(offsetTargetDistance);
-      
+      double virtualTargetDistance =
+          target.minus(robotSpeedsVec.times(t)).getDistance(robotPose.getTranslation());
+      double new_t = TOFs.get(virtualTargetDistance);
+
       double dT_dt = (t != prev_t) ? (new_t - t) / (t - prev_t) : 0; // prevent division by 0
-      
+
       prev_t = t;
       t = new_t;
-      
+
       if (Math.abs(dT_dt) > contractionRate) {
-        _shotPreset.isValid = false;
+        _shotParameters.isValid = false;
         break;
       }
-      
+
       if (Math.abs(t - prev_t) < dTtolerance) {
-        _shotPreset.set();
+        virtualTargetDistance =
+            target.minus(robotSpeedsVec.times(t)).getDistance(robotPose.getTranslation());
+        _shotParameters.set(presets.get(virtualTargetDistance));
         break;
       }
     }
 
-    return _shotPreset.set(
-        presets.get(shotPose.getTranslation().getDistance(getShotTarget(robotPose))));
+    return _shotParameters;
   }
 }
