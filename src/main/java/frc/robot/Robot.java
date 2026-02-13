@@ -74,7 +74,7 @@ public class Robot extends TimedRobot {
   private final Shooter _shooter = new Shooter(() -> _shotParameters);
 
   @Logged(name = "Hopper")
-  private final Hopper _hopper = new Hopper();
+  private final Hopper _hopper = new Hopper(() -> _shotParameters);
 
   @Logged(name = "IntakePivot")
   private final IntakePivot _intakePivot = new IntakePivot();
@@ -95,7 +95,7 @@ public class Robot extends TimedRobot {
           _intakeFeed,
           _climb,
           _swerve,
-          _shotParameters::getShotHeading);
+          () -> _shotParameters.getShotHeading());
 
   /**
    * This function is run when the robot is first started up and should be used for any

@@ -20,6 +20,8 @@ import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
 import frc.robot.Constants;
 import frc.robot.Constants.HopperConstants;
+import frc.robot.utils.ShotParameters;
+import java.util.function.Supplier;
 
 public class Hopper extends AdvancedSubsystem {
   private final TalonFX _rollerMotor =
@@ -34,7 +36,11 @@ public class Hopper extends AdvancedSubsystem {
   private final StatusSignal<AngularVelocity> _rollerVelocityGetter = _rollerMotor.getVelocity();
   private final StatusSignal<AngularVelocity> _floorVelocityGetter = _floorMotor.getVelocity();
 
-  public Hopper() {
+  private final Supplier<ShotParameters> _shotParametersSupplier;
+
+  public Hopper(Supplier<ShotParameters> shotParametersSupplier) {
+    _shotParametersSupplier = shotParametersSupplier;
+
     var rollerMotorConfig = new TalonFXConfiguration();
     var floorMotorConfig = new TalonFXConfiguration();
 
@@ -75,17 +81,21 @@ public class Hopper extends AdvancedSubsystem {
             }));
   }
 
-  /** Feeds fuel into shooter. */
+  /** Feeds fuel into shooter when shot parameters are valid. */
   public Command feed() {
     return run(() -> {
-          _floorMotor.setControl(
-              _floorVelocitySetter.withVelocity(
-                  HopperConstants.floorFeedSpeed.in(RotationsPerSecond)));
-          _rollerMotor.setControl(
-              _rollerVelocitySetter.withVelocity(
-                  HopperConstants.rollerFeedSpeed.in(RotationsPerSecond)));
+          if (!_shotParametersSupplier.get().isValid) {
+            _floorMotor.setControl(_floorVelocitySetter.withVelocity(0));
+            _rollerMotor.setControl(_rollerVelocitySetter.withVelocity(0));
+            return;
+          }
+
+          ShotParameters parameters = _shotParametersSupplier.get();
+
+          _floorMotor.setControl(_floorVelocitySetter.withVelocity(parameters.getFloorSpeed()));
+          _rollerMotor.setControl(_rollerVelocitySetter.withVelocity(parameters.getRollerSpeed()));
         })
-        .withName("Fee");
+        .withName("Feed");
   }
 
   @Logged(name = "Roller Speed")

@@ -7,7 +7,9 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 
@@ -19,32 +21,58 @@ public class ShotParameters {
   @Logged(name = "Hood Angle")
   private final MutAngle _hoodAngle = Rotations.mutable(0);
 
+  @Logged(name = "Roller Speed")
+  private final MutAngularVelocity _rollerSpeed = RotationsPerSecond.mutable(0);
+
+  @Logged(name = "Floor Speed")
+  private final MutAngularVelocity _floorSpeed = RotationsPerSecond.mutable(0);
+
   @Logged(name = "Shot Heading")
-  private final Rotation2d _shotHeading = new Rotation2d();
+  private Rotation2d _shotHeading = new Rotation2d();
 
   @Logged(name = "Virtual Target")
-  private final Translation2d _virtualTarget = Translation2d.kZero;
+  private Translation2d _virtualTarget = Translation2d.kZero;
 
   @Logged(name = "Is Valid")
   public boolean isValid = true;
 
+  @Logged(name = "FPI Iterations")
+  public int fpiIterations = 0;
+
   public ShotParameters() {}
 
-  public MutAngularVelocity getFlywheelSpeed() {
+  public AngularVelocity getFlywheelSpeed() {
     return _flywheelSpeed;
   }
 
-  public MutAngle getHoodAngle() {
+  public Angle getHoodAngle() {
     return _hoodAngle;
+  }
+
+  public AngularVelocity getRollerSpeed() {
+    return _rollerSpeed;
+  }
+
+  public AngularVelocity getFloorSpeed() {
+    return _floorSpeed;
   }
 
   public Rotation2d getShotHeading() {
     return _shotHeading;
   }
 
-  // <flywheelRPS, hoodAngleRot>
-  public void set(Matrix<N2, N1> vec) {
-    _flywheelSpeed.mut_setMagnitude(vec.get(0, 0));
-    _hoodAngle.mut_setMagnitude(vec.get(1, 0));
+  public void setPreset(Matrix<N4, N1> preset) {
+    _flywheelSpeed.mut_setMagnitude(preset.get(0, 0));
+    _hoodAngle.mut_setMagnitude(preset.get(1, 0));
+    _rollerSpeed.mut_setMagnitude(preset.get(2, 0));
+    _floorSpeed.mut_setMagnitude(preset.get(3, 0));
+  }
+
+  public void setShotHeading(Rotation2d shotHeading) {
+    _shotHeading = shotHeading;
+  }
+
+  public void setVirtualTarget(Translation2d virtualTarget) {
+    _virtualTarget = virtualTarget;
   }
 }

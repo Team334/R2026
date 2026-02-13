@@ -251,20 +251,16 @@ public class Shooter extends AdvancedSubsystem {
     return run(() -> {
           ShotParameters parameters = _shotParametersSupplier.get();
 
-          if (!parameters.isValid) return;
-
           setFlywheelSpeed(parameters.getFlywheelSpeed().times(idleVelocityPercentage));
           setHoodAngle(parameters.getHoodAngle());
         })
         .withName("Idle");
   }
 
-  /** Scores / ferries depending on robot pose. */
+  /** Scores / ferries depending on robot pose and validity of shot parameters. */
   public Command shoot() {
     return run(() -> {
           ShotParameters parameters = _shotParametersSupplier.get();
-
-          if (!parameters.isValid) return;
 
           setFlywheelSpeed(parameters.getFlywheelSpeed());
           setHoodAngle(parameters.getHoodAngle());

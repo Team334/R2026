@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.FieldConstants;
@@ -68,7 +68,7 @@ public class AllianceUtil {
    * correct shot parameters for the robot speeds.
    */
   public static ShotParameters getShotParameters(Pose2d robotPose, ChassisSpeeds robotSpeeds) {
-    InterpolatingMatrixTreeMap<Double, N2, N1> presets =
+    InterpolatingMatrixTreeMap<Double, N4, N1> presets =
         inFerryZone(robotPose) ? ShotConstants.ferryPresets : ShotConstants.hubPresets;
 
     InterpolatingDoubleTreeMap TOFs =
@@ -96,13 +96,20 @@ public class AllianceUtil {
 
       if (Math.abs(dT_dt) > contractionRate) {
         _shotParameters.isValid = false;
+        _shotParameters.fpiIterations = i + 1;
+
         break;
       }
 
       if (Math.abs(t - prev_t) < dTtolerance) {
-        virtualTargetDistance =
-            target.minus(robotSpeedsVec.times(t)).getDistance(robotPose.getTranslation());
-        _shotParameters.set(presets.get(virtualTargetDistance));
+        Translation2d virtualTarget = target.minus(robotSpeedsVec.times(t));
+
+        _shotParameters.setPreset(
+            presets.get(virtualTarget.getDistance(robotPose.getTranslation())));
+        _shotParameters.setShotHeading(virtualTarget.minus(robotPose.getTranslation()).getAngle());
+        _shotParameters.setVirtualTarget(virtualTarget);
+        _shotParameters.fpiIterations = i + 1;
+
         break;
       }
     }
