@@ -20,6 +20,7 @@ import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
 import frc.robot.Constants;
 import frc.robot.Constants.HopperConstants;
+import frc.robot.Constants.ShotConstants;
 import frc.robot.utils.ShotParameters;
 import java.util.function.Supplier;
 
@@ -81,21 +82,38 @@ public class Hopper extends AdvancedSubsystem {
             }));
   }
 
-  /** Feeds fuel into shooter when shot parameters are valid. */
-  public Command feed() {
+  private void setFloorSpeed(AngularVelocity speed) {
+    _floorMotor.setControl(_floorVelocitySetter.withVelocity(speed));
+  }
+
+  private void setRollerSpeed(AngularVelocity speed) {
+    _rollerMotor.setControl(_rollerVelocitySetter.withVelocity(speed));
+  }
+
+  /** Feeds fuel for shooting, checking that shot parameters are valid. */
+  public Command feedShot() {
     return run(() -> {
           if (!_shotParametersSupplier.get().isValid) {
-            _floorMotor.setControl(_floorVelocitySetter.withVelocity(0));
-            _rollerMotor.setControl(_rollerVelocitySetter.withVelocity(0));
+            setFloorSpeed(RotationsPerSecond.zero());
+            setRollerSpeed(RotationsPerSecond.zero());
             return;
           }
 
           ShotParameters parameters = _shotParametersSupplier.get();
 
-          _floorMotor.setControl(_floorVelocitySetter.withVelocity(parameters.getFloorSpeed()));
-          _rollerMotor.setControl(_rollerVelocitySetter.withVelocity(parameters.getRollerSpeed()));
+          setFloorSpeed(parameters.getFloorSpeed());
+          setRollerSpeed(parameters.getRollerSpeed());
         })
         .withName("Feed");
+  }
+
+  /** Feeds fuel for spitting. */
+  public Command feedSpit() {
+    return run(
+        () -> {
+          setFloorSpeed(ShotConstants.spitFloorSpeed);
+          setRollerSpeed(ShotConstants.spitRollerSpeed);
+        });
   }
 
   @Logged(name = "Roller Speed")

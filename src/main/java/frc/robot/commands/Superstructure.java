@@ -50,14 +50,14 @@ public class Superstructure {
   public Command shoot(InputStream velX, InputStream velY) {
     return parallel(
             _shooter.shoot(),
-            _hopper.feed(),
+            _hopper.feedShot(),
             _swerve.driveFacing(velX, velY, () -> _shotHeadingSupplier.get()))
         .withName("Shoot");
   }
 
   /** Spits fuel at a short range without aiming. */
   public Command spit() {
-    return parallel(_shooter.spit(), _hopper.feed()).withName("Spit");
+    return parallel(_shooter.spit(), _hopper.feedSpit()).withName("Spit");
   }
 
   /**

@@ -232,13 +232,13 @@ public class Shooter extends AdvancedSubsystem {
     _simNotifier.startPeriodic(1 / Constants.simNotifierFrequency.in(Hertz));
   }
 
-  private void setFlywheelSpeed(AngularVelocity desiredFrontSpeed) {
-    double errorRps = desiredFrontSpeed.minus(getFlywheelSpeed()).in(RotationsPerSecond);
+  private void setFlywheelSpeed(AngularVelocity speed) {
+    double errorRps = speed.minus(getFlywheelSpeed()).in(RotationsPerSecond);
 
     if (Math.abs(errorRps) > velocityThreshold.in(RotationsPerSecond)) {
       _flywheelMotor.setControl(_flywheelDutyCycleSetter.withOutput(Math.signum(errorRps)));
     } else {
-      _flywheelMotor.setControl(_flywheelVelocitySetter.withVelocity(desiredFrontSpeed));
+      _flywheelMotor.setControl(_flywheelVelocitySetter.withVelocity(speed));
     }
   }
 
