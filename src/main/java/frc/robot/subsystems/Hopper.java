@@ -104,16 +104,16 @@ public class Hopper extends AdvancedSubsystem {
           setFloorSpeed(parameters.getFloorSpeed());
           setRollerSpeed(parameters.getRollerSpeed());
         })
-        .withName("Feed");
+        .withName("Feed Shot");
   }
 
   /** Feeds fuel for spitting. */
   public Command feedSpit() {
-    return run(
-        () -> {
+    return run(() -> {
           setFloorSpeed(ShotConstants.spitFloorSpeed);
           setRollerSpeed(ShotConstants.spitRollerSpeed);
-        });
+        })
+        .withName("Feed Spit");
   }
 
   @Logged(name = "Roller Speed")
