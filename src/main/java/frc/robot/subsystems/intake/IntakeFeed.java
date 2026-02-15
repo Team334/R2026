@@ -61,13 +61,13 @@ public class IntakeFeed extends AdvancedSubsystem {
     FaultLogger.register(_feedMotor);
 
     if (Robot.isSimulation()) {
-      var c = new TalonFXConfiguration();
+      var feedMotorSimConfigs = new TalonFXConfiguration();
 
-      _feedMotor.getConfigurator().refresh(c);
+      _feedMotor.getConfigurator().refresh(feedMotorSimConfigs);
 
-      c.Slot0.kS = 0;
+      feedMotorSimConfigs.Slot0.kS = 0;
 
-      _feedMotor.getConfigurator().apply(c);
+      _feedMotor.getConfigurator().apply(feedMotorSimConfigs);
 
       _feedSim =
           new DCMotorSim(

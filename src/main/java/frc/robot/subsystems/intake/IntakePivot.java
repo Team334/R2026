@@ -91,16 +91,16 @@ public class IntakePivot extends AdvancedSubsystem {
       _pivotMotor.setPosition(0);
 
       // prevent setRawMotor_ from negating physics sim output
-      var c = new TalonFXConfiguration();
+      var pivotMotorSimConfigs = new TalonFXConfiguration();
 
-      _pivotMotor.getConfigurator().refresh(c);
+      _pivotMotor.getConfigurator().refresh(pivotMotorSimConfigs);
 
-      c.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
+      pivotMotorSimConfigs.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
 
-      c.Slot0.kS = 0;
-      c.Slot0.kG = 0;
+      pivotMotorSimConfigs.Slot0.kS = 0;
+      pivotMotorSimConfigs.Slot0.kG = 0;
 
-      _pivotMotor.getConfigurator().apply(c);
+      _pivotMotor.getConfigurator().apply(pivotMotorSimConfigs);
 
       _pivotSim =
           new DCMotorSim(

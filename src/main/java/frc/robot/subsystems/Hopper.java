@@ -20,6 +20,9 @@ import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
 import frc.robot.Constants;
 import frc.robot.Constants.HopperConstants;
+import frc.robot.Constants.ShotConstants;
+import frc.robot.utils.ShotParameters;
+import java.util.function.Supplier;
 
 public class Hopper extends AdvancedSubsystem {
   private final TalonFX _rollerMotor =
@@ -34,7 +37,11 @@ public class Hopper extends AdvancedSubsystem {
   private final StatusSignal<AngularVelocity> _rollerVelocityGetter = _rollerMotor.getVelocity();
   private final StatusSignal<AngularVelocity> _floorVelocityGetter = _floorMotor.getVelocity();
 
-  public Hopper() {
+  private final Supplier<ShotParameters> _shotParametersSupplier;
+
+  public Hopper(Supplier<ShotParameters> shotParametersSupplier) {
+    _shotParametersSupplier = shotParametersSupplier;
+
     var rollerMotorConfig = new TalonFXConfiguration();
     var floorMotorConfig = new TalonFXConfiguration();
 
@@ -75,17 +82,38 @@ public class Hopper extends AdvancedSubsystem {
             }));
   }
 
-  /** Shoots fuel into shooter. */
-  public Command shoot() {
+  private void setFloorSpeed(AngularVelocity speed) {
+    _floorMotor.setControl(_floorVelocitySetter.withVelocity(speed));
+  }
+
+  private void setRollerSpeed(AngularVelocity speed) {
+    _rollerMotor.setControl(_rollerVelocitySetter.withVelocity(speed));
+  }
+
+  /** Feeds fuel for shooting, checking that shot parameters are valid. */
+  public Command feedShot() {
     return run(() -> {
-          _floorMotor.setControl(
-              _floorVelocitySetter.withVelocity(
-                  HopperConstants.floorShootSpeed.in(RotationsPerSecond)));
-          _rollerMotor.setControl(
-              _rollerVelocitySetter.withVelocity(
-                  HopperConstants.rollerShootSpeed.in(RotationsPerSecond)));
+          if (!_shotParametersSupplier.get().isValid) {
+            setFloorSpeed(RotationsPerSecond.zero());
+            setRollerSpeed(RotationsPerSecond.zero());
+            return;
+          }
+
+          ShotParameters parameters = _shotParametersSupplier.get();
+
+          setFloorSpeed(parameters.getFloorSpeed());
+          setRollerSpeed(parameters.getRollerSpeed());
         })
-        .withName("Shoot");
+        .withName("Feed Shot");
+  }
+
+  /** Feeds fuel for spitting. */
+  public Command feedSpit() {
+    return run(() -> {
+          setFloorSpeed(ShotConstants.spitFloorSpeed);
+          setRollerSpeed(ShotConstants.spitRollerSpeed);
+        })
+        .withName("Feed Spit");
   }
 
   @Logged(name = "Roller Speed")
