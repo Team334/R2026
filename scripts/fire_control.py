@@ -36,24 +36,21 @@ def FPI(max_iter: int):
             print("t has been found - converged after {} iterations.".format(i + 1))
             break
 
-    fig, axs = plt.subplots(2, 1, figsize=(6, 8))
+    axs = plt.subplots(1, 1, figsize=(6, 4))[1]
 
-    axs[0].plot(t_values, tof_values, label='TOF(t)')
-    axs[0].plot(t_values, t_values, label='y = t')
-    axs[0].plot(t, TOF(v, g, t), 'ro', markersize=8, label='Fixed-Point Solution')
-    axs[0].set_xlabel('t')
-    axs[0].set_ylabel('TOF')
-    axs[0].set_title('Fixed-Point Method')
-    axs[0].grid(True)
-    axs[0].legend()
+    # Calculate numerical derivative of TOF
+    tof_derivative = np.gradient(tof_values, t_values)
 
-    axs[1].semilogy(dt_history, 'ro-')
-    axs[1].set_xlabel('Iteration')
-    axs[1].set_ylabel('|Δt| (log scale)')
-    axs[1].set_title('FPI Convergence')
-    axs[1].grid(True, which="both")
-    
-    return fig, t, axs[0]
+    axs.plot(t_values, tof_values, label='TOF(t)')
+    axs.plot(t_values, t_values, label='y = t')
+    axs.plot(t, TOF(v, g, t), 'ro', markersize=8, label='Fixed-Point Solution')
+    axs.plot(t_values, tof_derivative, label="TOF'(t)", linewidth=2, linestyle='dashed')
+    axs.set_xlabel('t')
+    axs.set_ylabel('TOF / TOF\'')
+    axs.set_title('Fixed-Point Method')
+    axs.grid(True)
+    axs.legend()
+
 
 def Newton(max_iter: int):
     t = 0
@@ -80,24 +77,21 @@ def Newton(max_iter: int):
 
         t = new_t
 
-    fig, axs = plt.subplots(2, 1, figsize=(6, 8))
+    axs = plt.subplots(1, 1, figsize=(6, 4))[1]
 
-    axs[0].plot(t_values, tof_values, label='TOF(t)')
-    axs[0].plot(t_values, t_values, label='y = t')
-    axs[0].plot(t, TOF(v, g, t), 'go', markersize=8, label='Newton Solution')
-    axs[0].set_xlabel('t')
-    axs[0].set_ylabel('TOF')
-    axs[0].set_title('Newton Method')
-    axs[0].grid(True)
-    axs[0].legend()
+    # Calculate numerical derivative of TOF
+    tof_derivative = np.gradient(tof_values, t_values)
 
-    axs[1].semilogy(dt_history, 'go-')
-    axs[1].set_xlabel('Iteration')
-    axs[1].set_ylabel('|Δt| (log scale)')
-    axs[1].set_title('Newton Convergence')
-    axs[1].grid(True, which="both")
-    
-    return fig, t, axs[0]
+    axs.plot(t_values, tof_values, label='TOF(t)')
+    axs.plot(t_values, t_values, label='y = t')
+    axs.plot(t, TOF(v, g, t), 'go', markersize=8, label='Newton Solution')
+    axs.plot(t_values, tof_derivative, label="TOF'(t)", linewidth=2, linestyle='dashed')
+    axs.set_xlabel('t')
+    axs.set_ylabel('TOF / TOF\'')
+    axs.set_title('Newton Method')
+    axs.grid(True)
+    axs.legend()
+
 
 v = np.array([10, 10])
 g = np.array([0, 500])

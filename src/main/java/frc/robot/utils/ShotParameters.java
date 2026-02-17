@@ -36,8 +36,11 @@ public class ShotParameters {
   @Logged(name = "Is Valid")
   public boolean isValid = true;
 
-  @Logged(name = "FPI Iterations")
+  @Logged(name = "Iterations")
   public int fpiIterations = 0;
+
+  @Logged(name = "Projectile Velocity")
+  public double projectileVelocity = 0.0;
 
   public ShotParameters() {}
 
