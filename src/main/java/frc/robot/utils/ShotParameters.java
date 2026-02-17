@@ -42,6 +42,9 @@ public class ShotParameters {
   @Logged(name = "Projectile Velocity")
   public double projectileVelocity = 0.0;
 
+  @Logged(name = "Derivative")
+  public double dT = 0.0;
+
   public ShotParameters() {}
 
   public AngularVelocity getFlywheelSpeed() {
