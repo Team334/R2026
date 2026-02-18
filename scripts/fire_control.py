@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def TOF(v: np.ndarray, g: np.ndarray, t: float) -> float:
-    offset_g = g - (v * t)
-    distance = np.linalg.norm(offset_g)
+    virtual_goal = g - (v * t)
+    distance = np.linalg.norm(virtual_goal)
 
     return distance / projectile_velocity
 
