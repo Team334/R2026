@@ -12,7 +12,6 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.AngleUnit;
@@ -82,7 +81,7 @@ public final class Constants {
             new Translation2d(
                 FIELD_LENTH.minus(Inches.of(204.48).plus(bumpZoneTolereance)),
                 FIELD_WIDTH.minus(Inches.of(258.65)))); // enclose both bumps and hub
-    
+
     public static final Translation2d blueHub =
         new Translation2d(
             tagLayout.getTagPose(26).get().getX() + Units.inchesToMeters(47.0) / 2.0,

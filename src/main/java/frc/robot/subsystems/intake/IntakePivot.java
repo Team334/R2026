@@ -1,7 +1,6 @@
 package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -121,9 +120,11 @@ public class IntakePivot extends AdvancedSubsystem {
       startSimThread();
     }
 
-    new Trigger(() -> checkInBumpZone(pose.get())).onTrue(tuck()).onFalse(raise());
-
     setDefaultCommand(raise());
+
+    // can't combine into 1 trigger
+    new Trigger(() -> checkInBumpZone(pose.get())).and(_intakeLowered).onTrue(tuck());
+    new Trigger(() -> checkInBumpZone(pose.get())).onFalse(lower());
   }
 
   private void startSimThread() {
