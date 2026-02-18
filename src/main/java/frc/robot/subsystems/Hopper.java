@@ -93,7 +93,7 @@ public class Hopper extends AdvancedSubsystem {
   /** Feeds fuel for shooting, checking that shot parameters are valid. */
   public Command feedShot() {
     return run(() -> {
-          if (!_shotParametersSupplier.get().badShot) {
+          if (!_shotParametersSupplier.get().isNoiseSensitive) {
             setFloorSpeed(RotationsPerSecond.zero());
             setRollerSpeed(RotationsPerSecond.zero());
             return;

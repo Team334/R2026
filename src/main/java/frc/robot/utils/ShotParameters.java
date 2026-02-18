@@ -33,8 +33,8 @@ public class ShotParameters {
   @Logged(name = "Virtual Target")
   private Translation2d _virtualTarget = Translation2d.kZero;
 
-  @Logged(name = "Bad Shot")
-  public boolean badShot = false;
+  @Logged(name = "is Noise Sensitive")
+  public boolean isNoiseSensitive = false;
 
   @Logged(name = "Iterations")
   public int fpiIterations = 0;

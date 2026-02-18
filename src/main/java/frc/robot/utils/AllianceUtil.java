@@ -91,6 +91,7 @@ public class AllianceUtil {
         virtualTargetDisplacementVec.getNorm() / TOFs.get(virtualTargetDisplacementVec.getNorm());
 
     _shotParameters.projectileVelocity = intialProjectileVelocity;
+    _shotParameters.isNoiseSensitive = false;
 
     for (int i = 0; i < maxIter; i++) {
       double E = t - (virtualTargetDisplacementVec.getNorm() / intialProjectileVelocity);
@@ -105,7 +106,7 @@ public class AllianceUtil {
 
       if (Math.abs(dTOF) > shotStabilityTolerance) {
         FaultLogger.report(new Fault("Shot may be inaccurate", FaultType.WARNING));
-        _shotParameters.badShot = true;
+        _shotParameters.isNoiseSensitive = true;
       }
 
       if (Math.abs(new_t - t) < dTtolerance) {
