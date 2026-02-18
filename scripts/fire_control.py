@@ -53,8 +53,6 @@ def FPI(max_iter: int):
 def Newton(max_iter: int):
     print("\nNewton")
 
-    global projectile_velocity
-
     t = 0
 
     for i in range(max_iter):
