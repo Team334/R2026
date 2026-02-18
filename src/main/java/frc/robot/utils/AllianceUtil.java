@@ -9,6 +9,9 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.lib.FaultLogger;
+import frc.lib.FaultsTable.Fault;
+import frc.lib.FaultsTable.FaultType;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShotConstants;
 
@@ -18,7 +21,7 @@ public class AllianceUtil {
   // fpi constants
   private static final int maxIter = 10;
   private static final double dTtolerance = 0.01;
-  private static final double contractionRate = 0.8;
+  private static final double shotStabilityTolerance = 0.8;
 
   /** Gets the alliance from the DS. If the alliance can't be retreived, blue is used by default. */
   public static Alliance getAlliance() {
@@ -77,39 +80,36 @@ public class AllianceUtil {
     Translation2d target = getShotTarget(robotPose);
 
     double t = 0;
-    double prev_t = 0;
 
     Translation2d robotSpeedsVec =
         new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
 
-    // fixed-point iteration
+    // newton
+    Translation2d virtualTargetDisplacementVec =
+        target.minus(robotPose.getTranslation()).minus(robotSpeedsVec.times(t));
+    double intialProjectileVelocity =
+        virtualTargetDisplacementVec.getNorm() / TOFs.get(virtualTargetDisplacementVec.getNorm());
+
+    _shotParameters.projectileVelocity = intialProjectileVelocity;
+
     for (int i = 0; i < maxIter; i++) {
-      // t_n+1 = T(t_n)
-      double virtualTargetDistance =
-          target.minus(robotSpeedsVec.times(t)).getDistance(robotPose.getTranslation());
-      double new_t = TOFs.get(virtualTargetDistance);
+      double E = t - (virtualTargetDisplacementVec.getNorm() / intialProjectileVelocity);
+      double dTOF =
+          -virtualTargetDisplacementVec.dot(robotSpeedsVec)
+              / (intialProjectileVelocity * virtualTargetDisplacementVec.getNorm());
+      double dE = 1 - dTOF;
 
-      double dT_dt = (t != prev_t) ? (new_t - t) / (t - prev_t) : 0; // prevent division by 0
+      _shotParameters.dT = dTOF;
 
-      double dE =
-          -robotSpeedsVec.dot(
-                  target.minus(robotPose.getTranslation()).minus(robotSpeedsVec.times(t)))
-              / (virtualTargetDistance * 1); // vp is 1
+      double new_t = t - (E / dE);
 
-      _shotParameters.dT = dE;
+      if (Math.abs(dTOF) > shotStabilityTolerance) {
+        FaultLogger.report(new Fault("Shot may be inaccurate", FaultType.WARNING));
+        _shotParameters.badShot = true;
+      }
 
-      prev_t = t;
-      t = new_t;
-
-      // if (Math.abs(dT_dt) > contractionRate) {
-      //   _shotParameters.isValid = false;
-      //   _shotParameters.fpiIterations = i + 1;
-
-      //   break;
-      // }
-
-      if (Math.abs(t - prev_t) < dTtolerance) {
-        Translation2d virtualTarget = target.minus(robotSpeedsVec.times(t));
+      if (Math.abs(new_t - t) < dTtolerance) {
+        Translation2d virtualTarget = target.minus(robotSpeedsVec.times(new_t));
 
         _shotParameters.setPreset(
             presets.get(virtualTarget.getDistance(robotPose.getTranslation())));
@@ -120,45 +120,11 @@ public class AllianceUtil {
 
         break;
       }
+
+      t = new_t;
+      virtualTargetDisplacementVec =
+          target.minus(robotPose.getTranslation()).minus(robotSpeedsVec.times(t));
     }
-
-    // newton
-    // Translation2d virtualTargetDisplacementVec =
-    //     target.minus(robotPose.getTranslation()).minus(robotSpeedsVec.times(t));
-    // double intialProjectileVelocity =
-    //     virtualTargetDisplacementVec.getNorm() /
-    // TOFs.get(virtualTargetDisplacementVec.getNorm());
-
-    // _shotParameters.projectileVelocity = intialProjectileVelocity;
-
-    // for (int i = 0; i < maxIter; i++) {
-    //   double E = t - (virtualTargetDisplacementVec.getNorm() / intialProjectileVelocity);
-    //   double dE =
-    //       1
-    //           + (virtualTargetDisplacementVec.dot(robotSpeedsVec)
-    //               / (virtualTargetDisplacementVec.getNorm() * intialProjectileVelocity));
-
-    //   _shotParameters.dT = dE;
-
-    //   double new_t = t - (E / dE);
-
-    //   if (Math.abs(new_t - t) < dTtolerance) {
-    //     Translation2d virtualTarget = target.minus(robotSpeedsVec.times(new_t));
-
-    //     _shotParameters.setPreset(
-    //         presets.get(virtualTarget.getDistance(robotPose.getTranslation())));
-    //
-    // _shotParameters.setShotHeading(virtualTarget.minus(robotPose.getTranslation()).getAngle());
-    //     _shotParameters.setVirtualTarget(virtualTarget);
-    //     _shotParameters.fpiIterations = i + 1;
-
-    //     break;
-    //   }
-
-    //   t = new_t;
-    //   virtualTargetDisplacementVec =
-    //       target.minus(robotPose.getTranslation()).minus(robotSpeedsVec.times(t));
-    // }
 
     return _shotParameters;
   }
