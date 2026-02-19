@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import choreo.auto.AutoFactory;
@@ -10,9 +9,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.doglog.DogLog;
 import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib.FaultLogger;
+import frc.lib.FaultsTable.FaultType;
 import frc.robot.subsystems.Swerve;
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +47,21 @@ public class Autos {
       return _dir;
     }
   }
+
+  private final StringSubscriber _saveJson =
+      DogLog.tunable(
+          "Save JSON",
+          "null",
+          jsonName -> {
+            saveJson(jsonName);
+          });
+  private final StringSubscriber _loadJson =
+      DogLog.tunable(
+          "Load JSON",
+          "null",
+          jsonName -> {
+            loadJson(jsonName);
+          });
 
   private final BooleanEntry _shootPreload =
       NetworkTableInstance.getDefault().getBooleanTopic("AutoPreset/Shoot Preload").getEntry(false);
@@ -90,13 +107,6 @@ public class Autos {
     _climb.set(false);
 
     SmartDashboard.putData("Side Selector", _sideSelector);
-    SmartDashboard.putData("Save Selected", runOnce(this::saveJson));
-    SmartDashboard.putData(
-        "Load",
-        runOnce(
-            () ->
-                loadJson(
-                    new File(Filesystem.getDeployDirectory() + "/autoPresets/autonLayout.json"))));
   }
 
   public AutoRoutine example() {
@@ -110,11 +120,11 @@ public class Autos {
     return routine;
   }
 
-  private void saveJson() {
+  private void saveJson(String name) {
     File folder = new File(Filesystem.getDeployDirectory(), "autoPresets");
     folder.mkdirs();
 
-    File jsonFile = new File(folder, "autonLayout.json");
+    File jsonFile = new File(folder, name + ".json");
 
     Map<String, Boolean> layout = new HashMap<>();
 
@@ -127,14 +137,17 @@ public class Autos {
 
     try {
       _jsonSave.writerWithDefaultPrettyPrinter().writeValue(jsonFile, layout);
+      FaultLogger.report("Saved JSON", FaultType.INFO);
+
     } catch (IOException e) {
-      e.printStackTrace();
+      FaultLogger.report("Error saving JSON: " + e.getStackTrace(), FaultType.ERROR);
     }
   }
 
-  private void loadJson(File jsonFile) {
+  private void loadJson(String name) {
+    File jsonFile = new File(Filesystem.getDeployDirectory() + "/autoPresets/" + name + ".json");
     if (!jsonFile.exists()) {
-      System.out.println("File not found: " + jsonFile.getAbsolutePath());
+      FaultLogger.report("Auto preset not found at " + jsonFile.getAbsolutePath(), FaultType.ERROR);
       return;
     }
 
@@ -155,6 +168,6 @@ public class Autos {
       e.printStackTrace();
     }
 
-    System.out.println("Loaded JSON from: " + jsonFile.getAbsolutePath());
+    FaultLogger.report("Loaded JSON", FaultType.INFO);
   }
 }
