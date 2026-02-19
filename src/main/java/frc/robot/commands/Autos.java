@@ -48,15 +48,15 @@ public class Autos {
 
   private final BooleanEntry _shootPreload =
       NetworkTableInstance.getDefault().getBooleanTopic("AutoPreset/Shoot Preload").getEntry(false);
-  private BooleanEntry _depot =
+  private final BooleanEntry _depot =
       NetworkTableInstance.getDefault().getBooleanTopic("AutoPreset/Depot").getEntry(false);
-  private BooleanEntry _humanStation =
+  private final BooleanEntry _humanStation =
       NetworkTableInstance.getDefault().getBooleanTopic("AutoPreset/Human Station").getEntry(false);
-  private BooleanEntry _bump =
+  private final BooleanEntry _bump =
       NetworkTableInstance.getDefault().getBooleanTopic("AutoPreset/Bump").getEntry(false);
-  private BooleanEntry _neutralZone =
+  private final BooleanEntry _neutralZone =
       NetworkTableInstance.getDefault().getBooleanTopic("AutoPreset/Neutral Zone").getEntry(false);
-  private BooleanEntry _climb =
+  private final BooleanEntry _climb =
       NetworkTableInstance.getDefault().getBooleanTopic("AutoPreset/Climb").getEntry(false);
 
   public Autos(Swerve swerve) {
