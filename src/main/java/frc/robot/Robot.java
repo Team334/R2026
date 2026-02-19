@@ -24,12 +24,14 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.FaultLogger;
 import frc.lib.FaultsTable.FaultType;
 import frc.lib.InputStream;
@@ -126,6 +128,17 @@ public class Robot extends TimedRobot {
     FaultLogger.setup(_ntInst);
 
     configureDriverBindings();
+
+    new Trigger(() -> _shotParameters.isNoiseSensitive)
+        .onTrue(
+            run(() -> {
+                  _driverController.setRumble(RumbleType.kBothRumble, 1);
+                })
+                .withTimeout(0.5)
+                .finallyDo(
+                    () -> {
+                      _driverController.setRumble(RumbleType.kBothRumble, 0);
+                    }));
 
     SmartDashboard.putData("Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)));
     SmartDashboard.putData("Drive to (1, 0)", _swerve.driveTo(new Pose2d(1, 0, Rotation2d.kZero)));
