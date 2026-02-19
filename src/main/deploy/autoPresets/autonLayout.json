@@ -1,0 +1,8 @@
+{
+  "climb" : true,
+  "depot" : true,
+  "shootPreload" : true,
+  "neutralZone" : false,
+  "bump" : true,
+  "humanStation" : false
+}
