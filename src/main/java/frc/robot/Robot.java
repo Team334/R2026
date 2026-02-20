@@ -17,8 +17,6 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
@@ -61,12 +59,12 @@ public class Robot extends TimedRobot {
 
   private boolean _fileOnlySet = false;
 
-  @Logged(name = "Shot Parameters")
-  private ShotParameters _shotParameters = new ShotParameters();
-
   // controllers
   private final CommandXboxController _driverController =
       new CommandXboxController(Ports.driverController);
+
+  @Logged(name = "Shot Parameters")
+  private ShotParameters _shotParameters = new ShotParameters();
 
   // subsystems
   @Logged(name = "Swerve")
@@ -129,20 +127,22 @@ public class Robot extends TimedRobot {
 
     configureDriverBindings();
 
-    new Trigger(() -> _shotParameters.isNoiseSensitive)
-        .onTrue(
-            run(() -> {
+    new Trigger(() -> _shotParameters.isErrorSensitive)
+        .whileTrue(
+            run(
+                () -> {
                   _driverController.setRumble(RumbleType.kBothRumble, 1);
-                })
-                .withTimeout(0.5)
-                .finallyDo(
-                    () -> {
-                      _driverController.setRumble(RumbleType.kBothRumble, 0);
-                    }));
+                }))
+        .onFalse(
+            runOnce(
+                () -> {
+                  _driverController.setRumble(RumbleType.kBothRumble, 0);
+                }));
 
-    SmartDashboard.putData("Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)));
-    SmartDashboard.putData("Drive to (1, 0)", _swerve.driveTo(new Pose2d(1, 0, Rotation2d.kZero)));
-    SmartDashboard.putData("Drive to (0, 0)", _swerve.driveTo(Pose2d.kZero));
+    // SmartDashboard.putData("Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)));
+    // SmartDashboard.putData("Drive to (1, 0)", _swerve.driveTo(new Pose2d(1, 0,
+    // Rotation2d.kZero)));
+    // SmartDashboard.putData("Drive to (0, 0)", _swerve.driveTo(Pose2d.kZero));
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
     SmartDashboard.putData("Calculate Wheel COF", _swerve.calculateWheelCOF());

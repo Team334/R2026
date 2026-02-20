@@ -33,17 +33,16 @@ public class ShotParameters {
   @Logged(name = "Virtual Target")
   private Translation2d _virtualTarget = Translation2d.kZero;
 
-  @Logged(name = "is Noise Sensitive")
-  public boolean isNoiseSensitive = false;
+  /**
+   * If the robot-relative projectile velocity and the robot velocity vectors are strongly coupled,
+   * the field-relative projectile velocity will have a larger error, given errors in the
+   * robot-relative projectile velocity and robot velocity vectors.
+   */
+  @Logged(name = "Is Error Sensitive")
+  public boolean isErrorSensitive = false;
 
-  @Logged(name = "Iterations")
-  public int fpiIterations = 0;
-
-  @Logged(name = "Projectile Velocity")
-  public double projectileVelocity = 0.0;
-
-  @Logged(name = "Derivative")
-  public double dT = 0.0;
+  @Logged(name = "Newton Iterations")
+  public int newtonIterations = 0;
 
   public ShotParameters() {}
 

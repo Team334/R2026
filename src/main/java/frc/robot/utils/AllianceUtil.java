@@ -1,5 +1,7 @@
 package frc.robot.utils;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -7,21 +9,24 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.lib.FaultLogger;
-import frc.lib.FaultsTable.Fault;
-import frc.lib.FaultsTable.FaultType;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShotConstants;
+import frc.robot.Constants.SwerveConstants;
 
 public class AllianceUtil {
   private static final ShotParameters _shotParameters = new ShotParameters();
 
-  // fpi constants
+  // newton's method constants
   private static final int maxIter = 10;
-  private static final double dTtolerance = 0.01;
-  private static final double shotStabilityTolerance = 0.8;
+  private static final LinearVelocity projectileHorizontalVelocity = MetersPerSecond.of(15);
+  private static final double E_tolerance = 0.1;
+  private static final double dT_dt_tolerance =
+      SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)
+          * Math.cos(Math.toRadians(20)) // min overlap angle at worst-case robot velocity
+          / projectileHorizontalVelocity.in(MetersPerSecond);
 
   /** Gets the alliance from the DS. If the alliance can't be retreived, blue is used by default. */
   public static Alliance getAlliance() {
@@ -67,8 +72,8 @@ public class AllianceUtil {
   }
 
   /**
-   * Finds the shot target at the current robot pose, then uses fixed-point iteration to find the
-   * correct shot parameters for the robot speeds.
+   * Finds the shot target at the current robot pose, then uses newton's method to find the correct
+   * shot parameters for the robot speeds.
    */
   public static ShotParameters getShotParameters(Pose2d robotPose, ChassisSpeeds robotSpeeds) {
     InterpolatingMatrixTreeMap<Double, N4, N1> presets =
@@ -81,50 +86,44 @@ public class AllianceUtil {
 
     double t = 0;
 
-    Translation2d robotSpeedsVec =
+    Translation2d robotVelocity =
         new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
 
-    // newton
-    Translation2d virtualTargetDisplacementVec =
-        target.minus(robotPose.getTranslation()).minus(robotSpeedsVec.times(t));
-    double intialProjectileVelocity =
-        virtualTargetDisplacementVec.getNorm() / TOFs.get(virtualTargetDisplacementVec.getNorm());
+    Translation2d robotToVirtualTarget =
+        target.minus(robotPose.getTranslation()).minus(robotVelocity.times(t));
 
-    _shotParameters.projectileVelocity = intialProjectileVelocity;
-    _shotParameters.isNoiseSensitive = false;
+    _shotParameters.isErrorSensitive = false;
 
     for (int i = 0; i < maxIter; i++) {
-      double E = t - (virtualTargetDisplacementVec.getNorm() / intialProjectileVelocity);
-      double dTOF =
-          -virtualTargetDisplacementVec.dot(robotSpeedsVec)
-              / (intialProjectileVelocity * virtualTargetDisplacementVec.getNorm());
-      double dE = 1 - dTOF;
+      double T = TOFs.get(robotToVirtualTarget.getNorm());
+      double dT_dt =
+          (-robotToVirtualTarget.dot(robotVelocity))
+              / (projectileHorizontalVelocity.in(MetersPerSecond) * robotToVirtualTarget.getNorm());
 
-      _shotParameters.dT = dTOF;
+      double E = t - T;
+      double dE_dt = 1 - dT_dt;
 
-      double new_t = t - (E / dE);
+      double new_t = t - (E / dE_dt);
 
-      if (Math.abs(dTOF) > shotStabilityTolerance) {
-        FaultLogger.report(new Fault("Shot may be inaccurate", FaultType.WARNING));
-        _shotParameters.isNoiseSensitive = true;
-      }
-
-      if (Math.abs(new_t - t) < dTtolerance) {
-        Translation2d virtualTarget = target.minus(robotSpeedsVec.times(new_t));
+      if (Math.abs(new_t - t) < E_tolerance) {
+        Translation2d virtualTarget = target.minus(robotVelocity.times(new_t));
 
         _shotParameters.setPreset(
             presets.get(virtualTarget.getDistance(robotPose.getTranslation())));
 
         _shotParameters.setShotHeading(virtualTarget.minus(robotPose.getTranslation()).getAngle());
         _shotParameters.setVirtualTarget(virtualTarget);
-        _shotParameters.fpiIterations = i + 1;
+        _shotParameters.newtonIterations = i + 1;
 
         break;
       }
 
+      if (dT_dt > dT_dt_tolerance && !_shotParameters.isErrorSensitive) {
+        _shotParameters.isErrorSensitive = true;
+      }
+
       t = new_t;
-      virtualTargetDisplacementVec =
-          target.minus(robotPose.getTranslation()).minus(robotSpeedsVec.times(t));
+      robotToVirtualTarget = target.minus(robotPose.getTranslation()).minus(robotVelocity.times(t));
     }
 
     return _shotParameters;
