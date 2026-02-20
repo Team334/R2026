@@ -1,5 +1,7 @@
 package frc.robot.utils;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -7,18 +9,22 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShotConstants;
+import frc.robot.Constants.SwerveConstants;
 
 public class AllianceUtil {
-  private static final ShotParameters _shotParameters = new ShotParameters();
-
-  // fpi constants
+  // newton's method constants
   private static final int maxIter = 10;
-  private static final double dTtolerance = 0.01;
-  private static final double contractionRate = 0.8;
+  private static final LinearVelocity projectileHorizontalVelocity = MetersPerSecond.of(15);
+  private static final double E_tolerance = 0.1;
+  private static final double dT_dt_tolerance =
+      SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)
+          * Math.cos(Math.toRadians(20)) // min overlap angle at worst-case robot velocity
+          / projectileHorizontalVelocity.in(MetersPerSecond);
 
   /** Gets the alliance from the DS. If the alliance can't be retreived, blue is used by default. */
   public static Alliance getAlliance() {
@@ -64,10 +70,11 @@ public class AllianceUtil {
   }
 
   /**
-   * Finds the shot target at the current robot pose, then uses fixed-point iteration to find the
-   * correct shot parameters for the robot speeds.
+   * Finds the shot target at the current robot pose, then uses newton's method to update the
+   * supplied shot parameters.
    */
-  public static ShotParameters getShotParameters(Pose2d robotPose, ChassisSpeeds robotSpeeds) {
+  public static void getShotParameters(
+      Pose2d robotPose, ChassisSpeeds robotSpeeds, ShotParameters shotParameters) {
     InterpolatingMatrixTreeMap<Double, N4, N1> presets =
         inFerryZone(robotPose) ? ShotConstants.ferryPresets : ShotConstants.hubPresets;
 
@@ -76,44 +83,53 @@ public class AllianceUtil {
 
     Translation2d target = getShotTarget(robotPose);
 
-    double t = 0;
-    double prev_t = 0;
+    shotParameters.setTarget(target);
 
-    Translation2d robotSpeedsVec =
+    double t = 0;
+
+    Translation2d robotVelocity =
         new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
 
-    // fixed-point iteration
+    Translation2d robotToVirtualTarget =
+        target.minus(robotPose.getTranslation()).minus(robotVelocity.times(t));
+
     for (int i = 0; i < maxIter; i++) {
-      // t_n+1 = T(t_n)
-      double virtualTargetDistance =
-          target.minus(robotSpeedsVec.times(t)).getDistance(robotPose.getTranslation());
-      double new_t = TOFs.get(virtualTargetDistance);
+      double T = TOFs.get(robotToVirtualTarget.getNorm());
+      double dT_dt =
+          -robotToVirtualTarget.dot(robotVelocity)
+              / (projectileHorizontalVelocity.in(MetersPerSecond) * robotToVirtualTarget.getNorm());
 
-      double dT_dt = (t != prev_t) ? (new_t - t) / (t - prev_t) : 0; // prevent division by 0
+      double E = t - T;
+      double dE_dt = 1 - dT_dt;
 
-      prev_t = t;
-      t = new_t;
+      double new_t = t - (E / dE_dt);
 
-      if (Math.abs(dT_dt) > contractionRate) {
-        _shotParameters.isValid = false;
-        _shotParameters.fpiIterations = i + 1;
-
-        break;
+      if (i == 0) {
+        shotParameters.isErrorSensitive = Math.abs(dT_dt) > dT_dt_tolerance;
+        shotParameters.couplingDegrees =
+            Math.toDegrees(
+                Math.acos(
+                    Math.abs(
+                        robotToVirtualTarget.dot(robotVelocity)
+                            / (robotToVirtualTarget.getNorm() * robotVelocity.getNorm()))));
       }
 
-      if (Math.abs(t - prev_t) < dTtolerance) {
-        Translation2d virtualTarget = target.minus(robotSpeedsVec.times(t));
+      if (Math.abs(new_t - t) < E_tolerance) {
+        Translation2d virtualTarget = target.minus(robotVelocity.times(new_t));
 
-        _shotParameters.setPreset(
+        shotParameters.setPreset(
             presets.get(virtualTarget.getDistance(robotPose.getTranslation())));
-        _shotParameters.setShotHeading(virtualTarget.minus(robotPose.getTranslation()).getAngle());
-        _shotParameters.setVirtualTarget(virtualTarget);
-        _shotParameters.fpiIterations = i + 1;
+
+        shotParameters.setShotHeading(virtualTarget.minus(robotPose.getTranslation()).getAngle());
+        shotParameters.setVirtualTarget(virtualTarget);
+
+        shotParameters.newtonIterations = i + 1;
 
         break;
       }
-    }
 
-    return _shotParameters;
+      t = new_t;
+      robotToVirtualTarget = target.minus(robotPose.getTranslation()).minus(robotVelocity.times(t));
+    }
   }
 }

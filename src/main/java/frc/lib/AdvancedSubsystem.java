@@ -27,7 +27,7 @@ public abstract class AdvancedSubsystem extends SubsystemBase
   }
 
   public AdvancedSubsystem(NetworkTableInstance ntInst) {
-    _faultsTable = new FaultsTable(ntInst.getTable("Self Check"), getName() + " Faults");
+    _faultsTable = new FaultsTable(ntInst.getTable("SelfChecked"), getName() + " Faults");
   }
 
   /**
@@ -48,7 +48,7 @@ public abstract class AdvancedSubsystem extends SubsystemBase
 
     Fault fault = new Fault(description, faultType);
 
-    DogLog.logFault(fault.toString());
+    DogLog.logFault(fault.toString(), null);
 
     _faults.add(fault);
     _faultsTable.set(_faults);

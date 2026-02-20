@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
@@ -12,6 +13,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 @Logged
 public class ShotParameters {
@@ -30,16 +33,52 @@ public class ShotParameters {
   @Logged(name = "Shot Heading")
   private Rotation2d _shotHeading = new Rotation2d();
 
+  @Logged(name = "Target")
+  private Pose2d _target = Pose2d.kZero;
+
   @Logged(name = "Virtual Target")
-  private Translation2d _virtualTarget = Translation2d.kZero;
+  private Pose2d _virtualTarget = Pose2d.kZero;
 
-  @Logged(name = "Is Valid")
-  public boolean isValid = true;
+  /**
+   * If the robot-relative projectile velocity and the robot velocity vectors are strongly coupled,
+   * the field-relative projectile velocity will have a larger error, given errors in the
+   * robot-relative projectile velocity and robot velocity vectors.
+   */
+  @Logged(name = "Is Error Sensitive")
+  public boolean isErrorSensitive = false;
 
-  @Logged(name = "FPI Iterations")
-  public int fpiIterations = 0;
+  @Logged(name = "Is Ready To Shoot")
+  private final BooleanSupplier _isReadyToShoot;
 
-  public ShotParameters() {}
+  /**
+   * The angle in degrees between the robot velocity vector and the vector pointing from the robot
+   * to the target.
+   */
+  @Logged(name = "Coupling Degrees")
+  public double couplingDegrees = 0;
+
+  @Logged(name = "Newton Iterations")
+  public int newtonIterations = 0;
+
+  public ShotParameters() {
+    _isReadyToShoot = () -> true;
+  }
+
+  public ShotParameters(
+      Supplier<AngularVelocity> flywheelVelocitySupplier,
+      Supplier<Angle> hoodAngleSupplier,
+      Supplier<Rotation2d> headingSupplier,
+      AngularVelocity flywheelVelocityTolerance,
+      Angle hoodTolerance,
+      Rotation2d headingTolerance) {
+    _isReadyToShoot =
+        () -> {
+          return flywheelVelocitySupplier.get().isNear(_flywheelSpeed, flywheelVelocityTolerance)
+              && hoodAngleSupplier.get().isNear(_hoodAngle, hoodTolerance)
+              && Math.abs(_shotHeading.minus(headingSupplier.get()).getDegrees())
+                  < headingTolerance.getDegrees();
+        };
+  }
 
   public AngularVelocity getFlywheelSpeed() {
     return _flywheelSpeed;
@@ -61,6 +100,10 @@ public class ShotParameters {
     return _shotHeading;
   }
 
+  public boolean isReadyToShoot() {
+    return _isReadyToShoot.getAsBoolean();
+  }
+
   public void setPreset(Matrix<N4, N1> preset) {
     _flywheelSpeed.mut_setMagnitude(preset.get(0, 0));
     _hoodAngle.mut_setMagnitude(preset.get(1, 0));
@@ -72,7 +115,11 @@ public class ShotParameters {
     _shotHeading = shotHeading;
   }
 
+  public void setTarget(Translation2d target) {
+    _target = new Pose2d(target, Rotation2d.kZero);
+  }
+
   public void setVirtualTarget(Translation2d virtualTarget) {
-    _virtualTarget = virtualTarget;
+    _virtualTarget = new Pose2d(virtualTarget, Rotation2d.kZero);
   }
 }
