@@ -257,7 +257,7 @@ public class Shooter extends AdvancedSubsystem {
         .withName("Idle");
   }
 
-  /** Scores / ferries depending on robot pose and validity of shot parameters. */
+  /** Scores / ferries depending on robot pose. */
   public Command shoot() {
     return run(() -> {
           ShotParameters parameters = _shotParametersSupplier.get();

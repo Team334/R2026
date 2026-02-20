@@ -128,6 +128,7 @@ public class Robot extends TimedRobot {
     configureDriverBindings();
 
     new Trigger(() -> _shotParameters.isErrorSensitive)
+        .and(_driverController.rightTrigger())
         .whileTrue(
             run(
                 () -> {
@@ -262,11 +263,10 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     DogLog.time("Timing/Robot/robotPeriodic()");
 
-    _shotParameters =
-        AllianceUtil.getShotParameters(
-            _swerve.getPose(),
-            ChassisSpeeds.fromRobotRelativeSpeeds(
-                _swerve.getChassisSpeeds(), _swerve.getHeading()));
+    AllianceUtil.getShotParameters(
+        _swerve.getPose(),
+        ChassisSpeeds.fromRobotRelativeSpeeds(_swerve.getChassisSpeeds(), _swerve.getHeading()),
+        _shotParameters);
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,

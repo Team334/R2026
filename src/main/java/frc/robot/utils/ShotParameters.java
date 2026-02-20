@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
@@ -30,8 +31,11 @@ public class ShotParameters {
   @Logged(name = "Shot Heading")
   private Rotation2d _shotHeading = new Rotation2d();
 
+  @Logged(name = "Target")
+  private Pose2d _target = Pose2d.kZero;
+
   @Logged(name = "Virtual Target")
-  private Translation2d _virtualTarget = Translation2d.kZero;
+  private Pose2d _virtualTarget = Pose2d.kZero;
 
   /**
    * If the robot-relative projectile velocity and the robot velocity vectors are strongly coupled,
@@ -84,7 +88,11 @@ public class ShotParameters {
     _shotHeading = shotHeading;
   }
 
+  public void setTarget(Translation2d target) {
+    _target = new Pose2d(target, Rotation2d.kZero);
+  }
+
   public void setVirtualTarget(Translation2d virtualTarget) {
-    _virtualTarget = virtualTarget;
+    _virtualTarget = new Pose2d(virtualTarget, Rotation2d.kZero);
   }
 }
