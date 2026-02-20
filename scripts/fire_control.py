@@ -34,7 +34,7 @@ def TOF(v: np.ndarray, g: np.ndarray, t: float) -> float:
     virtual_goal = g - (v * t)
     distance = np.linalg.norm(virtual_goal)
 
-    return distance / projectile_velocity_lookup.get(distance)
+    return projectile_tof_lookup.get(distance)
 
 def dTOF_dt(v: np.ndarray, g: np.ndarray, t: float) -> float:
     virtual_goal = g - (v * t)
@@ -68,8 +68,8 @@ def FPI(max_iter: int):
     axs = plt.subplots(1, 1, figsize=(6, 4))[1]
 
     axs.plot(t_values, tof_values, label='TOF(t)')
-    # axs.plot(t_values, t_values, label='y = t')
-    # axs.plot(t_values, dtof_dt_values, label="TOF'(t)", linewidth=2, linestyle='dashed')
+    axs.plot(t_values, t_values, label='y = t')
+    axs.plot(t_values, dtof_dt_values, label="TOF'(t)", linewidth=2, linestyle='dashed')
     axs.plot(t, TOF(v, g, t), 'ro', markersize=8, label='Fixed-Point Solution')
     axs.set_xlabel('t')
     axs.set_ylabel('TOF / TOF\'')
@@ -121,15 +121,15 @@ def Newton(max_iter: int):
 # g = <0, 10>
 # projectile_velocity = 30
 
-v = np.array([0, 3])
-g = np.array([0, 10])
+v = np.array([5, 25])
+g = np.array([0, 15])
 
 projectile_velocity = 30
 
 max_iter = 200
 
-projectile_velocity_lookup = LookupTable({
-    i: projectile_velocity * random.uniform(0.8, 1.2)
+projectile_tof_lookup = LookupTable({
+    i: i / (projectile_velocity * random.uniform(0.8, 1.2))
     for i in range(1, 21)  # 1 through 20 inclusive
 })
 
@@ -138,6 +138,6 @@ tof_values = [TOF(v, g, t) for t in t_values]
 dtof_dt_values = [dTOF_dt(v, g, t) for t in t_values]
 
 FPI(max_iter)
-# Newton(max_iter)
+Newton(max_iter)
 
 plt.show()
