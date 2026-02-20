@@ -90,10 +90,16 @@ public class Hopper extends AdvancedSubsystem {
     _rollerMotor.setControl(_rollerVelocitySetter.withVelocity(speed));
   }
 
-  /** Feeds fuel for shooting. */
+  /** Feeds fuel for shooting, waiting for is ready condition. */
   public Command feedShot() {
     return run(() -> {
           ShotParameters parameters = _shotParametersSupplier.get();
+
+          if (!parameters.isReadyToShoot()) {
+            setFloorSpeed(RotationsPerSecond.zero());
+            setRollerSpeed(RotationsPerSecond.zero());
+            return;
+          }
 
           setFloorSpeed(parameters.getFloorSpeed());
           setRollerSpeed(parameters.getRollerSpeed());

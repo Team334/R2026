@@ -13,6 +13,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 @Logged
 public class ShotParameters {
@@ -45,6 +47,9 @@ public class ShotParameters {
   @Logged(name = "Is Error Sensitive")
   public boolean isErrorSensitive = false;
 
+  @Logged(name = "Is Ready To Shoot")
+  private final BooleanSupplier _isReadyToShoot;
+
   /**
    * The angle in degrees between the robot velocity vector and the vector pointing from the robot
    * to the target.
@@ -55,7 +60,25 @@ public class ShotParameters {
   @Logged(name = "Newton Iterations")
   public int newtonIterations = 0;
 
-  public ShotParameters() {}
+  public ShotParameters() {
+    _isReadyToShoot = () -> true;
+  }
+
+  public ShotParameters(
+      Supplier<AngularVelocity> flywheelVelocitySupplier,
+      Supplier<Angle> hoodAngleSupplier,
+      Supplier<Rotation2d> headingSupplier,
+      AngularVelocity flywheelVelocityTolerance,
+      Angle hoodTolerance,
+      Rotation2d headingTolerance) {
+    _isReadyToShoot =
+        () -> {
+          return flywheelVelocitySupplier.get().isNear(_flywheelSpeed, flywheelVelocityTolerance)
+              && hoodAngleSupplier.get().isNear(_hoodAngle, hoodTolerance)
+              && Math.abs(_shotHeading.minus(headingSupplier.get()).getDegrees())
+                  < headingTolerance.getDegrees();
+        };
+  }
 
   public AngularVelocity getFlywheelSpeed() {
     return _flywheelSpeed;
@@ -75,6 +98,10 @@ public class ShotParameters {
 
   public Rotation2d getShotHeading() {
     return _shotHeading;
+  }
+
+  public boolean isReadyToShoot() {
+    return _isReadyToShoot.getAsBoolean();
   }
 
   public void setPreset(Matrix<N4, N1> preset) {
