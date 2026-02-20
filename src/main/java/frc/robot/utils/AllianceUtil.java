@@ -118,8 +118,13 @@ public class AllianceUtil {
         break;
       }
 
-      if (dT_dt > dT_dt_tolerance && !_shotParameters.isErrorSensitive) {
-        _shotParameters.isErrorSensitive = true;
+      if (i == 0) {
+        _shotParameters.isErrorSensitive = Math.abs(dT_dt) > dT_dt_tolerance;
+        _shotParameters.couplingDegrees =
+            Math.toDegrees(
+                Math.acos(
+                    robotToVirtualTarget.dot(robotVelocity)
+                        / (robotToVirtualTarget.getNorm() * robotVelocity.getNorm())));
       }
 
       t = new_t;

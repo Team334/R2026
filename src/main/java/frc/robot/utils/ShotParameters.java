@@ -41,6 +41,13 @@ public class ShotParameters {
   @Logged(name = "Is Error Sensitive")
   public boolean isErrorSensitive = false;
 
+  /**
+   * The angle in degrees between the robot velocity vector and the vector pointing from the robot
+   * to the target.
+   */
+  @Logged(name = "Coupling Degrees")
+  public double couplingDegrees = 0;
+
   @Logged(name = "Newton Iterations")
   public int newtonIterations = 0;
 
