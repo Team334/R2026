@@ -19,6 +19,7 @@ import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -43,6 +44,8 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.intake.IntakeFeed;
 import frc.robot.subsystems.intake.IntakePivot;
+import frc.robot.utils.AllianceUtil;
+import frc.robot.utils.ShotParameters;
 import java.lang.reflect.Field;
 
 /**
@@ -56,6 +59,9 @@ public class Robot extends TimedRobot {
 
   private boolean _fileOnlySet = false;
 
+  @Logged(name = "Shot Parameters")
+  private ShotParameters _shotParameters = new ShotParameters();
+
   // controllers
   private final CommandXboxController _driverController =
       new CommandXboxController(Ports.driverController);
@@ -65,10 +71,10 @@ public class Robot extends TimedRobot {
   private final Swerve _swerve = TunerConstants.createDrivetrain();
 
   @Logged(name = "Shooter")
-  private final Shooter _shooter = new Shooter();
+  private final Shooter _shooter = new Shooter(() -> _shotParameters);
 
   @Logged(name = "Hopper")
-  private final Hopper _hopper = new Hopper();
+  private final Hopper _hopper = new Hopper(() -> _shotParameters);
 
   @Logged(name = "IntakePivot")
   private final IntakePivot _intakePivot = new IntakePivot(_swerve::getPose);
@@ -82,7 +88,14 @@ public class Robot extends TimedRobot {
   private final Autos _autos = new Autos(_swerve);
 
   private final Superstructure _superstructure =
-      new Superstructure(_shooter, _hopper, _intakePivot, _intakeFeed, _climb, _swerve);
+      new Superstructure(
+          _shooter,
+          _hopper,
+          _intakePivot,
+          _intakeFeed,
+          _climb,
+          _swerve,
+          () -> _shotParameters.getShotHeading());
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -191,27 +204,32 @@ public class Robot extends TimedRobot {
   }
 
   private void configureDriverBindings() {
+    InputStream baseVelX =
+        InputStream.of(_driverController::getLeftY).deadband(0.02, 1).negate().signedPow(2);
+
+    InputStream baseVelY =
+        InputStream.of(_driverController::getLeftX).deadband(0.02, 1).negate().signedPow(2);
+
+    InputStream baseVelOmega =
+        InputStream.of(_driverController::getRightX).deadband(0.02, 1).negate().signedPow(2);
+
     _swerve.setDefaultCommand(
         _swerve
             .drive(
-                InputStream.of(_driverController::getLeftY)
-                    .deadband(0.02, 1)
-                    .negate()
-                    .signedPow(2)
-                    .scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
-                InputStream.of(_driverController::getLeftX)
-                    .deadband(0.02, 1)
-                    .negate()
-                    .signedPow(2)
-                    .scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
-                InputStream.of(_driverController::getRightX)
-                    .deadband(0.02, 1)
-                    .negate()
-                    .signedPow(2)
-                    .scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
+                baseVelX.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+                baseVelY.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+                baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
             .beforeStarting(() -> _swerve.isOpenLoop = true));
 
-    _driverController.rightTrigger().whileTrue(_superstructure.shoot());
+    _driverController
+        .rightTrigger()
+        .whileTrue(
+            _superstructure.shoot(
+                baseVelX.scale(
+                    SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+                baseVelY.scale(
+                    SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond))));
+
     _driverController.rightBumper().whileTrue(_superstructure.spit());
 
     _driverController.leftTrigger().whileTrue(_intakeFeed.feedIn());
@@ -230,6 +248,12 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     DogLog.time("Timing/Robot/robotPeriodic()");
+
+    _shotParameters =
+        AllianceUtil.getShotParameters(
+            _swerve.getPose(),
+            ChassisSpeeds.fromRobotRelativeSpeeds(
+                _swerve.getChassisSpeeds(), _swerve.getHeading()));
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,

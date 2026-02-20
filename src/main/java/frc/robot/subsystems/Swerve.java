@@ -16,7 +16,6 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.*;
 import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
 import dev.doglog.DogLog;
@@ -94,12 +93,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   private boolean _hasError = false;
 
-  private final SwerveRequest.SysIdSwerveTranslation _translationCharacterization =
-      new SwerveRequest.SysIdSwerveTranslation();
-  private final SwerveRequest.SysIdSwerveSteerGains _steerCharacterization =
-      new SwerveRequest.SysIdSwerveSteerGains();
-  private final SwerveRequest.SysIdSwerveRotation _rotationCharacterization =
-      new SwerveRequest.SysIdSwerveRotation();
+  private final SysIdSwerveTranslation _translationCharacterization = new SysIdSwerveTranslation();
+  private final SysIdSwerveSteerGains _steerCharacterization = new SysIdSwerveSteerGains();
+  private final SysIdSwerveRotation _rotationCharacterization = new SysIdSwerveRotation();
 
   private final SysIdRoutine _translationRoutine =
       new SysIdRoutine(
@@ -148,9 +144,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   @Logged(name = "Is Open Loop")
   public boolean isOpenLoop = true;
-
-  @Logged(name = "Driver Chassis Speeds")
-  private final ChassisSpeeds _driverChassisSpeeds = new ChassisSpeeds();
 
   @Logged(name = "Ignore Vision Estimates")
   private boolean _ignoreVisionEstimates = false;
@@ -344,17 +337,21 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   }
 
   /**
-   * Creates a new command that drives the chassis in teleop.
+   * Drives the chassis in teleop, with the chassis fixed at a supplied heading. Open loop / field
+   * oriented behavior is configured with {@link #isOpenLoop} and {@link #isFieldOriented}.
    *
    * @param velX The x velocity in meters per second.
    * @param velY The y velocity in meters per second.
-   * @param velOmega The rotational velocity in radians per second.
+   * @param heading The heading the chassis should drive at.
    */
-  public Command drive(InputStream velX, InputStream velY, InputStream velOmega) {
-    return run(() -> {
-          drive(velX.get(), velY.get(), velOmega.get());
-        })
-        .withName("Drive");
+  public Command driveFacing(InputStream velX, InputStream velY, Supplier<Rotation2d> heading) {
+    return drive(velX, velY, () -> _poseController.rotationCalculate(heading.get(), getHeading()))
+        .beforeStarting(
+            runOnce(
+                () ->
+                    _poseController.rotationReset(
+                        getHeading(), getChassisSpeeds().omegaRadiansPerSecond)))
+        .withName("Drive Facing");
   }
 
   /**
@@ -365,28 +362,27 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param velY The y velocity in meters per second.
    * @param velOmega The rotational velocity in radians per second.
    */
-  public void drive(double velX, double velY, double velOmega) {
-    _driverChassisSpeeds.vxMetersPerSecond = velX;
-    _driverChassisSpeeds.vyMetersPerSecond = velY;
-    _driverChassisSpeeds.omegaRadiansPerSecond = velOmega;
-
-    if (isFieldOriented) {
-      setControl(
-          _fieldCentricRequest
-              .withVelocityX(velX)
-              .withVelocityY(velY)
-              .withRotationalRate(velOmega)
-              .withDriveRequestType(
-                  isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
-    } else {
-      setControl(
-          _robotCentricRequest
-              .withVelocityX(velX)
-              .withVelocityY(velY)
-              .withRotationalRate(velOmega)
-              .withDriveRequestType(
-                  isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
-    }
+  public Command drive(InputStream velX, InputStream velY, InputStream velOmega) {
+    return run(() -> {
+          if (isFieldOriented) {
+            setControl(
+                _fieldCentricRequest
+                    .withVelocityX(velX.get())
+                    .withVelocityY(velY.get())
+                    .withRotationalRate(velOmega.get())
+                    .withDriveRequestType(
+                        isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
+          } else {
+            setControl(
+                _robotCentricRequest
+                    .withVelocityX(velX.get())
+                    .withVelocityY(velY.get())
+                    .withRotationalRate(velOmega.get())
+                    .withDriveRequestType(
+                        isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
+          }
+        })
+        .withName("Drive");
   }
 
   /**

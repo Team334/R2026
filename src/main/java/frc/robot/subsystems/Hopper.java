@@ -20,23 +20,30 @@ import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
 import frc.robot.Constants;
 import frc.robot.Constants.HopperConstants;
+import frc.robot.Constants.ShotConstants;
+import frc.robot.utils.ShotParameters;
+import java.util.function.Supplier;
 
 public class Hopper extends AdvancedSubsystem {
   private final TalonFX _rollerMotor =
       new TalonFX(HopperConstants.rollerMotorID, Constants.subsystemBus);
 
-  private final TalonFX _feedMotor =
-      new TalonFX(HopperConstants.feedMotorID, Constants.subsystemBus);
+  private final TalonFX _floorMotor =
+      new TalonFX(HopperConstants.floorMotorID, Constants.subsystemBus);
 
   private final VelocityVoltage _rollerVelocitySetter = new VelocityVoltage(0);
-  private final VelocityVoltage _feedVelocitySetter = new VelocityVoltage(0);
+  private final VelocityVoltage _floorVelocitySetter = new VelocityVoltage(0);
 
   private final StatusSignal<AngularVelocity> _rollerVelocityGetter = _rollerMotor.getVelocity();
-  private final StatusSignal<AngularVelocity> _feedVelocityGetter = _feedMotor.getVelocity();
+  private final StatusSignal<AngularVelocity> _floorVelocityGetter = _floorMotor.getVelocity();
 
-  public Hopper() {
+  private final Supplier<ShotParameters> _shotParametersSupplier;
+
+  public Hopper(Supplier<ShotParameters> shotParametersSupplier) {
+    _shotParametersSupplier = shotParametersSupplier;
+
     var rollerMotorConfig = new TalonFXConfiguration();
-    var feedMotorConfig = new TalonFXConfiguration();
+    var floorMotorConfig = new TalonFXConfiguration();
 
     // roller motor configs
     rollerMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -48,44 +55,65 @@ public class Hopper extends AdvancedSubsystem {
 
     rollerMotorConfig.Feedback.SensorToMechanismRatio = HopperConstants.rollerGearRatio;
 
-    // feed motor configs
-    feedMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    // floor motor configs
+    floorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    feedMotorConfig.Slot0.kS = HopperConstants.feedkS.in(Volts);
-    feedMotorConfig.Slot0.kV = HopperConstants.feedkV.in(Volts.per(RotationsPerSecond));
+    floorMotorConfig.Slot0.kS = HopperConstants.floorkS.in(Volts);
+    floorMotorConfig.Slot0.kV = HopperConstants.floorkV.in(Volts.per(RotationsPerSecond));
 
-    feedMotorConfig.Slot0.kP = HopperConstants.feedkP.in(Volts.per(RotationsPerSecond));
+    floorMotorConfig.Slot0.kP = HopperConstants.floorkP.in(Volts.per(RotationsPerSecond));
 
-    feedMotorConfig.Feedback.SensorToMechanismRatio = HopperConstants.feedGearRatio;
+    floorMotorConfig.Feedback.SensorToMechanismRatio = HopperConstants.floorGearRatio;
 
     CTREUtil.attempt(() -> _rollerMotor.getConfigurator().apply(rollerMotorConfig), _rollerMotor);
-    CTREUtil.attempt(() -> _feedMotor.getConfigurator().apply(feedMotorConfig), _feedMotor);
+    CTREUtil.attempt(() -> _floorMotor.getConfigurator().apply(floorMotorConfig), _floorMotor);
 
     CTREUtil.attempt(() -> _rollerMotor.optimizeBusUtilization(), _rollerMotor);
-    CTREUtil.attempt(() -> _feedMotor.optimizeBusUtilization(), _feedMotor);
+    CTREUtil.attempt(() -> _floorMotor.optimizeBusUtilization(), _floorMotor);
 
     FaultLogger.register(_rollerMotor);
-    FaultLogger.register(_feedMotor);
+    FaultLogger.register(_floorMotor);
 
     setDefaultCommand(
         run(
             () -> {
-              _feedMotor.setControl(_feedVelocitySetter.withVelocity(0));
+              _floorMotor.setControl(_floorVelocitySetter.withVelocity(0));
               _rollerMotor.setControl(_rollerVelocitySetter.withVelocity(0));
             }));
   }
 
-  /** Shoots fuel into shooter. */
-  public Command shoot() {
+  private void setFloorSpeed(AngularVelocity speed) {
+    _floorMotor.setControl(_floorVelocitySetter.withVelocity(speed));
+  }
+
+  private void setRollerSpeed(AngularVelocity speed) {
+    _rollerMotor.setControl(_rollerVelocitySetter.withVelocity(speed));
+  }
+
+  /** Feeds fuel for shooting, checking that shot parameters are valid. */
+  public Command feedShot() {
     return run(() -> {
-          _feedMotor.setControl(
-              _feedVelocitySetter.withVelocity(
-                  HopperConstants.feedShootSpeed.in(RotationsPerSecond)));
-          _rollerMotor.setControl(
-              _rollerVelocitySetter.withVelocity(
-                  HopperConstants.rollerShootSpeed.in(RotationsPerSecond)));
+          if (!_shotParametersSupplier.get().isValid) {
+            setFloorSpeed(RotationsPerSecond.zero());
+            setRollerSpeed(RotationsPerSecond.zero());
+            return;
+          }
+
+          ShotParameters parameters = _shotParametersSupplier.get();
+
+          setFloorSpeed(parameters.getFloorSpeed());
+          setRollerSpeed(parameters.getRollerSpeed());
         })
-        .withName("Shoot");
+        .withName("Feed Shot");
+  }
+
+  /** Feeds fuel for spitting. */
+  public Command feedSpit() {
+    return run(() -> {
+          setFloorSpeed(ShotConstants.spitFloorSpeed);
+          setRollerSpeed(ShotConstants.spitRollerSpeed);
+        })
+        .withName("Feed Spit");
   }
 
   @Logged(name = "Roller Speed")
@@ -93,9 +121,9 @@ public class Hopper extends AdvancedSubsystem {
     return _rollerVelocityGetter.refresh().getValue();
   }
 
-  @Logged(name = "Feed Speed")
-  public AngularVelocity getFeedSpeed() {
-    return _feedVelocityGetter.refresh().getValue();
+  @Logged(name = "Floor Speed")
+  public AngularVelocity getFloorSpeed() {
+    return _floorVelocityGetter.refresh().getValue();
   }
 
   @Override
@@ -108,6 +136,6 @@ public class Hopper extends AdvancedSubsystem {
   @Override
   public void close() {
     _rollerMotor.close();
-    _feedMotor.close();
+    _floorMotor.close();
   }
 }

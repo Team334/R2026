@@ -4,14 +4,20 @@
 
 package frc.robot;
 
+import static edu.wpi.first.math.Nat.*;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rectangle2d;
+import edu.wpi.first.math.InterpolatingMatrixTreeMap;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.AngleUnit;
@@ -30,6 +36,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 
 /**
@@ -44,6 +51,8 @@ public final class Constants {
   public static final Frequency simNotifierFrequency = Hertz.of(200);
 
   public static final CANBus subsystemBus = new CANBus("canivore");
+
+  public static final Time shotTimeScaler = Seconds.of(0.2);
 
   public static class Ports {
     public static final int driverController = 0;
@@ -61,27 +70,6 @@ public final class Constants {
     public static final AprilTagFieldLayout tagLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
-    public static final Distance FIELD_LENTH = Inches.of(650.12);
-    public static final Distance FIELD_WIDTH = Inches.of(316.64);
-
-    public static final Distance bumpZoneTolereance = Meters.of(1.25);
-
-    public static final Rectangle2d blueBumpZone =
-        new Rectangle2d(
-            new Translation2d(Inches.of(157.48).minus(bumpZoneTolereance), Inches.of(65.65)),
-            new Translation2d(
-                Inches.of(204.48).plus(bumpZoneTolereance),
-                Inches.of(258.65))); // enclose both bumps and hub
-
-    public static final Rectangle2d redBumpZone =
-        new Rectangle2d(
-            new Translation2d(
-                FIELD_LENTH.minus(Inches.of(157.48).minus(bumpZoneTolereance)),
-                FIELD_WIDTH.minus(Inches.of(65.65))),
-            new Translation2d(
-                FIELD_LENTH.minus(Inches.of(204.48).plus(bumpZoneTolereance)),
-                FIELD_WIDTH.minus(Inches.of(258.65)))); // enclose both bumps and hub
-
     public static final Translation2d blueHub =
         new Translation2d(
             tagLayout.getTagPose(26).get().getX() + Units.inchesToMeters(47.0) / 2.0,
@@ -91,6 +79,22 @@ public final class Constants {
         blueHub.rotateAround(
             new Translation2d(tagLayout.getFieldLength() / 2.0, tagLayout.getFieldWidth() / 2.0),
             Rotation2d.k180deg);
+
+    public static final Translation2d blueFerryBottom = new Translation2d(2, 2);
+    public static final Translation2d blueFerryTop =
+        new Translation2d(2, tagLayout.getFieldWidth() - blueFerryBottom.getY());
+
+    public static final Translation2d redFerryBottom =
+        new Translation2d(
+            tagLayout.getFieldLength() - blueFerryBottom.getX(), blueFerryBottom.getY());
+    public static final Translation2d redFerryTop =
+        new Translation2d(redFerryBottom.getX(), blueFerryTop.getY());
+
+    public static final double ferryXThresholdBlue = 5;
+    public static final double ferryXThresholdRed =
+        tagLayout.getFieldLength() - ferryXThresholdBlue;
+
+    public static final double ferryYThreshold = tagLayout.getFieldWidth() / 2.0;
 
     // uncomment if using the test tag layout
     // public static final AprilTagFieldLayout tagLayout;
@@ -115,32 +119,78 @@ public final class Constants {
     public static final double zBoundMargin = 0.01;
   }
 
-  public static class ShooterConstants {
-    public static final int frontMotorID = 0;
-    public static final int backMotorID = 9;
+  public static class ShotConstants {
+    public static final AngularVelocity spitFlywheelSpeed = RotationsPerSecond.of(5);
+    public static final Angle spitHoodAngle = Rotations.of(0.25);
 
-    public static final Voltage frontFlywheelkS = Volts.of(0.39);
-    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkV =
+    public static final AngularVelocity spitRollerSpeed = RotationsPerSecond.of(1);
+    public static final AngularVelocity spitFloorSpeed = RotationsPerSecond.of(1);
+
+    // distanceMeters : <flywheelRPS, hoodAngleRots, rollerRPS, floorRPS>
+    public static InterpolatingMatrixTreeMap<Double, N4, N1> hubPresets =
+        new InterpolatingMatrixTreeMap<>();
+    public static InterpolatingMatrixTreeMap<Double, N4, N1> ferryPresets =
+        new InterpolatingMatrixTreeMap<>();
+
+    // distanceMeters : TOFSecs
+    public static InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
+    public static InterpolatingDoubleTreeMap ferryTOFs = new InterpolatingDoubleTreeMap();
+
+    private static Matrix<N4, N1> vec4d(double a, double b, double c, double d) {
+      return new Matrix<N4, N1>(N4(), N1(), new double[] {a, b, c, d});
+    }
+
+    static {
+      // hub presets
+      hubPresets.put(1.0, vec4d(1.0, 1.0, 2.0, 2.0));
+      hubPresets.put(5.0, vec4d(5.0, 5.0, 2.0, 2.0));
+
+      // ferry presets
+      ferryPresets.put(1.0, vec4d(1.0, 1.0, 2.0, 2.0));
+      ferryPresets.put(5.0, vec4d(5.0, 5.0, 2.0, 2.0));
+
+      // hub TOFs
+      hubTOFs.put(1.0, 0.1);
+      hubTOFs.put(5.0, 0.5);
+
+      // ferry TOFs
+      ferryTOFs.put(1.0, 0.1);
+      ferryTOFs.put(5.0, 0.5);
+    }
+  }
+
+  public static class ShooterConstants {
+    public static final int flywheelMotorID = 42;
+    public static final int flywheelFollowerMotorID = 41;
+    public static final int hoodMotorID = 40;
+
+    public static final Voltage flywheelkS = Volts.of(0.39);
+    public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkV =
         Volts.per(RotationsPerSecond).ofNative(0.27);
-    public static final Per<VoltageUnit, AngularVelocityUnit> frontFlywheelkP =
+    public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkP =
         Volts.per(RotationsPerSecond).ofNative(1.3);
 
-    public static final Voltage backFlywheelkS = Volts.of(0.47);
-    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkV =
-        Volts.per(RotationsPerSecond).ofNative(0.3);
-    public static final Per<VoltageUnit, AngularVelocityUnit> backFlywheelkP =
+    public static final Voltage hoodkS = Volts.of(0);
+    public static final Voltage hoodkG = Volts.of(0);
+    public static final Per<VoltageUnit, AngularVelocityUnit> hoodkV =
         Volts.per(RotationsPerSecond).ofNative(1);
+    public static final Per<VoltageUnit, AngularAccelerationUnit> hoodkA =
+        Volts.per(RotationsPerSecondPerSecond).ofNative(0.1);
+    public static final Per<VoltageUnit, AngleUnit> hoodkP = Volts.per(Rotations).ofNative(0);
 
-    public static final double frontFlywheelGearRatio = 3;
-    public static final double backFlywheelGearRatio = 3;
+    public static final AngularVelocity hoodVelocity = RotationsPerSecond.of(2);
+    public static final AngularAcceleration hoodAcceleration = RotationsPerSecondPerSecond.of(5);
+
+    public static final Angle hoodForwardSoftLimitThreshold = Rotations.of(1);
+    public static final Angle hoodReverseSoftLimitThreshold = Rotations.of(0);
+
+    public static final double flywheelGearRatio = 3;
+    public static final double hoodGearRatio = 3;
   }
 
   public static class HopperConstants {
     public static final int rollerMotorID = 20;
-    public static final int feedMotorID = 21;
-
-    public static final AngularVelocity feedShootSpeed = RotationsPerSecond.of(0);
-    public static final AngularVelocity rollerShootSpeed = RotationsPerSecond.of(0);
+    public static final int floorMotorID = 21;
 
     public static final Voltage rollerkS = Volts.of(0.39);
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkV =
@@ -148,14 +198,14 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkP =
         Volts.per(RotationsPerSecond).ofNative(1.3);
 
-    public static final Voltage feedkS = Volts.of(0.47);
-    public static final Per<VoltageUnit, AngularVelocityUnit> feedkV =
+    public static final Voltage floorkS = Volts.of(0.47);
+    public static final Per<VoltageUnit, AngularVelocityUnit> floorkV =
         Volts.per(RotationsPerSecond).ofNative(0.3);
-    public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
+    public static final Per<VoltageUnit, AngularVelocityUnit> floorkP =
         Volts.per(RotationsPerSecond).ofNative(1);
 
     public static final double rollerGearRatio = 3;
-    public static final double feedGearRatio = 3;
+    public static final double floorGearRatio = 3;
   }
 
   public static class IntakeConstants {
@@ -231,6 +281,8 @@ public final class Constants {
 
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
     public static final AngularVelocity driverAngularVelocity = RadiansPerSecond.of(Math.PI);
+
+    public static final LinearVelocity driverTranslationalShootingVelocity = MetersPerSecond.of(2);
 
     public static final LinearVelocity profileTranslationalVelocity = MetersPerSecond.of(1);
     public static final LinearAcceleration profileTranslationalAcceleration =
