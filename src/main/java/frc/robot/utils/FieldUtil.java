@@ -16,7 +16,7 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShotConstants;
 import frc.robot.Constants.SwerveConstants;
 
-public class AllianceUtil {
+public class FieldUtil {
   // newton's method constants
   private static final int maxIter = 10;
   private static final LinearVelocity projectileHorizontalVelocity = MetersPerSecond.of(15);
