@@ -37,6 +37,16 @@ public class AllianceUtil {
     return Alliance.Blue;
   }
 
+  /** Whether the supplied robot pose is in the bump zone(s). */
+  public static boolean inBumpZone(Pose2d robotPose) {
+    if (FieldConstants.blueBumpZone.contains(robotPose.getTranslation())
+        || FieldConstants.redBumpZone.contains(robotPose.getTranslation())) {
+      return true;
+    }
+
+    return false;
+  }
+
   /** Whether the supplied robot pose is in the ferry zone, depending on alliance. */
   public static boolean inFerryZone(Pose2d robotPose) {
     if (getAlliance() == Alliance.Blue) {

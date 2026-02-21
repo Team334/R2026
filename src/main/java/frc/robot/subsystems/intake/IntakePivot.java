@@ -13,8 +13,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Notifier;
@@ -26,11 +24,10 @@ import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Robot;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 public class IntakePivot extends AdvancedSubsystem {
   private final TalonFX _pivotMotor =
@@ -39,19 +36,23 @@ public class IntakePivot extends AdvancedSubsystem {
   private final MotionMagicVoltage _pivotAngleSetter = new MotionMagicVoltage(0);
   private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
 
-  private Trigger _intakeLowered =
+  private final Trigger _intakeLowered =
       new Trigger(
               () ->
                   MathUtil.isNear(
                       IntakeConstants.pivotLowered.in(Degrees), getAngle().in(Degrees), 3))
           .debounce(0.5);
 
+  private final BooleanSupplier _inBumpZoneSupplier;
+
   private DCMotorSim _pivotSim;
 
   private Notifier _simNotifier;
   private double _lastSimTime;
 
-  public IntakePivot(Supplier<Pose2d> pose) {
+  public IntakePivot(BooleanSupplier inBumpZoneSupplier) {
+    _inBumpZoneSupplier = inBumpZoneSupplier;
+
     var pivotMotorConfigs = new TalonFXConfiguration();
 
     // pivot motor configs
@@ -122,10 +123,6 @@ public class IntakePivot extends AdvancedSubsystem {
     }
 
     setDefaultCommand(raise());
-
-    // can't combine into 1 trigger
-    new Trigger(() -> checkInBumpZone(pose.get())).and(_intakeLowered).onTrue(tuck());
-    new Trigger(() -> checkInBumpZone(pose.get())).onFalse(lower());
   }
 
   private void startSimThread() {
@@ -177,29 +174,16 @@ public class IntakePivot extends AdvancedSubsystem {
         .withName("Raise");
   }
 
-  /** Partially lowers intake to clear bump and protect intake with the expandable hopper. */
-  public Command tuck() {
-    return run(() -> {
-          _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotTucked));
-        })
-        .withName("Tuck");
-  }
-
-  /** Lowers the intake. */
+  /** Lowers the intake, tucking it if necessary. */
   public Command lower() {
     return run(() -> {
+          if (_inBumpZoneSupplier.getAsBoolean()) {
+            _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotTucked));
+          }
+
           _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotLowered));
         })
         .withName("Lower");
-  }
-
-  public static boolean checkInBumpZone(Pose2d pose) {
-    if (FieldConstants.blueBumpZone.contains(new Translation2d(pose.getX(), pose.getY()))
-        || FieldConstants.redBumpZone.contains(new Translation2d(pose.getX(), pose.getY()))) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   @Override

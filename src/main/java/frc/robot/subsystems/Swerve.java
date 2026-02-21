@@ -701,15 +701,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     return shiftSequence();
   }
 
-  @Logged(name = "Distance To Hub") // meters
-  public double toHub() {
-    if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      return getPose().getTranslation().getDistance(FieldConstants.blueHub);
-    } else {
-      return getPose().getTranslation().getDistance(FieldConstants.redHub);
-    }
-  }
-
   @Override
   public Command selfCheck() {
     return shiftSequence(
