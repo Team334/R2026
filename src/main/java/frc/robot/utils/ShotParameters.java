@@ -3,6 +3,7 @@ package frc.robot.utils;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -47,8 +48,7 @@ public class ShotParameters {
   @Logged(name = "Is Error Sensitive")
   public boolean isErrorSensitive = false;
 
-  @Logged(name = "Is Ready To Shoot")
-  private final BooleanSupplier _isReadyToShoot;
+  @NotLogged private final BooleanSupplier _isReadyToShoot;
 
   /**
    * The angle in degrees between the robot velocity vector and the vector pointing from the robot
@@ -100,6 +100,7 @@ public class ShotParameters {
     return _shotHeading;
   }
 
+  @Logged(name = "Is Ready To Shoot")
   public boolean isReadyToShoot() {
     return _isReadyToShoot.getAsBoolean();
   }
