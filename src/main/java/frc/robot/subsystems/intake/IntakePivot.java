@@ -179,6 +179,8 @@ public class IntakePivot extends AdvancedSubsystem {
     return run(() -> {
           if (_inBumpZoneSupplier.getAsBoolean()) {
             _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotTucked));
+
+            return;
           }
 
           _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotLowered));
