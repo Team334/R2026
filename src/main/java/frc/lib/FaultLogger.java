@@ -53,7 +53,7 @@ public final class FaultLogger {
   public static void setup(NetworkTableInstance ntInst) {
     if (_hasBeenSetup) return;
 
-    var base = ntInst.getTable("Faults");
+    var base = ntInst.getTable("FaultLogger");
 
     activeAlerts = new FaultsTable(base, "Active Faults");
     totalAlerts = new FaultsTable(base, "Total Faults");
