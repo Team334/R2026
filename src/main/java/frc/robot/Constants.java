@@ -150,12 +150,12 @@ public final class Constants {
       ferryPresets.put(5.0, vec4d(5.0, 5.0, 2.0, 2.0));
 
       // hub TOFs
-      hubTOFs.put(1.0, 0.1);
-      hubTOFs.put(5.0, 0.5);
+      hubTOFs.put(1.0, 0.066);
+      hubTOFs.put(10.0, 0.66);
 
       // ferry TOFs
-      ferryTOFs.put(1.0, 0.1);
-      ferryTOFs.put(5.0, 0.5);
+      ferryTOFs.put(1.0, 0.066);
+      ferryTOFs.put(10.0, 0.66);
     }
   }
 

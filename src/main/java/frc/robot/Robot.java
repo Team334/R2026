@@ -17,19 +17,19 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.FaultLogger;
 import frc.lib.FaultsTable.FaultType;
 import frc.lib.InputStream;
@@ -59,12 +59,12 @@ public class Robot extends TimedRobot {
 
   private boolean _fileOnlySet = false;
 
-  @Logged(name = "Shot Parameters")
-  private ShotParameters _shotParameters = new ShotParameters();
-
   // controllers
   private final CommandXboxController _driverController =
       new CommandXboxController(Ports.driverController);
+
+  @Logged(name = "Shot Parameters")
+  private ShotParameters _shotParameters = new ShotParameters();
 
   // subsystems
   @Logged(name = "Swerve")
@@ -127,9 +127,23 @@ public class Robot extends TimedRobot {
 
     configureDriverBindings();
 
-    SmartDashboard.putData("Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)));
-    SmartDashboard.putData("Drive to (1, 0)", _swerve.driveTo(new Pose2d(1, 0, Rotation2d.kZero)));
-    SmartDashboard.putData("Drive to (0, 0)", _swerve.driveTo(Pose2d.kZero));
+    new Trigger(() -> _shotParameters.isErrorSensitive)
+        .and(_driverController.rightTrigger())
+        .whileTrue(
+            run(
+                () -> {
+                  _driverController.setRumble(RumbleType.kBothRumble, 1);
+                }))
+        .onFalse(
+            runOnce(
+                () -> {
+                  _driverController.setRumble(RumbleType.kBothRumble, 0);
+                }));
+
+    // SmartDashboard.putData("Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)));
+    // SmartDashboard.putData("Drive to (1, 0)", _swerve.driveTo(new Pose2d(1, 0,
+    // Rotation2d.kZero)));
+    // SmartDashboard.putData("Drive to (0, 0)", _swerve.driveTo(Pose2d.kZero));
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
     SmartDashboard.putData("Calculate Wheel COF", _swerve.calculateWheelCOF());
@@ -249,11 +263,10 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     DogLog.time("Timing/Robot/robotPeriodic()");
 
-    _shotParameters =
-        AllianceUtil.getShotParameters(
-            _swerve.getPose(),
-            ChassisSpeeds.fromRobotRelativeSpeeds(
-                _swerve.getChassisSpeeds(), _swerve.getHeading()));
+    AllianceUtil.getShotParameters(
+        _swerve.getPose(),
+        ChassisSpeeds.fromRobotRelativeSpeeds(_swerve.getChassisSpeeds(), _swerve.getHeading()),
+        _shotParameters);
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,

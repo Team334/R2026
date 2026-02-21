@@ -88,7 +88,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   private Set<Fault> _faults = new HashSet<Fault>();
   private FaultsTable _faultsTable =
       new FaultsTable(
-          NetworkTableInstance.getDefault().getTable("Self Check"),
+          NetworkTableInstance.getDefault().getTable("SelfChecked"),
           getName() + " Faults"); // TODO: watch out unit tests
 
   private boolean _hasError = false;
@@ -241,7 +241,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
     Fault fault = new Fault(description, faultType);
 
-    DogLog.logFault(fault.toString());
+    DogLog.logFault(fault.toString(), null);
 
     _faults.add(fault);
     _faultsTable.set(_faults);
