@@ -44,7 +44,7 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.intake.IntakeFeed;
 import frc.robot.subsystems.intake.IntakePivot;
-import frc.robot.utils.AllianceUtil;
+import frc.robot.utils.FieldUtil;
 import frc.robot.utils.ShotParameters;
 import java.lang.reflect.Field;
 
@@ -264,7 +264,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     DogLog.time("Timing/Robot/robotPeriodic()");
 
-    AllianceUtil.getShotParameters(
+    FieldUtil.getShotParameters(
         _swerve.getPose(),
         ChassisSpeeds.fromRobotRelativeSpeeds(_swerve.getChassisSpeeds(), _swerve.getHeading()),
         _shotParameters);
