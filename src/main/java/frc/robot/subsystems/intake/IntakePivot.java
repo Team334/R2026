@@ -40,7 +40,7 @@ public class IntakePivot extends AdvancedSubsystem {
       new Trigger(
               () ->
                   MathUtil.isNear(
-                      IntakeConstants.pivotLowered.in(Degrees), getAngle().in(Degrees), 3))
+                      IntakeConstants.pivotTucked.in(Degrees), getAngle().in(Degrees), 3))
           .debounce(0.5);
 
   private final BooleanSupplier _inBumpZoneSupplier;
