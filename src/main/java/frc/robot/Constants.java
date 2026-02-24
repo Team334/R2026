@@ -12,6 +12,8 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
@@ -93,6 +95,9 @@ public final class Constants {
         tagLayout.getFieldLength() - ferryXThresholdBlue;
 
     public static final double ferryYThreshold = tagLayout.getFieldWidth() / 2.0;
+
+    public static final Rectangle2d blueBumpZone = new Rectangle2d(Pose2d.kZero, 1, 1);
+    public static final Rectangle2d redBumpZone = new Rectangle2d(Pose2d.kZero, 1, 1);
 
     // uncomment if using the test tag layout
     // public static final AprilTagFieldLayout tagLayout;
