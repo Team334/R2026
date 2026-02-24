@@ -29,6 +29,7 @@ public class Autos {
   private final Swerve _swerve;
 
   private SendableChooser<Side> _sideSelector = new SendableChooser<Side>();
+  private SendableChooser<String> _savedLayouts = new SendableChooser<String>();
   private ObjectMapper _jsonSave = new ObjectMapper();
 
   // auton objectives
@@ -54,13 +55,6 @@ public class Autos {
           "null",
           jsonName -> {
             saveJson(jsonName);
-          });
-  private final StringSubscriber _loadJson =
-      DogLog.tunable(
-          "Load JSON",
-          "null",
-          jsonName -> {
-            loadJson(jsonName);
           });
 
   private final BooleanEntry _shootPreload =
@@ -106,7 +100,21 @@ public class Autos {
     _neutralZone.set(false);
     _climb.set(false);
 
+    File dir = new File(Filesystem.getDeployDirectory() + "/autoPresets/");
+
+    if (dir.listFiles() != null)
+      for (File preset : dir.listFiles()) {
+        String fileName = preset.getName().substring(0, preset.getName().lastIndexOf("."));
+        _savedLayouts.addOption(fileName, fileName);
+      }
+
+    _savedLayouts.onChange(
+        jsonName -> {
+          loadJson(jsonName);
+        });
+
     SmartDashboard.putData("Side Selector", _sideSelector);
+    SmartDashboard.putData("Saved Layouts", _savedLayouts);
   }
 
   public AutoRoutine example() {
@@ -121,7 +129,7 @@ public class Autos {
   }
 
   private void saveJson(String name) {
-    File folder = new File(Filesystem.getDeployDirectory(), "autoPresets");
+    File folder = new File(Filesystem.getDeployDirectory(), "layouts");
     folder.mkdirs();
 
     File jsonFile = new File(folder, name + ".json");
@@ -137,6 +145,7 @@ public class Autos {
 
     try {
       _jsonSave.writerWithDefaultPrettyPrinter().writeValue(jsonFile, layout);
+      _savedLayouts.addOption(name, name);
       FaultLogger.report("Saved JSON", FaultType.INFO);
 
     } catch (IOException e) {
