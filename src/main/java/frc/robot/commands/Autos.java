@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import choreo.auto.AutoFactory;
@@ -44,9 +45,10 @@ public class Autos {
   }
 
   private final AutoFactory _factory;
-  // private AutoTrajectory _currentTraj;
+  private AutoTrajectory _currentTraj;
 
   private final Swerve _swerve;
+  private final Superstructure _superstructure;
 
   private final NetworkTableInstance _ntInst;
 
@@ -67,8 +69,9 @@ public class Autos {
 
   private final String layoutDir = "layouts";
 
-  public Autos(Swerve swerve) {
+  public Autos(Swerve swerve, Superstructure superstructure) {
     _swerve = swerve;
+    _superstructure = superstructure;
 
     _factory =
         new AutoFactory(
@@ -137,11 +140,58 @@ public class Autos {
 
   /** The auto routine generated from the specified layout. */
   public AutoRoutine layoutAuto() {
+    String obstacleRoute = _bump.get() ? "Bump" : "Trench";
+
     AutoRoutine routine = _factory.newRoutine("Layout Auto");
 
-    AutoTrajectory exampleTraj = routine.trajectory(_side.getSelected().getPrefix() + "example");
+    AutoTrajectory initialTraj = routine.trajectory(_side.getSelected().getPrefix() + "Start");
 
-    routine.active().onTrue(sequence(exampleTraj.resetOdometry(), exampleTraj.cmd()));
+    AutoTrajectory depot = routine.trajectory(_side.getSelected().getPrefix() + "Depot");
+    AutoTrajectory humanStation =
+        routine.trajectory(_side.getSelected().getPrefix() + "HumanStation");
+
+    AutoTrajectory neutralZone =
+        routine.trajectory(_side.getSelected().getPrefix() + obstacleRoute + "NeutralZone");
+
+    AutoTrajectory climb = routine.trajectory(_side.getSelected().getPrefix() + "Climb");
+
+    _currentTraj = initialTraj;
+    routine.active().onTrue(sequence(initialTraj.resetOdometry(), _currentTraj.cmd()));
+
+    if (_shootPreload.get())
+      // _superstructure.shoot(null, null)
+
+      if (_neutralZone.get())
+        _currentTraj
+            .done()
+            .onTrue(sequence(runOnce(() -> _currentTraj = neutralZone), _currentTraj.cmd()));
+
+    if (_depot.get())
+      _currentTraj
+          .done()
+          .onTrue(
+              sequence(
+                  runOnce(() -> _currentTraj = depot),
+                  _currentTraj.cmd())); // Add shooting while moving
+
+    if (_humanStation.get())
+      _currentTraj
+          .done()
+          .onTrue(
+              sequence(
+                  runOnce(() -> _currentTraj = humanStation),
+                  _currentTraj.cmd())); // Add shooting while moving
+
+    if (_neutralZone.get())
+      _currentTraj
+          .done()
+          .onTrue(
+              sequence(
+                  runOnce(() -> _currentTraj = neutralZone),
+                  _currentTraj.cmd())); // Add shooting while moving
+
+    if (_climb.get())
+      _currentTraj.done().onTrue(sequence(runOnce(() -> _currentTraj = climb), _currentTraj.cmd()));
 
     return routine;
   }

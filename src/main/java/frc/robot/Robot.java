@@ -86,8 +86,6 @@ public class Robot extends TimedRobot {
   @Logged(name = "Climb")
   private final Climb _climb = new Climb();
 
-  private final Autos _autos = new Autos(_swerve);
-
   private final Superstructure _superstructure =
       new Superstructure(
           _shooter,
@@ -97,6 +95,8 @@ public class Robot extends TimedRobot {
           _climb,
           _swerve,
           () -> _shotParameters.getShotHeading());
+
+  private final Autos _autos = new Autos(_swerve, _superstructure);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -167,7 +167,7 @@ public class Robot extends TimedRobot {
 
     AutoChooser chooser = new AutoChooser();
 
-    chooser.addRoutine("Example", _autos::layoutAuto);
+    chooser.addRoutine("Layout Auto", _autos::layoutAuto);
 
     SmartDashboard.putData("Auto Chooser", chooser);
 
