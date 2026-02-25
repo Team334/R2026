@@ -167,7 +167,7 @@ public class Robot extends TimedRobot {
 
     AutoChooser chooser = new AutoChooser();
 
-    chooser.addRoutine("Example", _autos::example);
+    chooser.addRoutine("Example", _autos::layoutAuto);
 
     SmartDashboard.putData("Auto Chooser", chooser);
 
