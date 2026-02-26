@@ -57,7 +57,7 @@ public class ModularAuto {
   // private final Superstructure _superstructure;
 
   private final NetworkTableInstance _ntInst;
-  
+
   // file management
   private final String layoutDir = "layouts";
   private final ObjectMapper _jsonSave = new ObjectMapper();
@@ -65,7 +65,7 @@ public class ModularAuto {
   // auto table
   private final NetworkTable _autoTable;
 
-  private final BooleanPublisher _isRoutineGenerated; 
+  private final BooleanPublisher _isRoutineGenerated;
 
   private final StringSubscriber _saveLayout;
   private final SendableChooser<String> _chooseLayout = new SendableChooser<String>();
@@ -114,7 +114,7 @@ public class ModularAuto {
 
     _saveLayout = _autoTable.getStringTopic("Save Layout").subscribe("New Layout");
     _autoTable.getStringTopic("Save Layout").publish();
-    
+
     File dir = new File(Filesystem.getDeployDirectory() + "/" + layoutDir);
 
     if (dir.listFiles() != null) {
@@ -131,7 +131,7 @@ public class ModularAuto {
 
     // build layout table
     _layoutTable = _autoTable.getSubTable("Layout");
-    
+
     _side = new SendableChooser<Side>();
 
     _side.addOption("Left", Side.LEFT);
@@ -155,27 +155,27 @@ public class ModularAuto {
     _bump.set(false);
     _neutralZone.set(false);
     _climb.set(false);
-  
+
     // set up nt listeners
     _ntPoller = new NetworkTableListenerPoller(_ntInst);
 
-    _layoutTableListener = _ntPoller.addListener(
-      new String[] {_layoutTable.getPath() + "/"},
-      EnumSet.of(NetworkTableEvent.Kind.kValueAll)
-    );
+    _layoutTableListener =
+        _ntPoller.addListener(
+            new String[] {_layoutTable.getPath() + "/"},
+            EnumSet.of(NetworkTableEvent.Kind.kValueAll));
 
-    _saveLayoutListener = _ntPoller.addListener(
-      _saveLayout,
-      EnumSet.of(NetworkTableEvent.Kind.kValueAll)
-    );
+    _saveLayoutListener =
+        _ntPoller.addListener(_saveLayout, EnumSet.of(NetworkTableEvent.Kind.kValueAll));
 
-    _chooseLayout.onChange(layout -> {
-      loadLayout(layout);
-    });
+    _chooseLayout.onChange(
+        layout -> {
+          loadLayout(layout);
+        });
 
-    _side.onChange(side -> {
-      generateAuto();
-    });
+    _side.onChange(
+        side -> {
+          generateAuto();
+        });
 
     addPeriodic.accept(this::poll);
 
@@ -230,9 +230,9 @@ public class ModularAuto {
     }
 
     if (_neutralZone.get()) {
-        _currentTraj
+      _currentTraj
           .done()
-            .onTrue(sequence(runOnce(() -> _currentTraj = neutralZone), _currentTraj.cmd()));
+          .onTrue(sequence(runOnce(() -> _currentTraj = neutralZone), _currentTraj.cmd()));
     }
 
     if (_depot.get()) {
@@ -265,7 +265,7 @@ public class ModularAuto {
     if (_climb.get()) {
       _currentTraj.done().onTrue(sequence(runOnce(() -> _currentTraj = climb), _currentTraj.cmd()));
     }
-    
+
     _routineCmd = routine.cmd();
 
     _isRoutineGenerated.set(true);
@@ -293,10 +293,12 @@ public class ModularAuto {
 
       _chooseLayout.addOption(name, name);
 
-      FaultLogger.report("Saved auto layout (" + layoutJson.getAbsolutePath() + ") successfully.", FaultType.INFO);
+      FaultLogger.report(
+          "Saved auto layout (" + layoutJson.getAbsolutePath() + ") successfully.", FaultType.INFO);
 
     } catch (IOException e) {
-      FaultLogger.report("Auto layout (" + layoutJson.getAbsolutePath() + ") failed to save.", FaultType.ERROR);
+      FaultLogger.report(
+          "Auto layout (" + layoutJson.getAbsolutePath() + ") failed to save.", FaultType.ERROR);
     }
   }
 
@@ -323,7 +325,8 @@ public class ModularAuto {
       _climb.set(layout.getOrDefault("climb", false));
 
       FaultLogger.report(
-        "Loaded auto layout (" + layoutJson.getAbsolutePath() + ") successfully.", FaultType.INFO);
+          "Loaded auto layout (" + layoutJson.getAbsolutePath() + ") successfully.",
+          FaultType.INFO);
     } catch (IOException e) {
       FaultLogger.report(
           "Auto layout (" + layoutJson.getAbsolutePath() + ") failed to load.", FaultType.ERROR);

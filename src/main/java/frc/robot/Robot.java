@@ -95,7 +95,8 @@ public class Robot extends TimedRobot {
           _swerve,
           () -> _shotParameters.getShotHeading());
 
-  private final ModularAuto _auto = new ModularAuto(_swerve, _superstructure, runnable -> addPeriodic(runnable, 0.02));
+  private final ModularAuto _auto =
+      new ModularAuto(_swerve, _superstructure, runnable -> addPeriodic(runnable, 0.02));
 
   /**
    * This function is run when the robot is first started up and should be used for any
