@@ -30,9 +30,9 @@ import java.util.Map;
 /** All auton routines. */
 public class Autos {
   private enum Side {
-    LEFT("Left "),
-    CENTER("Center "),
-    RIGHT("Right ");
+    LEFT("Left"),
+    CENTER("Center"),
+    RIGHT("Right");
 
     private final String _prefix;
 
