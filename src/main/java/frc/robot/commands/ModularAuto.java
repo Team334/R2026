@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import frc.lib.FaultLogger;
 import frc.lib.FaultsTable.FaultType;
 import frc.robot.subsystems.Swerve;
@@ -202,7 +201,7 @@ public class ModularAuto {
 
   /** The auto generated from the specified layout. */
   public Command getAuto() {
-    return new ScheduleCommand(_routineCmd).withName("Modular Auto");
+    return defer(() -> _routineCmd, _routineCmd.getRequirements()).withName("Modular Auto");
   }
 
   // generate the modular auto

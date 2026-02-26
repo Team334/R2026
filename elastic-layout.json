@@ -17,8 +17,8 @@
           {
             "title": "Layout Chooser",
             "x": 360.0,
-            "y": 540.0,
-            "width": 360.0,
+            "y": 360.0,
+            "width": 270.0,
             "height": 180.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -30,9 +30,9 @@
           {
             "title": "Side Chooser",
             "x": 0.0,
-            "y": 540.0,
+            "y": 450.0,
             "width": 360.0,
-            "height": 180.0,
+            "height": 270.0,
             "type": "ComboBox Chooser",
             "properties": {
               "topic": "/SmartDashboard/Side Chooser",
@@ -120,10 +120,10 @@
           },
           {
             "title": "Total Faults",
-            "x": 720.0,
+            "x": 630.0,
             "y": 270.0,
-            "width": 360.0,
-            "height": 450.0,
+            "width": 270.0,
+            "height": 270.0,
             "type": "Alerts",
             "properties": {
               "topic": "/FaultLogger/Total Faults",
@@ -134,7 +134,7 @@
             "title": "Is Auto Generated",
             "x": 540.0,
             "y": 0.0,
-            "width": 180.0,
+            "width": 90.0,
             "height": 360.0,
             "type": "Boolean Box",
             "properties": {
@@ -151,8 +151,8 @@
             "title": "Save Layout",
             "x": 0.0,
             "y": 360.0,
-            "width": 450.0,
-            "height": 180.0,
+            "width": 360.0,
+            "height": 90.0,
             "type": "Text Display",
             "properties": {
               "topic": "/Robot/Auto/Save Layout",
@@ -163,9 +163,9 @@
           },
           {
             "title": "Active Faults",
-            "x": 720.0,
+            "x": 630.0,
             "y": 0.0,
-            "width": 360.0,
+            "width": 270.0,
             "height": 270.0,
             "type": "Alerts",
             "properties": {
@@ -175,9 +175,9 @@
           },
           {
             "title": "Choreo Alerts",
-            "x": 1080.0,
+            "x": 900.0,
             "y": 0.0,
-            "width": 450.0,
+            "width": 360.0,
             "height": 720.0,
             "type": "Alerts",
             "properties": {
@@ -187,9 +187,9 @@
           },
           {
             "title": "Clear Faults",
-            "x": 450.0,
-            "y": 360.0,
-            "width": 270.0,
+            "x": 360.0,
+            "y": 540.0,
+            "width": 540.0,
             "height": 180.0,
             "type": "Command",
             "properties": {
