@@ -13,6 +13,7 @@ import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableListenerPoller;
 import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -100,6 +101,10 @@ public class Autos {
 
     _side.setDefaultOption("Center", Side.CENTER);
 
+    _side.onChange(side -> {
+      layoutAuto();
+    });
+      
     SmartDashboard.putData("Side Chooser", _side);
 
     // TODO: add listeners to options
@@ -110,6 +115,10 @@ public class Autos {
     _bump = _layoutTable.getBooleanTopic("Bump").getEntry(false);
     _neutralZone = _layoutTable.getBooleanTopic("Neutral Zone").getEntry(false);
     _climb = _layoutTable.getBooleanTopic("Climb").getEntry(false);
+
+    var p = new NetworkTableListenerPoller(_ntInst);
+
+    // p.addListener(null, null);
 
     // display all saved layouts
     File dir = new File(Filesystem.getDeployDirectory() + "/" + layoutDir);
