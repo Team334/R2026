@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
-import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
-import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
@@ -10,6 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.doglog.DogLog;
 import edu.wpi.first.networktables.BooleanEntry;
+import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -18,6 +18,8 @@ import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import frc.lib.FaultLogger;
 import frc.lib.FaultsTable.FaultType;
 import frc.robot.subsystems.Swerve;
@@ -26,9 +28,10 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
-/** All auton routines. */
-public class Autos {
+/** Generates the modular auto. */
+public class ModularAuto {
   private enum Side {
     LEFT("Left"),
     CENTER("Center"),
@@ -46,17 +49,30 @@ public class Autos {
   }
 
   private final AutoFactory _factory;
+
+  private Command _routineCmd;
   private AutoTrajectory _currentTraj;
 
   private final Swerve _swerve;
-  private final Superstructure _superstructure;
+  // private final Superstructure _superstructure;
 
   private final NetworkTableInstance _ntInst;
+  
+  // file management
+  private final String layoutDir = "layouts";
+  private final ObjectMapper _jsonSave = new ObjectMapper();
 
+  // auto table
   private final NetworkTable _autoTable;
+
+  private final BooleanPublisher _isRoutineGenerated; 
+
+  private final StringSubscriber _saveLayout;
+  private final SendableChooser<String> _chooseLayout = new SendableChooser<String>();
+
+  // layout table
   private final NetworkTable _layoutTable;
 
-  // all the auto layout options
   private final SendableChooser<Side> _side;
   private final BooleanEntry _shootPreload;
   private final BooleanEntry _depot;
@@ -65,14 +81,15 @@ public class Autos {
   private final BooleanEntry _neutralZone;
   private final BooleanEntry _climb;
 
-  private SendableChooser<String> _layoutChooser = new SendableChooser<String>();
-  private ObjectMapper _jsonSave = new ObjectMapper();
+  // nt listeners
+  private final NetworkTableListenerPoller _ntPoller;
 
-  private final String layoutDir = "layouts";
+  private final int _layoutTableListener;
+  private final int _saveLayoutListener;
 
-  public Autos(Swerve swerve, Superstructure superstructure) {
+  public ModularAuto(Swerve swerve, Superstructure superstructure, Consumer<Runnable> addPeriodic) {
     _swerve = swerve;
-    _superstructure = superstructure;
+    // _superstructure = superstructure;
 
     _factory =
         new AutoFactory(
@@ -88,11 +105,33 @@ public class Autos {
               DogLog.log("Auto/Current Trajectory Is Active", isActive);
             });
 
-    _ntInst = NetworkTableInstance.getDefault(); // TODO: change
+    _ntInst = NetworkTableInstance.getDefault();
 
-    _autoTable = _ntInst.getTable("Auto");
+    // build auto table
+    _autoTable = _ntInst.getTable("Robot/Auto");
+
+    _isRoutineGenerated = _autoTable.getBooleanTopic("Is Auto Generated").publish();
+
+    _saveLayout = _autoTable.getStringTopic("Save Layout").subscribe("New Layout");
+    _autoTable.getStringTopic("Save Layout").publish();
+    
+    File dir = new File(Filesystem.getDeployDirectory() + "/" + layoutDir);
+
+    if (dir.listFiles() != null) {
+      for (File preset : dir.listFiles()) {
+        String fileName = preset.getName().substring(0, preset.getName().lastIndexOf("."));
+
+        _chooseLayout.addOption(fileName, fileName);
+      }
+    }
+
+    _chooseLayout.setDefaultOption("Empty", "Empty");
+
+    SmartDashboard.putData("Layout Chooser", _chooseLayout);
+
+    // build layout table
     _layoutTable = _autoTable.getSubTable("Layout");
-
+    
     _side = new SendableChooser<Side>();
 
     _side.addOption("Left", Side.LEFT);
@@ -101,13 +140,7 @@ public class Autos {
 
     _side.setDefaultOption("Center", Side.CENTER);
 
-    _side.onChange(side -> {
-      layoutAuto();
-    });
-      
     SmartDashboard.putData("Side Chooser", _side);
-
-    // TODO: add listeners to options
 
     _shootPreload = _layoutTable.getBooleanTopic("Shoot Preload").getEntry(false);
     _depot = _layoutTable.getBooleanTopic("Depot").getEntry(false);
@@ -116,93 +149,126 @@ public class Autos {
     _neutralZone = _layoutTable.getBooleanTopic("Neutral Zone").getEntry(false);
     _climb = _layoutTable.getBooleanTopic("Climb").getEntry(false);
 
-    var p = new NetworkTableListenerPoller(_ntInst);
+    _shootPreload.set(false);
+    _depot.set(false);
+    _humanStation.set(false);
+    _bump.set(false);
+    _neutralZone.set(false);
+    _climb.set(false);
+  
+    // set up nt listeners
+    _ntPoller = new NetworkTableListenerPoller(_ntInst);
 
-    // p.addListener(null, null);
+    _layoutTableListener = _ntPoller.addListener(
+      new String[] {_layoutTable.getPath() + "/"},
+      EnumSet.of(NetworkTableEvent.Kind.kValueAll)
+    );
 
-    // display all saved layouts
-    File dir = new File(Filesystem.getDeployDirectory() + "/" + layoutDir);
+    _saveLayoutListener = _ntPoller.addListener(
+      _saveLayout,
+      EnumSet.of(NetworkTableEvent.Kind.kValueAll)
+    );
 
-    if (dir.listFiles() != null)
-      for (File preset : dir.listFiles()) {
-        String fileName = preset.getName().substring(0, preset.getName().lastIndexOf("."));
+    _chooseLayout.onChange(layout -> {
+      loadLayout(layout);
+    });
 
-        _layoutChooser.addOption(fileName, fileName);
-      }
+    _side.onChange(side -> {
+      generateAuto();
+    });
 
-    _layoutChooser.onChange(
-        jsonName -> {
-          loadLayout(jsonName);
-        });
+    addPeriodic.accept(this::poll);
 
-    StringSubscriber saveLayout = _autoTable.getStringTopic("Save Layout").subscribe("New Layout");
-
-    _ntInst.addListener(
-        saveLayout,
-        EnumSet.of(NetworkTableEvent.Kind.kValueAll),
-        event -> {
-          saveLayout(event.valueData.value.getString());
-        });
-
-    SmartDashboard.putData("Auto Chooser", _layoutChooser);
+    // initial load and generate
+    loadLayout(_chooseLayout.getSelected());
+    generateAuto();
   }
 
-  /** The auto routine generated from the specified layout. */
-  public AutoRoutine layoutAuto() {
-    String obstacleRoute = _bump.get() ? "Bump" : "Trench";
+  private void poll() {
+    var changes = _ntPoller.readQueue();
 
-    AutoRoutine routine = _factory.newRoutine("Layout Auto");
+    if (changes.length == 0) return;
 
-    AutoTrajectory initialTraj = routine.trajectory(_side.getSelected().getPrefix() + "Start");
+    var latestChange = changes[changes.length - 1];
 
+    if (latestChange.listener == _layoutTableListener) {
+      generateAuto();
+    }
+
+    if (latestChange.listener == _saveLayoutListener) {
+      saveLayout(_saveLayout.get());
+    }
+  }
+
+  /** The auto generated from the specified layout. */
+  public Command getAuto() {
+    return new ScheduleCommand(_routineCmd).withName("Modular Auto");
+  }
+
+  // generate the modular auto
+  private void generateAuto() {
+    _isRoutineGenerated.set(false);
+
+    AutoRoutine routine = _factory.newRoutine("Modular Auto");
+
+    String obstacle = _bump.get() ? "Bump" : "Trench";
+
+    AutoTrajectory initial = routine.trajectory(_side.getSelected().getPrefix() + "Start");
     AutoTrajectory depot = routine.trajectory(_side.getSelected().getPrefix() + "Depot");
     AutoTrajectory humanStation =
         routine.trajectory(_side.getSelected().getPrefix() + "HumanStation");
-
     AutoTrajectory neutralZone =
-        routine.trajectory(_side.getSelected().getPrefix() + obstacleRoute + "NeutralZone");
-
+        routine.trajectory(_side.getSelected().getPrefix() + obstacle + "NeutralZone");
     AutoTrajectory climb = routine.trajectory(_side.getSelected().getPrefix() + "Climb");
 
-    _currentTraj = initialTraj;
-    routine.active().onTrue(sequence(initialTraj.resetOdometry(), _currentTraj.cmd()));
+    _currentTraj = initial;
 
-    if (_shootPreload.get())
+    routine.active().onTrue(sequence(initial.resetOdometry(), _currentTraj.cmd()));
+
+    if (_shootPreload.get()) {
       // _superstructure.shoot(null, null)
+    }
 
-      if (_neutralZone.get())
+    if (_neutralZone.get()) {
         _currentTraj
-            .done()
+          .done()
             .onTrue(sequence(runOnce(() -> _currentTraj = neutralZone), _currentTraj.cmd()));
+    }
 
-    if (_depot.get())
+    if (_depot.get()) {
       _currentTraj
           .done()
           .onTrue(
               sequence(
                   runOnce(() -> _currentTraj = depot),
                   _currentTraj.cmd())); // Add shooting while moving
+    }
 
-    if (_humanStation.get())
+    if (_humanStation.get()) {
       _currentTraj
           .done()
           .onTrue(
               sequence(
                   runOnce(() -> _currentTraj = humanStation),
                   _currentTraj.cmd())); // Add shooting while moving
+    }
 
-    if (_neutralZone.get())
+    if (_neutralZone.get()) {
       _currentTraj
           .done()
           .onTrue(
               sequence(
                   runOnce(() -> _currentTraj = neutralZone),
                   _currentTraj.cmd())); // Add shooting while moving
+    }
 
-    if (_climb.get())
+    if (_climb.get()) {
       _currentTraj.done().onTrue(sequence(runOnce(() -> _currentTraj = climb), _currentTraj.cmd()));
+    }
+    
+    _routineCmd = routine.cmd();
 
-    return routine;
+    _isRoutineGenerated.set(true);
   }
 
   // save auto layout as json
@@ -224,11 +290,13 @@ public class Autos {
 
     try {
       _jsonSave.writerWithDefaultPrettyPrinter().writeValue(layoutJson, layout);
-      _layoutChooser.addOption(name, name);
-      FaultLogger.report("Saved auto layout (" + name + ".json) successfully.", FaultType.INFO);
+
+      _chooseLayout.addOption(name, name);
+
+      FaultLogger.report("Saved auto layout (" + layoutJson.getAbsolutePath() + ") successfully.", FaultType.INFO);
 
     } catch (IOException e) {
-      FaultLogger.report("Auto layout (" + name + ".json) failed to save.", FaultType.ERROR);
+      FaultLogger.report("Auto layout (" + layoutJson.getAbsolutePath() + ") failed to save.", FaultType.ERROR);
     }
   }
 
@@ -253,13 +321,12 @@ public class Autos {
       _bump.set(layout.getOrDefault("bump", false));
       _neutralZone.set(layout.getOrDefault("neutralZone", false));
       _climb.set(layout.getOrDefault("climb", false));
+
+      FaultLogger.report(
+        "Loaded auto layout (" + layoutJson.getAbsolutePath() + ") successfully.", FaultType.INFO);
     } catch (IOException e) {
       FaultLogger.report(
           "Auto layout (" + layoutJson.getAbsolutePath() + ") failed to load.", FaultType.ERROR);
-      return;
     }
-
-    FaultLogger.report(
-        "Loaded auto layout (" + layoutJson.getAbsolutePath() + ") successfully.", FaultType.INFO);
   }
 }
