@@ -3,6 +3,8 @@ package frc.robot.commands;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.doglog.DogLog;
@@ -83,6 +85,19 @@ public class ModularAuto {
   private final int _layoutTableListener;
   private final int _saveLayoutListener;
 
+  // locations and hierarchy
+  private final String START = "Start";
+  private final String DEPOT = "Depot";
+  private final String HUMAN_STATION = "HumanStation";
+  private final String NEUTRAL_ZONE = "NeutralZone";
+  private final String CLIMB = "Climb";
+
+  private final String[] hierarchy = {NEUTRAL_ZONE, DEPOT, HUMAN_STATION, NEUTRAL_ZONE, CLIMB};
+
+  private final Map<String, BooleanEntry> locationMap;
+
+  private final String locationConnector = "To";
+
   public ModularAuto(Swerve swerve, Superstructure superstructure, Consumer<Runnable> addPeriodic) {
     _swerve = swerve;
     // _superstructure = superstructure;
@@ -152,6 +167,13 @@ public class ModularAuto {
     _neutralZone.set(false);
     _climb.set(false);
 
+    locationMap =
+        Map.of(
+            DEPOT, _depot,
+            HUMAN_STATION, _humanStation,
+            NEUTRAL_ZONE, _neutralZone,
+            CLIMB, _climb);
+
     // set up nt listeners
     _ntPoller = new NetworkTableListenerPoller(_ntInst);
 
@@ -210,38 +232,31 @@ public class ModularAuto {
   private void generateAuto() {
     _isRoutineGenerated.set(false);
 
-    String sidePrefix = _side.getSelected().getPrefix();
-    String obstacleTraj = _bump.get() ? "Bump" : "Trench";
+    AutoRoutine routine = _factory.newRoutine("Modular Auto");
 
-    Command depot = _factory.trajectoryCmd(sidePrefix + "Depot");
-    Command humanStation = _factory.trajectoryCmd(sidePrefix + "HumanStation");
-    Command neutralZone = _factory.trajectoryCmd(sidePrefix + obstacleTraj + "NeutralZone");
-    Command climb = _factory.trajectoryCmd(sidePrefix + "Climb");
+    String obstacleLocation = _bump.get() ? "Bump" : "Trench";
 
-    _routineCmd =
-        _factory
-            .resetOdometry(sidePrefix + "Start")
-            .andThen(_factory.trajectoryCmd(sidePrefix + "Start"));
+    String prevLocation = _side.getSelected().getPrefix() + START;
+    AutoTrajectory current = routine.trajectory(prevLocation);
 
-    if (_shootPreload.get()) {
-      // _superstructure.shoot(null, null)
+    routine.active().onTrue(sequence(current.resetOdometry(), current.cmd()));
+
+    for (String location : hierarchy) {
+      if (!locationMap.get(location).get()) continue;
+
+      if (location.equals(NEUTRAL_ZONE)) {
+        location += obstacleLocation;
+      }
+
+      AutoTrajectory next = routine.trajectory(prevLocation + locationConnector + location);
+
+      current.done().onTrue(next.cmd());
+
+      current = next;
+      prevLocation = location;
     }
 
-    if (_depot.get()) {
-      _routineCmd = _routineCmd.andThen(depot); // Add shooting while moving
-    }
-
-    if (_humanStation.get()) {
-      _routineCmd = _routineCmd.andThen(humanStation); // Add shooting while moving
-    }
-
-    if (_neutralZone.get()) {
-      _routineCmd = _routineCmd.andThen(neutralZone); // Add shooting while moving
-    }
-
-    if (_climb.get()) {
-      _routineCmd = _routineCmd.andThen(climb);
-    }
+    _routineCmd = routine.cmd();
 
     _isRoutineGenerated.set(true);
   }
