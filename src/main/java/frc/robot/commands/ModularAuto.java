@@ -3,8 +3,6 @@ package frc.robot.commands;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
-import choreo.auto.AutoTrajectory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.doglog.DogLog;
@@ -50,7 +48,6 @@ public class ModularAuto {
   private final AutoFactory _factory;
 
   private Command _routineCmd;
-  private AutoTrajectory _currentTraj;
 
   private final Swerve _swerve;
   // private final Superstructure _superstructure;
@@ -201,71 +198,50 @@ public class ModularAuto {
 
   /** The auto generated from the specified layout. */
   public Command getAuto() {
-    return defer(() -> _routineCmd, _routineCmd.getRequirements()).withName("Modular Auto");
+    return _routineCmd.withName("Modular Auto");
+  }
+
+  /** The auto generated from the specified layout. */
+  public Command getAutoScheduler() {
+    return deferredProxy(() -> _routineCmd).withName("Modular Auto");
   }
 
   // generate the modular auto
   private void generateAuto() {
     _isRoutineGenerated.set(false);
 
-    AutoRoutine routine = _factory.newRoutine("Modular Auto");
+    String sidePrefix = _side.getSelected().getPrefix();
+    String obstacleTraj = _bump.get() ? "Bump" : "Trench";
 
-    String obstacle = _bump.get() ? "Bump" : "Trench";
+    Command depot = _factory.trajectoryCmd(sidePrefix + "Depot");
+    Command humanStation = _factory.trajectoryCmd(sidePrefix + "HumanStation");
+    Command neutralZone = _factory.trajectoryCmd(sidePrefix + obstacleTraj + "NeutralZone");
+    Command climb = _factory.trajectoryCmd(sidePrefix + "Climb");
 
-    AutoTrajectory initial = routine.trajectory(_side.getSelected().getPrefix() + "Start");
-    AutoTrajectory depot = routine.trajectory(_side.getSelected().getPrefix() + "Depot");
-    AutoTrajectory humanStation =
-        routine.trajectory(_side.getSelected().getPrefix() + "HumanStation");
-    AutoTrajectory neutralZone =
-        routine.trajectory(_side.getSelected().getPrefix() + obstacle + "NeutralZone");
-    AutoTrajectory climb = routine.trajectory(_side.getSelected().getPrefix() + "Climb");
-
-    _currentTraj = initial;
-
-    routine.active().onTrue(sequence(initial.resetOdometry(), _currentTraj.cmd()));
+    _routineCmd =
+        _factory
+            .resetOdometry(sidePrefix + "Start")
+            .andThen(_factory.trajectoryCmd(sidePrefix + "Start"));
 
     if (_shootPreload.get()) {
       // _superstructure.shoot(null, null)
     }
 
-    if (_neutralZone.get()) {
-      _currentTraj
-          .done()
-          .onTrue(sequence(runOnce(() -> _currentTraj = neutralZone), _currentTraj.cmd()));
-    }
-
     if (_depot.get()) {
-      _currentTraj
-          .done()
-          .onTrue(
-              sequence(
-                  runOnce(() -> _currentTraj = depot),
-                  _currentTraj.cmd())); // Add shooting while moving
+      _routineCmd = _routineCmd.andThen(depot); // Add shooting while moving
     }
 
     if (_humanStation.get()) {
-      _currentTraj
-          .done()
-          .onTrue(
-              sequence(
-                  runOnce(() -> _currentTraj = humanStation),
-                  _currentTraj.cmd())); // Add shooting while moving
+      _routineCmd = _routineCmd.andThen(humanStation); // Add shooting while moving
     }
 
     if (_neutralZone.get()) {
-      _currentTraj
-          .done()
-          .onTrue(
-              sequence(
-                  runOnce(() -> _currentTraj = neutralZone),
-                  _currentTraj.cmd())); // Add shooting while moving
+      _routineCmd = _routineCmd.andThen(neutralZone); // Add shooting while moving
     }
 
     if (_climb.get()) {
-      _currentTraj.done().onTrue(sequence(runOnce(() -> _currentTraj = climb), _currentTraj.cmd()));
+      _routineCmd = _routineCmd.andThen(climb);
     }
-
-    _routineCmd = routine.cmd();
 
     _isRoutineGenerated.set(true);
   }

@@ -4,7 +4,22 @@
  "type":"Swerve",
  "variables":{
   "expressions":{},
-  "poses":{}
+  "poses":{
+   "CenterPoint":{
+    "x":{
+     "exp":"2.202131509780884 m",
+     "val":2.202131509780884
+    },
+    "y":{
+     "exp":"5.406726360321045 m",
+     "val":5.406726360321045
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   }
+  }
  },
  "config":{
   "frontLeft":{
