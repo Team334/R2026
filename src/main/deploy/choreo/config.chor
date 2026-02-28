@@ -4,22 +4,7 @@
  "type":"Swerve",
  "variables":{
   "expressions":{},
-  "poses":{
-   "CenterPoint":{
-    "x":{
-     "exp":"2.202131509780884 m",
-     "val":2.202131509780884
-    },
-    "y":{
-     "exp":"5.406726360321045 m",
-     "val":5.406726360321045
-    },
-    "heading":{
-     "exp":"0 rad",
-     "val":0.0
-    }
-   }
-  }
+  "poses":{}
  },
  "config":{
   "frontLeft":{
@@ -43,8 +28,8 @@
    }
   },
   "mass":{
-   "exp":"75 lbs",
-   "val":34.01942775
+   "exp":"135 lbs",
+   "val":61.23496995
   },
   "inertia":{
    "exp":"6.883 kg m ^ 2",
@@ -67,21 +52,21 @@
    "val":2.327950310559006
   },
   "cof":{
-   "exp":"1.5",
-   "val":1.5
+   "exp":"1.6",
+   "val":1.6
   },
   "bumper":{
    "front":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"13.3 in",
+    "val":0.33782
    },
    "side":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"13.3 in",
+    "val":0.33782
    },
    "back":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"13.3 in",
+    "val":0.33782
    }
   },
   "differentialTrackWidth":{
