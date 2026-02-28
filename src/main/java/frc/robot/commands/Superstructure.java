@@ -67,4 +67,15 @@ public class Superstructure {
   public Command climbRoutine() {
     return run(() -> {}).withName("Climb Routine");
   }
+
+  public boolean isShooting() {
+    return _shooter.getCurrentCommand() != null
+        && (_shooter.getCurrentCommand().getName().equals("Shoot")
+            || _shooter.getCurrentCommand().getName().equals("Spit"));
+  }
+
+  public boolean isClimbing() {
+    return _climb.getCurrentCommand() != null
+        && _climb.getCurrentCommand().getName().equals("Climb Routine");
+  }
 }

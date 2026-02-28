@@ -40,6 +40,7 @@ import frc.robot.commands.Superstructure;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Hopper;
+import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.intake.IntakeFeed;
@@ -97,6 +98,8 @@ public class Robot extends TimedRobot {
           _climb,
           _swerve,
           () -> _shotParameters.getShotHeading());
+
+  private final LEDs _leds = new LEDs(_superstructure, _shotParameters);
 
   /**
    * This function is run when the robot is first started up and should be used for any
