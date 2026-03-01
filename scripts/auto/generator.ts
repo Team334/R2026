@@ -122,10 +122,10 @@ const locationParams: Record<Location, LocationParams> = {
     neutralbump: {},
     neutralmiddle: {
         centerWaypoints: [
-            makeWaypoint(4.125550270080566, 7.580191135406494, -1.5599661588553948),
+            makeWaypoint(4.059676647186279, 7.521993637084961, -1.5599661588553948),
             makeWaypoint(7.636203765869141, 6.131853103637695, -1.4711286226200226),
             makeWaypoint(7.501785278320312, 4.563638210296631, -2.0576957311828057),
-            makeWaypoint(4.662569522857666, 7.593451023101807, 0)
+            makeWaypoint(4.451730728149414, 7.541596412658691, 0)
         ]
     },
     trench: {},
@@ -143,7 +143,10 @@ var baseTraj: Trajectory = {
     version: TRAJ_SCHEMA_VERSION,
     params: {
         waypoints: [],
-        constraints: [],
+        constraints: [
+            {from: "first", to:"last", data: {type: "KeepOutCircle", props: {x: toExpr(4.6220447067171335, "m"), y: toExpr(6.499967720359564, "m"), r: toExpr(0.7, "m")}}, enabled: true},
+            {from: "first", to:"last", data: {type: "KeepInRectangle", props: {x: toExpr(0, "m"), y: toExpr(0, "m"), w: toExpr(16.541, "m"), h: toExpr(8.0629, "m")}}, enabled: true},
+        ],
         targetDt: toExpr(0.05, "s")
     },
     snapshot: { // ignore this
