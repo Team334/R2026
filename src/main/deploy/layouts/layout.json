@@ -1,0 +1,9 @@
+{
+    "name": "Layout",
+    "excludedSides": ["L", "R"],
+    "layout": [
+        "start",
+        "neutralmiddle",
+        "depot"
+    ]
+}
