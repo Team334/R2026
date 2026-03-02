@@ -95,8 +95,7 @@ public class Robot extends TimedRobot {
           _swerve,
           () -> _shotParameters.getShotHeading());
 
-  private final ModularAuto _auto =
-      new ModularAuto(_swerve, _superstructure, runnable -> addPeriodic(runnable, 0.02));
+  private final ModularAuto _auto = new ModularAuto(_swerve, _superstructure);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -165,7 +164,7 @@ public class Robot extends TimedRobot {
 
     addPeriodic(FaultLogger::update, 1);
 
-    autonomous().whileTrue(_auto.getAuto());
+    autonomous().whileTrue(_auto.getAutoScheduler());
 
     preventChoreoDelay();
   }
