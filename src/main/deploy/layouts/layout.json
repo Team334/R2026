@@ -4,6 +4,7 @@
     "layout": [
         "start",
         "neutralmiddle",
-        "depot"
+        "depot",
+        "neutralmiddle"
     ]
 }
