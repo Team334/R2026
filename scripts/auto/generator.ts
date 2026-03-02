@@ -1,4 +1,4 @@
-import { Expr, Constraint, Trajectory, TRAJ_SCHEMA_VERSION, Waypoint } from "./choreo/DocumentTypes";
+import { Expr, Constraint, Trajectory, TRAJ_SCHEMA_VERSION, Waypoint, EventMarker } from "./choreo/DocumentTypes";
 
 // @ts-ignore
 import * as fs from "fs";
@@ -47,31 +47,32 @@ function shiftConstraints(constraints: Constraint[], waypointOffset: number) : C
     return shiftedConstraints;
 }
 
-function buildTrajectory(baseTraj: Trajectory, name: string, side: Side, layout: Location[]) : Trajectory {
+function buildTrajectory(baseTraj: Trajectory, name: string, layout: Location[]) : Trajectory {
     let trajWaypoints: Waypoint<Expr>[] = [];
     let trajConstraints: Constraint[] = [];
 
     let waypointOffset: number = 0;
 
     for (const location of layout) {
-        const params = locationParams[location];
+        const side = location.split('_')[0] as Side;
+        const params = locationParams[location.split('_')[1] as GenericLocation];
 
         switch (side) {
-            case "L":
+            case "l":
                 trajWaypoints.push(...(params.leftWaypoints ?? []));
                 trajConstraints.push(...shiftConstraints(params.constraints ?? [], waypointOffset));
 
                 waypointOffset += params.leftWaypoints?.length ?? 0;
                 break;
     
-            case "C":
+            case "c":
                 trajWaypoints.push(...(params.centerWaypoints ?? []));
                 trajConstraints.push(...shiftConstraints(params.constraints ?? [], waypointOffset));
 
                 waypointOffset += params.centerWaypoints?.length ?? 0;
                 break;
 
-            case "R":
+            case "r":
                 trajWaypoints.push(...(params.rightWaypoints ?? []));
                 trajConstraints.push(...shiftConstraints(params.constraints ?? [], waypointOffset));
 
@@ -85,7 +86,7 @@ function buildTrajectory(baseTraj: Trajectory, name: string, side: Side, layout:
 
     const updatedTraj: Trajectory = baseTraj;
 
-    updatedTraj.name = side + name;
+    updatedTraj.name = name;
 
     updatedTraj.params.waypoints = trajWaypoints;
     updatedTraj.params.constraints.push(...trajConstraints);
@@ -116,19 +117,21 @@ function generateTrajectory(traj: Trajectory) : void {
     });
 }
 
-type Location = "start" | "neutralbump" | "neutralmiddle" | "trench" | "depot" | "human" | "climb";
-type Side = "L" | "C" | "R";
+type Side = "l" | "c" | "r";
+type GenericLocation = "start" | "neutralbump" | "neutralmiddle" | "trench" | "depot" | "human" | "climb";
+
+type Location = `${Side}_${GenericLocation}`;
 
 interface LocationParams {
     leftWaypoints?: Waypoint<Expr>[],
     centerWaypoints?: Waypoint<Expr>[],
     rightWaypoints?: Waypoint<Expr>[],
-    constraints?: Constraint[] // assume no coordinate constraints per location
+    constraints?: Constraint[],
+    eventMarkers?: EventMarker[]
 }
 
 interface Layout {
     name: string,
-    excludedSides: Side[],
     layout: Location[]
 }
 
@@ -154,13 +157,14 @@ const makeConstraint = (from: number, to: number, data: ConstraintData) : Constr
     };
 }
 
-const locationParams: Record<Location, LocationParams> = {
+const locationParams: Record<GenericLocation, LocationParams> = {
     start: {
+        leftWaypoints: [makeWaypoint(3.5716943740844727, 6.001647472381592, -1.1441687766816608)],
         centerWaypoints: [makeWaypoint(3, 4, 0)]
     },
     neutralbump: {},
     neutralmiddle: {
-        centerWaypoints: [
+        leftWaypoints: [
             makeWaypoint(4.059676647186279, 7.521993637084961, -1.5599661588553948),
             makeWaypoint(7.636203765869141, 6.131853103637695, -1.4711286226200226),
             makeWaypoint(7.501785278320312, 4.563638210296631, -2.0576957311828057),
@@ -169,7 +173,7 @@ const locationParams: Record<Location, LocationParams> = {
     },
     trench: {},
     depot: {
-        centerWaypoints: [
+        leftWaypoints: [
             makeWaypoint(0.4917987287044525, 6.870540618896484, -1.5707963267948966),
             makeWaypoint(0.4917987287044525, 5.075254440307617, -1.5707963267948966)
         ],
@@ -212,7 +216,7 @@ var baseTraj: Trajectory = {
 
 var layout: Layout = loadLayout("layout");
 
-var traj : Trajectory = buildTrajectory(baseTraj, layout.name, "C", layout.layout);
+var traj : Trajectory = buildTrajectory(baseTraj, layout.name, layout.layout);
 
 saveTrajectory(traj);
 generateTrajectory(traj);
