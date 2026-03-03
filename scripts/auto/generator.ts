@@ -140,6 +140,8 @@ type GenericLocation = "start" | "neutralbump" | "neutralmiddle" | "trench" | "d
 
 type Location = `${Side}_${GenericLocation}`;
 
+type EventName = "pivot out" | "pivot in" | "feed in" | "feed stop" | "shoot" | "stop shooting" | "climb";
+
 interface LocationParams {
     leftWaypoints?: Waypoint<Expr>[],
     centerWaypoints?: Waypoint<Expr>[],
@@ -175,7 +177,7 @@ const makeConstraint = (from: number, to: number, data: ConstraintData) : Constr
     };
 }
 
-const makeEventMarker = (name: string, target: number, offset: number) : EventMarker => {
+const makeEventMarker = (name: EventName, target: number, offset: number) : EventMarker => {
     return {
         name: name,
         from: {
