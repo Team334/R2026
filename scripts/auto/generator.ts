@@ -41,8 +41,15 @@ function shiftParams(constraints: Constraint[], eventMarkers: EventMarker[], way
     for (const constraint of constraints) {
         const shiftedConstraint: Constraint = structuredClone(constraint);
 
-        if (typeof constraint.from === 'number') shiftedConstraint.from = (constraint.from as number) + waypointOffset;
-        if (typeof constraint.to === 'number') shiftedConstraint.to = (constraint.to as number) + waypointOffset;
+        if (typeof constraint.from === 'number' && typeof constraint.to === 'number') {
+            shiftedConstraint.from = (constraint.from as number) + waypointOffset;
+            shiftedConstraint.to = (constraint.to as number) + waypointOffset
+
+            if (shiftedConstraint.from == -1) {
+                // connect constraint to the next waypoint
+                shiftedConstraint.to == shiftedConstraint.from + 1;
+            }
+        } 
 
         shiftedConstraints.push(shiftedConstraint);
     }
@@ -50,7 +57,9 @@ function shiftParams(constraints: Constraint[], eventMarkers: EventMarker[], way
     for (const eventMarker of eventMarkers) {
         const shiftedEventMarker: EventMarker = structuredClone(eventMarker);
 
-        if (typeof eventMarker.from.target === 'number') shiftedEventMarker.from.target = (eventMarker.from.target as number) + waypointOffset;
+        if (typeof eventMarker.from.target === 'number') {
+           shiftedEventMarker.from.target = (eventMarker.from.target as number);
+        }
 
         shiftedEventMarkers.push(shiftedEventMarker);
     }
