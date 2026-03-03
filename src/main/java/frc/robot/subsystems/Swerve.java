@@ -80,6 +80,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   private final HolonomicController _poseController =
       new HolonomicController(getKinematics().getModules());
 
+  private boolean _mustResetRotationTrajectory = true;
+
   private double _lastSimTime = 0;
   private Notifier _simNotifier;
 
@@ -350,7 +352,11 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
             () -> {
               _poseController.nextSetpointRotation(getHeading(), heading.get());
 
-              return _poseController.calculate(_poseController.getSetpointSpeeds(), _poseController.getSetpointPose(), getPose()).omegaRadiansPerSecond;
+              return _poseController.calculate(
+                      _poseController.getSetpointSpeeds(),
+                      _poseController.getSetpointPose(),
+                      getPose())
+                  .omegaRadiansPerSecond;
             })
         .beforeStarting(
             runOnce(
@@ -400,8 +406,47 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param sample The SwerveSample.
    */
   public void followTrajectory(SwerveSample sample) {
-    var desiredSpeeds = sample.getChassisSpeeds();
-    var desiredPose = sample.getPose();
+    _mustResetRotationTrajectory = true;
+
+    ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
+    Pose2d desiredPose = sample.getPose();
+
+    desiredSpeeds = _poseController.calculate(desiredSpeeds, desiredPose, getPose());
+
+    setControl(
+        _fieldSpeedsRequest
+            .withSpeeds(desiredSpeeds)
+            .withWheelForceFeedforwardsX(sample.moduleForcesX())
+            .withWheelForceFeedforwardsY(sample.moduleForcesY()));
+  }
+
+  /**
+   * Sets the chassis state to the given {@link SwerveSample} for trajectory following. Omega is
+   * overriden by the omega generated from the heading profile to follow the supplied heading.
+   *
+   * @param sample The SwerveSample.
+   * @param heading Heading to follow.
+   */
+  public void followTrajectoryFacing(SwerveSample sample, Rotation2d heading) {
+    if (_mustResetRotationTrajectory) {
+      _poseController.resetRotation(getHeading(), getChassisSpeeds().omegaRadiansPerSecond);
+
+      _mustResetRotationTrajectory = false;
+    }
+
+    ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
+    Pose2d desiredPose = sample.getPose();
+
+    _poseController.nextSetpointRotation(getHeading(), heading);
+
+    desiredSpeeds =
+        new ChassisSpeeds(
+            desiredSpeeds.vxMetersPerSecond,
+            desiredSpeeds.vyMetersPerSecond,
+            _poseController.getSetpointSpeeds().omegaRadiansPerSecond);
+
+    desiredPose =
+        new Pose2d(desiredPose.getTranslation(), _poseController.getSetpointPose().getRotation());
 
     desiredSpeeds = _poseController.calculate(desiredSpeeds, desiredPose, getPose());
 
