@@ -17,7 +17,6 @@ import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest.*;
-import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -345,12 +344,22 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param heading The heading the chassis should drive at.
    */
   public Command driveFacing(InputStream velX, InputStream velY, Supplier<Rotation2d> heading) {
-    return drive(velX, velY, () -> _poseController.rotationCalculate(heading.get(), getHeading()))
+    return drive(
+            velX,
+            velY,
+            () -> {
+              _poseController.nextSetpointRotation(getHeading(), heading.get());
+
+              return _poseController.calculate(_poseController.getSetpointSpeeds(), _poseController.getSetpointPose(), getPose()).omegaRadiansPerSecond;
+            })
         .beforeStarting(
             runOnce(
-                () ->
-                    _poseController.rotationReset(
-                        getHeading(), getChassisSpeeds().omegaRadiansPerSecond)))
+                () -> {
+                  _poseController.resetRotation(
+                      getHeading(), getChassisSpeeds().omegaRadiansPerSecond);
+
+                  _poseController.resetPID();
+                }))
         .withName("Drive Facing");
   }
 
@@ -411,21 +420,23 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   /** Drives the robot in a straight line to some given goal pose. */
   public Command driveTo(Supplier<Pose2d> goalPose) {
     return run(() -> {
-          ChassisSpeeds speeds = _poseController.calculate(getPose());
-          Feedforwards wheelForces = _poseController.getWheelForces();
+          _poseController.nextSetpoint(getHeading());
 
           setControl(
               _fieldSpeedsRequest
-                  .withSpeeds(speeds)
-                  .withWheelForceFeedforwardsX(wheelForces.x_newtons)
-                  .withWheelForceFeedforwardsY(wheelForces.y_newtons));
+                  .withSpeeds(_poseController.getSetpointSpeeds())
+                  .withWheelForceFeedforwardsX(_poseController.getWheelForces().x_newtons)
+                  .withWheelForceFeedforwardsY(_poseController.getWheelForces().y_newtons));
         })
         .beforeStarting(
-            () ->
-                _poseController.reset(
-                    getPose(),
-                    goalPose.get(),
-                    ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getHeading())))
+            () -> {
+              _poseController.reset(
+                  getPose(),
+                  goalPose.get(),
+                  ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getHeading()));
+
+              _poseController.resetPID();
+            })
         .until(_poseController::isFinished)
         .withName("Drive To");
   }
