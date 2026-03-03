@@ -39,16 +39,20 @@ function shiftParams(constraints: Constraint[], eventMarkers: EventMarker[], way
     const shiftedEventMarkers: EventMarker[] = [];
 
     for (const constraint of constraints) {
-        if (typeof constraint.from === 'number') constraint.from += waypointOffset;
-        if (typeof constraint.to === 'number') constraint.to += waypointOffset;
+        const shiftedConstraint: Constraint = structuredClone(constraint);
 
-        shiftedConstraints.push(constraint);
+        if (typeof constraint.from === 'number') shiftedConstraint.from = (constraint.from as number) + waypointOffset;
+        if (typeof constraint.to === 'number') shiftedConstraint.to = (constraint.to as number) + waypointOffset;
+
+        shiftedConstraints.push(shiftedConstraint);
     }
 
-    for (const marker of eventMarkers) {
-        if (typeof marker.from.target === 'number') marker.from.target += waypointOffset;
+    for (const eventMarker of eventMarkers) {
+        const shiftedEventMarker: EventMarker = structuredClone(eventMarker);
 
-        shiftedEventMarkers.push(marker);
+        if (typeof eventMarker.from.target === 'number') shiftedEventMarker.from.target = (eventMarker.from.target as number) + waypointOffset;
+
+        shiftedEventMarkers.push(shiftedEventMarker);
     }
 
     return { constraints: shiftedConstraints, eventMarkers: shiftedEventMarkers };
@@ -210,7 +214,7 @@ const locationParams: Record<GenericLocation, LocationParams> = {
             makeConstraint(0, 1, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}})
         ],
         eventMarkers: [
-            makeEventMarker("stop shooting", 0, -0.4)
+            makeEventMarker("stop shooting", 0, 0)
         ]
     },
     human: {},

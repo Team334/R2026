@@ -1,5 +1,5 @@
 {
- "name":"Layout",
+ "name":"Layout.traj",
  "version":3,
  "snapshot":{
   "waypoints":[
@@ -313,5 +313,6 @@
  },
  "events":[
    {"name":"shoot", "from":{"target":4, "targetTimestamp":3.57174, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
-   {"name":"stop shooting", "from":{"target":5, "targetTimestamp":4.77789, "offset":{"exp":"-0.4 s", "val":-0.4}}, "event":null}]
+   {"name":"stop shooting", "from":{"target":5, "targetTimestamp":4.77789, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"shoot", "from":{"target":10, "targetTimestamp":9.71407, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }
