@@ -212,8 +212,9 @@ const locationParams: Record<GenericLocation, LocationParams> = {
     neutralbump: {},
     neutralmiddle: {
         leftWaypoints: [
+            makeWaypoint(3.7149038314819336, 7.477536201477051, 0, true, false),
             makeWaypoint(4.809019565582275, 7.465332508087158, 0),
-            makeWaypoint(7.636203765869141, 6.131853103637695, -1.4711286226200226),
+            makeWaypoint(7.636203765869141, 6.1318531637695, -1.4711286226200226),
             makeWaypoint(7.501785278320312, 4.563638210296631, -2.0576957311828057),
             makeWaypoint(5.85708475112915, 7.2897186279296875, 3.141592653589793),
             makeWaypoint(3.043476104736328, 7.380959987640381, 3.141592653589793, true, false),
@@ -236,7 +237,8 @@ const locationParams: Record<GenericLocation, LocationParams> = {
             makeWaypoint(1.004274845123291, 5.474844455718994, 0, true, false)
         ],
         constraints: [
-            makeConstraint(0, 1, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}})
+            makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}}),
+            makeConstraint(3, -1, {type: "PointAt", props: {x: toExpr(4.624067783355713, "m"), y: toExpr(4.038748741149902, "m"), tolerance: toExpr(1, "deg"), flip: false}}),
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 8, -0.25),
