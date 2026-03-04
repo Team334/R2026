@@ -202,34 +202,45 @@ const makeEventMarker = (name: EventName, target: number, offset: number) : Even
 const locationParams: Record<GenericLocation, LocationParams> = {
     start: {
         leftWaypoints: [
-            makeWaypoint(3.4212963581085205, 5.941174030303955, -1.1441687766816608),
-            makeWaypoint(3.283968210220337, 7.041266441345215, 0)
+            makeWaypoint(3.419274091720581, 7.474021911621094, 0),
         ],
-        centerWaypoints: [makeWaypoint(3, 4, 0)]
+        centerWaypoints: [makeWaypoint(3, 4, 0)],
+        eventMarkers: [
+            makeEventMarker("pivot out", 0, 0)
+        ]
     },
     neutralbump: {},
     neutralmiddle: {
         leftWaypoints: [
-            makeWaypoint(4.059676647186279, 7.521993637084961, -1.5599661588553948),
+            makeWaypoint(4.809019565582275, 7.465332508087158, 0),
             makeWaypoint(7.636203765869141, 6.131853103637695, -1.4711286226200226),
             makeWaypoint(7.501785278320312, 4.563638210296631, -2.0576957311828057),
-            makeWaypoint(4.586862087249756, 7.546622276306152, -1.5708)
+            makeWaypoint(5.85708475112915, 7.2897186279296875, 3.141592653589793),
+            makeWaypoint(3.043476104736328, 7.380959987640381, 3.141592653589793, true, false),
+        ],
+        constraints: [
+            makeConstraint(6, -1, {type: "PointAt", props: {x: toExpr(4.624067783355713, "m"), y: toExpr(4.038748741149902, "m"), tolerance: toExpr(1, "deg"), flip: false}}),
+            makeConstraint(6, -1, {type: "MaxVelocity", props: {max: toExpr(2, "m/s")}})
         ],
         eventMarkers: [
-            makeEventMarker("shoot", 3, 0)
+            makeEventMarker("stop shooting", 2, 0),
+            makeEventMarker("shoot", 6, 0)
         ]
     },
     trench: {},
     depot: {
         leftWaypoints: [
-            makeWaypoint(0.4917987287044525, 6.870540618896484, -1.5707963267948966),
-            makeWaypoint(0.4917987287044525, 5.075254440307617, -1.5707963267948966)
+            makeWaypoint(1.0084538459777832, 7.350242614746094, -1.5707963267948966, true, false),
+            makeWaypoint(0.4468134641647339, 7.149000644683838, -1.5707963267948966),
+            makeWaypoint(0.4468134641647339, 5.474844455718994, -1.5707963267948966),
+            makeWaypoint(1.004274845123291, 5.474844455718994, 0, true, false)
         ],
         constraints: [
             makeConstraint(0, 1, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}})
         ],
         eventMarkers: [
-            makeEventMarker("stop shooting", 0, 0)
+            makeEventMarker("stop shooting", 8, -0.25),
+            makeEventMarker("shoot", 10, 0)
         ]
     },
     human: {},
@@ -282,7 +293,7 @@ var baseTraj: Trajectory = {
         constraints: [
             {from: "first", data: {type: "StopPoint", props: {}}, enabled: true},
             {from: "last", data: {type: "StopPoint", props: {}}, enabled: true},
-            {from: "first", to: "last", data: {type: "KeepOutCircle", props: {x: toExpr(4.6220447067171335, "m"), y: toExpr(6.499967720359564, "m"), r: toExpr(0.7, "m")}}, enabled: true},
+            {from: "first", to: "last", data: {type: "KeepOutCircle", props: {x: toExpr(4.625668669119477, "m"), y: toExpr(6.208901214599609, "m"), r: toExpr(0.826396949005302, "m")}}, enabled: true},
             // TODO right side keep out circle
             {from: "first", to: "last", data: {type: "KeepInRectangle", props: {x: toExpr(0, "m"), y: toExpr(0, "m"), w: toExpr(16.541, "m"), h: toExpr(8.0629, "m")}}, enabled: true}
         ],
