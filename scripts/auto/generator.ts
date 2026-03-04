@@ -198,6 +198,7 @@ const makeEventMarker = (name: EventName, target: number, offset: number) : Even
     }
 }
 
+// SOTM
 const locationParams: Record<GenericLocation, LocationParams> = {
     start: {
         leftWaypoints: [
@@ -234,6 +235,44 @@ const locationParams: Record<GenericLocation, LocationParams> = {
     human: {},
     climb: {}
 }
+
+// SNM
+// const locationParams: Record<GenericLocation, LocationParams> = {
+//     start: {
+//         leftWaypoints: [
+//             makeWaypoint(3.4212963581085205, 5.941174030303955, -1.1441687766816608),
+//             makeWaypoint(3.283968210220337, 7.041266441345215, 0)
+//         ],
+//         centerWaypoints: [makeWaypoint(3, 4, 0)]
+//     },
+//     neutralbump: {},
+//     neutralmiddle: {
+//         leftWaypoints: [
+//             makeWaypoint(4.059676647186279, 7.521993637084961, -1.5599661588553948),
+//             makeWaypoint(7.636203765869141, 6.131853103637695, -1.4711286226200226),
+//             makeWaypoint(7.501785278320312, 4.563638210296631, -2.0576957311828057),
+//             makeWaypoint(4.586862087249756, 7.546622276306152, -1.5708)
+//         ],
+//         eventMarkers: [
+//             makeEventMarker("shoot", 3, 0)
+//         ]
+//     },
+//     trench: {},
+//     depot: {
+//         leftWaypoints: [
+//             makeWaypoint(0.4917987287044525, 6.870540618896484, -1.5707963267948966),
+//             makeWaypoint(0.4917987287044525, 5.075254440307617, -1.5707963267948966)
+//         ],
+//         constraints: [
+//             makeConstraint(0, 1, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}})
+//         ],
+//         eventMarkers: [
+//             makeEventMarker("stop shooting", 0, 0)
+//         ]
+//     },
+//     human: {},
+//     climb: {}
+// }
 
 var baseTraj: Trajectory = {
     name: "",
