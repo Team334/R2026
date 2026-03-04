@@ -200,7 +200,10 @@ const makeEventMarker = (name: EventName, target: number, offset: number) : Even
 
 const locationParams: Record<GenericLocation, LocationParams> = {
     start: {
-        leftWaypoints: [makeWaypoint(3.5716943740844727, 6.001647472381592, -1.1441687766816608)],
+        leftWaypoints: [
+            makeWaypoint(3.4212963581085205, 5.941174030303955, -1.1441687766816608),
+            makeWaypoint(3.283968210220337, 7.041266441345215, 0)
+        ],
         centerWaypoints: [makeWaypoint(3, 4, 0)]
     },
     neutralbump: {},
