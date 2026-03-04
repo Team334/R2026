@@ -271,5 +271,6 @@
    {"name":"shoot", "from":{"target":6, "targetTimestamp":4.0994, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"stop shooting", "from":{"target":7, "targetTimestamp":5.16227, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"feed in", "from":{"target":8, "targetTimestamp":5.55578, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
-   {"name":"feed stop", "from":{"target":10, "targetTimestamp":6.48781, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
+   {"name":"feed stop", "from":{"target":10, "targetTimestamp":6.48781, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"shoot", "from":{"target":10, "targetTimestamp":6.48781, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }
