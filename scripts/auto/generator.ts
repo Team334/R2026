@@ -41,23 +41,16 @@ function shiftParams(constraints: Constraint[], eventMarkers: EventMarker[], way
     for (const constraint of constraints) {
         const shiftedConstraint: Constraint = structuredClone(constraint);
 
-        if (typeof constraint.from === 'number' && typeof constraint.to === 'number') {
-            shiftedConstraint.from = (constraint.from as number) + waypointOffset;
+        if (!(typeof constraint.from === 'number' && typeof constraint.to === 'number')) { continue; }
 
-            if (shiftedConstraint.to == -1) {
-                // connect constraint to the next waypoint
-                shiftedConstraint.to = shiftedConstraint.from + 1;
-            } else {
-                shiftedConstraint.to = (constraint.to as number) + waypointOffset
-            }
+        shiftedConstraint.from = (constraint.from as number) + waypointOffset;
 
-            if (shiftedConstraint.from == -1) {
-                // connect constraint to the previous waypoint
-                shiftedConstraint.from = shiftedConstraint.to - 1;
-            } else {
-                shiftedConstraint.from = (constraint.from as number) + waypointOffset
-            }
-        } 
+        if (shiftedConstraint.to == -1) {
+            // connect constraint to the next waypoint
+            shiftedConstraint.to = shiftedConstraint.from + 1;
+        } else {
+            shiftedConstraint.to = (constraint.to as number) + waypointOffset
+        }
 
         shiftedConstraints.push(shiftedConstraint);
     }
@@ -65,9 +58,9 @@ function shiftParams(constraints: Constraint[], eventMarkers: EventMarker[], way
     for (const eventMarker of eventMarkers) {
         const shiftedEventMarker: EventMarker = structuredClone(eventMarker);
 
-        if (typeof eventMarker.from.target === 'number') {
-           shiftedEventMarker.from.target = (eventMarker.from.target as number) + waypointOffset;
-        }
+        if (!(typeof eventMarker.from.target === 'number')) { continue; }
+
+        shiftedEventMarker.from.target = (eventMarker.from.target as number) + waypointOffset;
 
         shiftedEventMarkers.push(shiftedEventMarker);
     }
@@ -219,20 +212,23 @@ const locationParams: Record<GenericLocation, LocationParams> = {
     },
     neutralbump: {
         leftWaypoints: [
-            makeWaypoint(3.7268662452697754, 7.4919657707214355, 0, true, false),
-            makeWaypoint(5.697521209716797, 7.402477741241455, -0.5536809038084497),
+            makeWaypoint(2.9307680130004883, 7.31110954284668, 0, true, false),
+            makeWaypoint(5.697521209716797, 7.402477741241455, -0.006293),
             makeWaypoint(5.955106735229492, 5.9437713623046875, -1.5707963267948966),
             makeWaypoint(5.971709251403809, 4.325946807861328, -1.6095124425448013),
             makeWaypoint(5.905695915222168, 7.3172287940979, 3.131788918491988),
             makeWaypoint(2.770551919937134, 7.13850736618042, 0, true, false),
         ],
         constraints: [
-            makeConstraint(5, -1, {type: "PointAt", props: {x: toExpr(4.624067783355713, "m"), y: toExpr(4.038748741149902, "m"), tolerance: toExpr(0.017, "rad"), flip: false}})
+            makeConstraint(5, -1, {type: "PointAt", props: {x: toExpr(4.624067783355713, "m"), y: toExpr(4.038748741149902, "m"), tolerance: toExpr(0.017, "rad"), flip: false}}),
+            makeConstraint(5, -1, {type: "MaxVelocity", props: {max: toExpr(2, "m/s")}})
         ],
         eventMarkers: [
+            makeEventMarker("stop shooting", 0, 0),
+            makeEventMarker("pivot out", 0, 0),
             makeEventMarker("feed in", 1, 0),
-            makeEventMarker("feed stop", 4, 0),
-            makeEventMarker("shoot", 5, -0.25)
+            makeEventMarker("feed stop", 4, 0.4),
+            makeEventMarker("shoot", 5, 0)
         ]
     },
     neutralmiddle: {
@@ -255,7 +251,14 @@ const locationParams: Record<GenericLocation, LocationParams> = {
             makeEventMarker("shoot", 4, 0)
         ]
     },
-    trench: {},
+    trench: {
+        leftWaypoints: [
+            makeWaypoint(2.7739968299865723, 6.4496846199035645, 0, true, false)
+        ],
+        constraints: [
+            makeConstraint(0, -1, {type: "MaxVelocity", props: {max: toExpr(2, "m/s")}})
+        ]
+    },
     depot: {
         leftWaypoints: [
             makeWaypoint(1.206515908241272, 6.921103477478027, -1.5707963267948966, true, false),
@@ -266,11 +269,11 @@ const locationParams: Record<GenericLocation, LocationParams> = {
         constraints: [
             makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}}),
             makeConstraint(3, -1, {type: "PointAt", props: {x: toExpr(4.624067783355713, "m"), y: toExpr(4.038748741149902, "m"), tolerance: toExpr(0.071, "rad"), flip: false}}),
+            makeConstraint(3, -1, {type: "MaxVelocity", props: {max: toExpr(2, "m/s")}})
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),
-            makeEventMarker("shoot", 1, 0),
-            makeEventMarker("feed in", 2, 0),
+            makeEventMarker("feed in", 1, 0),
             makeEventMarker("feed stop", 3, 0),
             makeEventMarker("shoot", 3, 0)
         ]

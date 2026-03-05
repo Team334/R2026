@@ -2,7 +2,10 @@
     "name": "Layout",
     "layout": [
         "l_start",
+        "l_neutralmiddle",
+        "l_depot",
         "l_neutralbump",
-        "l_depot"
+        "l_trench",
+        "l_neutralbump"
     ]
 }
