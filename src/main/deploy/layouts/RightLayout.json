@@ -1,0 +1,9 @@
+{
+    "name": "RightLayout",
+    "layout": [
+        "r_start",
+        "r_neutralmiddle",
+        "r_depot",
+        "r_neutralbump"
+    ]
+}
