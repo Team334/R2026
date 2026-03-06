@@ -171,7 +171,7 @@ type GenericLocation = "start" | "neutralbump" | "neutralmiddle" | "trench" | "d
 
 type Location = `${Side}_${GenericLocation}`;
 
-type EventName = "pivot out" | "pivot in" | "feed in" | "feed stop" | "shoot" | "stop shooting" | "climb";
+type EventName = "pivot out" | "pivot in" | "feed in" | "feed stop" | "shoot" | "stop shooting" | "extend" | "climb";
 
 interface LocationParams {
     leftWaypoints?: Waypoint<Expr>[],
@@ -316,7 +316,7 @@ const locationParams: Record<GenericLocation, LocationParams> = {
         ],
         rightWaypoints: [
             makeWaypoint(1.5006606578826904, 5.137444972991943, 0.0, true, false),
-            makeWaypoint(0.47465676069259644, 4.826406002044678, 1.5708),
+            makeWaypoint(0.43300509452819824, 4.9178547859191895, 1.5708),
             makeWaypoint(0.44392159581184387, 6.838572978973389, 1.5708),
             makeWaypoint(1.206515908241272, 6.921103477478027, -1.5707963267948966, true, false)
         ],
@@ -333,7 +333,28 @@ const locationParams: Record<GenericLocation, LocationParams> = {
             makeEventMarker("shoot", 3, 0)
         ]
     },
-    climb: {}
+    climb: {
+        leftWaypoints: [
+            makeWaypoint(2.4901950359344482, 4.048068523406982, 0, true, false),
+            makeWaypoint(2.4865808486938477, 2.7771108150482178, 3.141592653589793),
+            makeWaypoint(0.8038443922996521, 2.7895240783691406, 0, true, false)
+        ],
+        rightWaypoints: [
+            // (same as left)
+            makeWaypoint(2.4901950359344482, 4.048068523406982, 0, true, false),
+            makeWaypoint(2.4865808486938477, 2.7771108150482178, 3.141592653589793),
+            makeWaypoint(0.8038443922996521, 2.7895240783691406, 0, true, false)
+        ],
+        constraints: [
+            makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}}),
+            makeConstraint(1, 2, {type: "MaxAngularVelocity", props: {max: toExpr(0, "rad/s")}}),
+            makeConstraint(1, 2, {type: "MaxVelocity", props: {max: toExpr(1, "m/s")}})
+        ],
+        eventMarkers: [
+            makeEventMarker("extend", 1, -0.5),
+            makeEventMarker("climb", 2, 0)
+        ]
+    }
 }
 
 // SNM
