@@ -1,0 +1,130 @@
+{
+  "version": 1.0,
+  "grid_size": 90,
+  "tabs": [
+    {
+      "name": "Dashboard",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Reset Pose",
+            "x": 540.0,
+            "y": 180.0,
+            "width": 360.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Reset Pose",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Drive to (0, 0)",
+            "x": 360.0,
+            "y": 0.0,
+            "width": 360.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Drive to (0, 0)",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Drive to (0, 1)",
+            "x": 720.0,
+            "y": 0.0,
+            "width": 360.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Drive to (0, 1)",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Auto",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Total Faults",
+            "x": 630.0,
+            "y": 270.0,
+            "width": 270.0,
+            "height": 360.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/FaultLogger/Total Faults",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Is Auto Generated",
+            "x": 450.0,
+            "y": 0.0,
+            "width": 180.0,
+            "height": 630.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/Auto/Is Auto Generated",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Active Faults",
+            "x": 630.0,
+            "y": 0.0,
+            "width": 270.0,
+            "height": 270.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/FaultLogger/Active Faults",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Choreo Alerts",
+            "x": 900.0,
+            "y": 0.0,
+            "width": 360.0,
+            "height": 630.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/Choreo Alerts",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Auto Chooser",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 450.0,
+            "height": 630.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
