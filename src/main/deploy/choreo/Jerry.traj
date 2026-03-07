@@ -557,6 +557,7 @@
    {"name":"feed in", "from":{"target":12, "targetTimestamp":8.73132, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"feed stop", "from":{"target":15, "targetTimestamp":10.90109, "offset":{"exp":"0.4 s", "val":0.4}}, "event":null},
    {"name":"shoot", "from":{"target":16, "targetTimestamp":12.00483, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"stop shooting", "from":{"target":17, "targetTimestamp":13.56244, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"extend", "from":{"target":18, "targetTimestamp":14.27197, "offset":{"exp":"-0.5 s", "val":-0.5}}, "event":null},
    {"name":"climb", "from":{"target":19, "targetTimestamp":15.99882, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }

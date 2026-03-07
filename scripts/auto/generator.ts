@@ -13,14 +13,14 @@ import { ConstraintData } from "./choreo/ConstraintDefinitions";
 // @ts-ignore
 import readline from "readline/promises";
 
-const CHOREO_CLI = os.homedir().replace(/\\/g, "/") + '/AppData/Local/choreo/choreo-cli';
+const CHOREO_CLI = `${os.homedir().replace(/\\/g, "/")}/AppData/Local/choreo/choreo-cli`;
 
 // (assume running generator from R2026 dir)
 const DEPLOY_DIR: string = './src/main/deploy';
-const TRAJ_DIR: string = DEPLOY_DIR + '/choreo/';
+const TRAJ_DIR: string = `${DEPLOY_DIR}/choreo/`;
 
-const LAYOUT_DIR: string = DEPLOY_DIR + '/layouts';
-const CONFIG: string = TRAJ_DIR + '/config.chor';
+const LAYOUT_DIR: string = `${DEPLOY_DIR}/layouts`;
+const CONFIG: string = `${TRAJ_DIR}/config.chor`;
 
 const FIELD_WIDTH = 8.0629;
 
@@ -46,7 +46,7 @@ function toExpr(val: number, unit: string) : Expr {
  * @param name Name of layout without extension.
  */
 function loadLayout(name: string) : Layout {
-    const layoutData = fs.readFileSync(LAYOUT_DIR + '/' + name + '.json', 'utf-8');
+    const layoutData = fs.readFileSync(`${LAYOUT_DIR}/${name}.json`, 'utf-8');
     
     return JSON.parse(layoutData) as Layout;
 }
@@ -148,14 +148,14 @@ function buildTrajectory(baseTraj: Trajectory, name: string, layout: Location[])
  * Save trajectory to deploy/choreo.
  */
 function saveTrajectory(traj: Trajectory) : void {
-    fs.writeFileSync(TRAJ_DIR + traj.name + ".traj", JSON.stringify(traj, null, 2));
+    fs.writeFileSync(`${TRAJ_DIR}/${traj.name}.traj`, JSON.stringify(traj, null, 2));
 }
 
 /**
  * Generate the trajectory through choreo cli. The trajectory must exist in deploy/choreo first.
  */
 function generateTrajectory(traj: Trajectory) : void {
-    exec(CHOREO_CLI + " --chor " + CONFIG + " --trajectory " + traj.name + ".traj" + " -g", (error: Error | null, stdout: string, stderr: string) => {
+    exec(`${CHOREO_CLI} --chor ${CONFIG} --trajectory ${traj.name}.traj -g`, (error: Error | null, stdout: string, stderr: string) => {
         if (error) {
             console.error("Choreo Error:", error);
             return;
@@ -351,6 +351,7 @@ const locationParams: Record<GenericLocation, LocationParams> = {
             makeConstraint(1, 2, {type: "MaxVelocity", props: {max: toExpr(1, "m/s")}})
         ],
         eventMarkers: [
+            makeEventMarker("stop shooting", 0, 0),
             makeEventMarker("extend", 1, -0.5),
             makeEventMarker("climb", 2, 0)
         ]
