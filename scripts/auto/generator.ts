@@ -335,13 +335,13 @@ const locationParams: Record<GenericLocation, LocationParams> = {
     },
     climb: {
         leftWaypoints: [
-            makeWaypoint(2.4901950359344482, 4.048068523406982, 0, true, false),
+            makeWaypoint(2.7496304512023926, 4.047032356262207, 0, true, false),
             makeWaypoint(2.4865808486938477, 2.7771108150482178, 3.141592653589793),
             makeWaypoint(0.8038443922996521, 2.7895240783691406, 0, true, false)
         ],
         rightWaypoints: [
             // (same as left)
-            makeWaypoint(2.4901950359344482, 4.048068523406982, 0, true, false),
+            makeWaypoint(2.7496304512023926, 4.047032356262207, 0, true, false),
             makeWaypoint(2.4865808486938477, 2.7771108150482178, 3.141592653589793),
             makeWaypoint(0.8038443922996521, 2.7895240783691406, 0, true, false)
         ],

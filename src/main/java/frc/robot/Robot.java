@@ -101,6 +101,7 @@ public class Robot extends TimedRobot {
           _hopper,
           _intakePivot,
           _intakeFeed,
+          _climb,
           _swerve,
           () -> _shotParameters.getShotHeading());
 
