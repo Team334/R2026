@@ -52,6 +52,9 @@ public class HolonomicController {
   private final WheelForceCalculator _wheelForceCalculator;
   private Feedforwards _wheelForces = new Feedforwards(4);
 
+  private ChassisSpeeds _setpointSpeeds = new ChassisSpeeds();
+  private Pose2d _setpointPose = Pose2d.kZero;
+
   private ChassisSpeeds _prevSetpointSpeeds = new ChassisSpeeds();
 
   /**
@@ -72,6 +75,16 @@ public class HolonomicController {
     return _wheelForces;
   }
 
+  /** Profile setpoint speeds. */
+  public ChassisSpeeds getSetpointSpeeds() {
+    return _setpointSpeeds;
+  }
+
+  /** Profile setpoint pose. */
+  public Pose2d getSetpointPose() {
+    return _setpointPose;
+  }
+
   /** Whether the profiles have been completed or not. */
   public boolean isFinished() {
     return _translationProfile.getSetpoint().equals(_translationProfile.getGoal())
@@ -79,7 +92,7 @@ public class HolonomicController {
   }
 
   /** Resets the PID controllers. */
-  public void reset() {
+  public void resetPID() {
     _xController.reset();
     _yController.reset();
 
@@ -87,7 +100,7 @@ public class HolonomicController {
   }
 
   /**
-   * Resets the profiles and the PID controllers.
+   * Resets the profiles.
    *
    * @param currentPose The current pose.
    * @param goalPose The goal pose.
@@ -147,20 +160,21 @@ public class HolonomicController {
     _headingProfile.reset(
         currentPose.getRotation().getRadians(), currentSpeeds.omegaRadiansPerSecond);
 
-    _prevSetpointSpeeds = currentSpeeds;
+    _setpointSpeeds = currentSpeeds;
+    _setpointPose = currentPose;
+
+    _prevSetpointSpeeds = _setpointSpeeds;
 
     _startPose = currentPose;
-
-    reset();
   }
 
   /**
-   * Resets the profiles and the PID controllers. To be used for a rotation-only profile.
+   * Resets the profiles for a rotation-only profile.
    *
    * @param currentHeading The current chassis heading.
    * @param currentOmega The current chassis omega in rad/s.
    */
-  public void rotationReset(Rotation2d currentHeading, double currentOmega) {
+  public void resetRotation(Rotation2d currentHeading, double currentOmega) {
     reset(
         new Pose2d(Translation2d.kZero, currentHeading),
         Pose2d.kZero,
@@ -168,54 +182,49 @@ public class HolonomicController {
   }
 
   /**
-   * Samples the motions profiles at the next timestep, finding chassis speeds based on the profiles
-   * and PID correction.
+   * Samples the motions profiles at the next setpoint.
    *
-   * @param currentPose The current pose.
-   * @return Field-relative speeds for the chassis.
+   * @param currentHeading The current heading, needed for heading profile.
    */
-  public ChassisSpeeds calculate(Pose2d currentPose) {
+  public void nextSetpoint(Rotation2d currentHeading) {
     _translationProfile.calculate(0); // measurement doesn't matter, handled by xy PID controllers
     _headingProfile.calculate(
-        currentPose.getRotation().getRadians()); // measurement matters for cont input calculations
+        currentHeading.getRadians()); // measurement matters for cont input calculations
 
     Vector<N2> setpointPosition =
         _translationDirection.unit().times(_translationProfile.getSetpoint().position);
     Vector<N2> setpointVelocity =
         _translationDirection.unit().times(_translationProfile.getSetpoint().velocity);
 
-    Pose2d setpointPose =
+    _setpointPose =
         new Pose2d(
             _startPose.getX() + setpointPosition.get(0),
             _startPose.getY() + setpointPosition.get(1),
             new Rotation2d(_headingProfile.getSetpoint().position));
 
-    ChassisSpeeds setpointSpeeds =
+    _setpointSpeeds =
         new ChassisSpeeds(
             setpointVelocity.get(0),
             setpointVelocity.get(1),
             _headingProfile.getSetpoint().velocity);
 
     _wheelForces =
-        _wheelForceCalculator.calculate(Robot.kDefaultPeriod, _prevSetpointSpeeds, setpointSpeeds);
+        _wheelForceCalculator.calculate(Robot.kDefaultPeriod, _prevSetpointSpeeds, _setpointSpeeds);
 
-    _prevSetpointSpeeds = setpointSpeeds;
-
-    return calculate(setpointSpeeds, setpointPose, currentPose);
+    _prevSetpointSpeeds = _setpointSpeeds;
   }
 
   /**
    * Seperately calculates an omega if the profile only involves rotation. Requires an initial
-   * {@link #rotationReset(Rotation2d, double)} call.
+   * {@link #resetRotation(Rotation2d, double)} call.
    *
-   * @param desiredHeading Desired chassis heading.
-   * @param currentHeading Current chassis heading.
-   * @return Omega in rad/s.
+   * @param currentHeading The current heading, needed for heading profile.
+   * @param desiredHeading Desired chassis heading as the profile goal.
    */
-  public double rotationCalculate(Rotation2d desiredHeading, Rotation2d currentHeading) {
+  public void nextSetpointRotation(Rotation2d currentHeading, Rotation2d desiredHeading) {
     _headingProfile.setGoal(desiredHeading.getRadians());
 
-    return calculate(new Pose2d(Translation2d.kZero, currentHeading)).omegaRadiansPerSecond;
+    nextSetpoint(currentHeading);
   }
 
   /**

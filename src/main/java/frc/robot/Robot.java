@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 
-import choreo.auto.AutoChooser;
 import com.ctre.phoenix6.SignalLogger;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Epilogue;
@@ -37,7 +36,7 @@ import frc.lib.FaultsTable.FaultType;
 import frc.lib.InputStream;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.commands.Autos;
+import frc.robot.commands.ModularAuto;
 import frc.robot.commands.Superstructure;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climb;
@@ -88,10 +87,18 @@ public class Robot extends TimedRobot {
   @Logged(name = "Climb")
   private final Climb _climb = new Climb();
 
-  private final Autos _autos = new Autos(_swerve);
-
   private final Superstructure _superstructure =
       new Superstructure(
+          _shooter,
+          _hopper,
+          _intakePivot,
+          _intakeFeed,
+          _climb,
+          _swerve,
+          () -> _shotParameters.getShotHeading());
+
+  private final ModularAuto _auto =
+      new ModularAuto(
           _shooter,
           _hopper,
           _intakePivot,
@@ -173,13 +180,7 @@ public class Robot extends TimedRobot {
 
     addPeriodic(FaultLogger::update, 1);
 
-    AutoChooser chooser = new AutoChooser();
-
-    chooser.addRoutine("Example", _autos::example);
-
-    SmartDashboard.putData("Auto Chooser", chooser);
-
-    autonomous().whileTrue(chooser.selectedCommandScheduler());
+    autonomous().whileTrue(_auto.getAutoScheduler());
 
     preventChoreoDelay();
   }

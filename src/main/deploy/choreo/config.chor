@@ -1,6 +1,6 @@
 {
  "name":"config",
- "version":1,
+ "version":2,
  "type":"Swerve",
  "variables":{
   "expressions":{},
@@ -28,8 +28,8 @@
    }
   },
   "mass":{
-   "exp":"75 lbs",
-   "val":34.01942775
+   "exp":"135 lbs",
+   "val":61.23496995
   },
   "inertia":{
    "exp":"6.883 kg m ^ 2",
@@ -52,21 +52,21 @@
    "val":2.327950310559006
   },
   "cof":{
-   "exp":"1.5",
-   "val":1.5
+   "exp":"1.6",
+   "val":1.6
   },
   "bumper":{
    "front":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"24.833 in",
+    "val":0.6307581999999999
    },
    "side":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"16.5 in",
+    "val":0.4191
    },
    "back":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"16.5 in",
+    "val":0.4191
    }
   },
   "differentialTrackWidth":{
@@ -74,5 +74,11 @@
    "val":0.5588
   }
  },
- "generationFeatures":[]
+ "generationFeatures":[],
+ "codegen":{
+  "root":null,
+  "genVars":true,
+  "genTrajData":true,
+  "useChoreoLib":true
+ }
 }

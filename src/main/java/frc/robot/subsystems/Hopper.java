@@ -74,12 +74,7 @@ public class Hopper extends AdvancedSubsystem {
     FaultLogger.register(_rollerMotor);
     FaultLogger.register(_floorMotor);
 
-    setDefaultCommand(
-        run(
-            () -> {
-              setFloorSpeed(RotationsPerSecond.zero());
-              setRollerSpeed(RotationsPerSecond.zero());
-            }));
+    setDefaultCommand(feedStop());
   }
 
   private void setFloorSpeed(AngularVelocity speed) {
@@ -88,6 +83,15 @@ public class Hopper extends AdvancedSubsystem {
 
   private void setRollerSpeed(AngularVelocity speed) {
     _rollerMotor.setControl(_rollerVelocitySetter.withVelocity(speed));
+  }
+
+  /** Stop feeding. */
+  public Command feedStop() {
+    return run(
+        () -> {
+          setFloorSpeed(RotationsPerSecond.zero());
+          setRollerSpeed(RotationsPerSecond.zero());
+        });
   }
 
   /** Feeds fuel for shooting, waiting for is ready condition. */

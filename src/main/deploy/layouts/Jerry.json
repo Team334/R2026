@@ -1,0 +1,10 @@
+{
+    "name": "Jerry",
+    "layout": [
+        "l_start",
+        "l_neutralmiddle",
+        "l_depot",
+        "l_neutralbump",
+        "l_climb"
+    ]
+}

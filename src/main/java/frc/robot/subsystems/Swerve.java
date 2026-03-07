@@ -17,7 +17,6 @@ import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest.*;
-import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -80,6 +79,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   private final HolonomicController _poseController =
       new HolonomicController(getKinematics().getModules());
+
+  private boolean _mustResetRotationTrajectory = true;
 
   private double _lastSimTime = 0;
   private Notifier _simNotifier;
@@ -345,12 +346,26 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param heading The heading the chassis should drive at.
    */
   public Command driveFacing(InputStream velX, InputStream velY, Supplier<Rotation2d> heading) {
-    return drive(velX, velY, () -> _poseController.rotationCalculate(heading.get(), getHeading()))
+    return drive(
+            velX,
+            velY,
+            () -> {
+              _poseController.nextSetpointRotation(getHeading(), heading.get());
+
+              return _poseController.calculate(
+                      _poseController.getSetpointSpeeds(),
+                      _poseController.getSetpointPose(),
+                      getPose())
+                  .omegaRadiansPerSecond;
+            })
         .beforeStarting(
             runOnce(
-                () ->
-                    _poseController.rotationReset(
-                        getHeading(), getChassisSpeeds().omegaRadiansPerSecond)))
+                () -> {
+                  _poseController.resetRotation(
+                      getHeading(), getChassisSpeeds().omegaRadiansPerSecond);
+
+                  _poseController.resetPID();
+                }))
         .withName("Drive Facing");
   }
 
@@ -391,8 +406,47 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param sample The SwerveSample.
    */
   public void followTrajectory(SwerveSample sample) {
-    var desiredSpeeds = sample.getChassisSpeeds();
-    var desiredPose = sample.getPose();
+    _mustResetRotationTrajectory = true;
+
+    ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
+    Pose2d desiredPose = sample.getPose();
+
+    desiredSpeeds = _poseController.calculate(desiredSpeeds, desiredPose, getPose());
+
+    setControl(
+        _fieldSpeedsRequest
+            .withSpeeds(desiredSpeeds)
+            .withWheelForceFeedforwardsX(sample.moduleForcesX())
+            .withWheelForceFeedforwardsY(sample.moduleForcesY()));
+  }
+
+  /**
+   * Sets the chassis state to the given {@link SwerveSample} for trajectory following. Omega is
+   * overriden by the omega generated from the heading profile to follow the supplied heading.
+   *
+   * @param sample The SwerveSample.
+   * @param heading Heading to follow.
+   */
+  public void followTrajectoryFacing(SwerveSample sample, Rotation2d heading) {
+    if (_mustResetRotationTrajectory) {
+      _poseController.resetRotation(getHeading(), getChassisSpeeds().omegaRadiansPerSecond);
+
+      _mustResetRotationTrajectory = false;
+    }
+
+    ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
+    Pose2d desiredPose = sample.getPose();
+
+    _poseController.nextSetpointRotation(getHeading(), heading);
+
+    desiredSpeeds =
+        new ChassisSpeeds(
+            desiredSpeeds.vxMetersPerSecond,
+            desiredSpeeds.vyMetersPerSecond,
+            _poseController.getSetpointSpeeds().omegaRadiansPerSecond);
+
+    desiredPose =
+        new Pose2d(desiredPose.getTranslation(), _poseController.getSetpointPose().getRotation());
 
     desiredSpeeds = _poseController.calculate(desiredSpeeds, desiredPose, getPose());
 
@@ -411,21 +465,23 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   /** Drives the robot in a straight line to some given goal pose. */
   public Command driveTo(Supplier<Pose2d> goalPose) {
     return run(() -> {
-          ChassisSpeeds speeds = _poseController.calculate(getPose());
-          Feedforwards wheelForces = _poseController.getWheelForces();
+          _poseController.nextSetpoint(getHeading());
 
           setControl(
               _fieldSpeedsRequest
-                  .withSpeeds(speeds)
-                  .withWheelForceFeedforwardsX(wheelForces.x_newtons)
-                  .withWheelForceFeedforwardsY(wheelForces.y_newtons));
+                  .withSpeeds(_poseController.getSetpointSpeeds())
+                  .withWheelForceFeedforwardsX(_poseController.getWheelForces().x_newtons)
+                  .withWheelForceFeedforwardsY(_poseController.getWheelForces().y_newtons));
         })
         .beforeStarting(
-            () ->
-                _poseController.reset(
-                    getPose(),
-                    goalPose.get(),
-                    ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getHeading())))
+            () -> {
+              _poseController.reset(
+                  getPose(),
+                  goalPose.get(),
+                  ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getHeading()));
+
+              _poseController.resetPID();
+            })
         .until(_poseController::isFinished)
         .withName("Drive To");
   }
