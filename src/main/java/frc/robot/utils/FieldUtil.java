@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -85,7 +85,7 @@ public class FieldUtil {
    */
   public static void getShotParameters(
       Pose2d robotPose, ChassisSpeeds robotSpeeds, ShotParameters shotParameters) {
-    InterpolatingMatrixTreeMap<Double, N4, N1> presets =
+    InterpolatingMatrixTreeMap<Double, N3, N1> presets =
         inFerryZone(robotPose) ? ShotConstants.ferryPresets : ShotConstants.hubPresets;
 
     InterpolatingDoubleTreeMap TOFs =

@@ -18,7 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.AngleUnit;
@@ -124,33 +124,32 @@ public final class Constants {
 
   public static class ShotConstants {
     public static final AngularVelocity spitFlywheelSpeed = RotationsPerSecond.of(5);
-    public static final Angle spitHoodAngle = Rotations.of(0.25);
 
     public static final AngularVelocity spitRollerSpeed = RotationsPerSecond.of(1);
     public static final AngularVelocity spitFloorSpeed = RotationsPerSecond.of(1);
 
-    // distanceMeters : <flywheelRPS, hoodAngleRots, rollerRPS, floorRPS>
-    public static InterpolatingMatrixTreeMap<Double, N4, N1> hubPresets =
+    // distanceMeters : <flywheelRPS, rollerRPS, floorRPS>
+    public static InterpolatingMatrixTreeMap<Double, N3, N1> hubPresets =
         new InterpolatingMatrixTreeMap<>();
-    public static InterpolatingMatrixTreeMap<Double, N4, N1> ferryPresets =
+    public static InterpolatingMatrixTreeMap<Double, N3, N1> ferryPresets =
         new InterpolatingMatrixTreeMap<>();
 
     // distanceMeters : TOFSecs
     public static InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
     public static InterpolatingDoubleTreeMap ferryTOFs = new InterpolatingDoubleTreeMap();
 
-    private static Matrix<N4, N1> vec4d(double a, double b, double c, double d) {
-      return new Matrix<N4, N1>(N4(), N1(), new double[] {a, b, c, d});
+    private static Matrix<N3, N1> vec3(double a, double b, double c) {
+      return new Matrix<N3, N1>(N3(), N1(), new double[] {a, b, c});
     }
 
     static {
       // hub presets
-      hubPresets.put(1.0, vec4d(1.0, 1.0, 2.0, 2.0));
-      hubPresets.put(5.0, vec4d(5.0, 5.0, 2.0, 2.0));
+      hubPresets.put(1.0, vec3(1.0, 2.0, 2.0));
+      hubPresets.put(5.0, vec3(5.0, 2.0, 2.0));
 
       // ferry presets
-      ferryPresets.put(1.0, vec4d(1.0, 1.0, 2.0, 2.0));
-      ferryPresets.put(5.0, vec4d(5.0, 5.0, 2.0, 2.0));
+      ferryPresets.put(1.0, vec3(1.0, 2.0, 2.0));
+      ferryPresets.put(5.0, vec3(5.0, 2.0, 2.0));
 
       // hub TOFs
       hubTOFs.put(1.0, 0.066);
@@ -165,7 +164,6 @@ public final class Constants {
   public static class ShooterConstants {
     public static final int flywheelMotorID = 42;
     public static final int flywheelFollowerMotorID = 41;
-    public static final int hoodMotorID = 40;
 
     public static final Voltage flywheelkS = Volts.of(0.39);
     public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkV =
@@ -173,22 +171,7 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkP =
         Volts.per(RotationsPerSecond).ofNative(1.3);
 
-    public static final Voltage hoodkS = Volts.of(0);
-    public static final Voltage hoodkG = Volts.of(0);
-    public static final Per<VoltageUnit, AngularVelocityUnit> hoodkV =
-        Volts.per(RotationsPerSecond).ofNative(1);
-    public static final Per<VoltageUnit, AngularAccelerationUnit> hoodkA =
-        Volts.per(RotationsPerSecondPerSecond).ofNative(0.1);
-    public static final Per<VoltageUnit, AngleUnit> hoodkP = Volts.per(Rotations).ofNative(0);
-
-    public static final AngularVelocity hoodVelocity = RotationsPerSecond.of(2);
-    public static final AngularAcceleration hoodAcceleration = RotationsPerSecondPerSecond.of(5);
-
-    public static final Angle hoodForwardSoftLimitThreshold = Rotations.of(1);
-    public static final Angle hoodReverseSoftLimitThreshold = Rotations.of(0);
-
     public static final double flywheelGearRatio = 3;
-    public static final double hoodGearRatio = 3;
   }
 
   public static class HopperConstants {

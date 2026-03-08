@@ -8,17 +8,14 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
@@ -40,18 +37,12 @@ public class Shooter extends AdvancedSubsystem {
       new TalonFX(ShooterConstants.flywheelMotorID, Constants.subsystemBus);
   private final TalonFX _flywheelFollowerMotor =
       new TalonFX(ShooterConstants.flywheelFollowerMotorID, Constants.subsystemBus);
-  private final TalonFX _hoodMotor =
-      new TalonFX(ShooterConstants.hoodMotorID, Constants.subsystemBus);
 
   private final VelocityVoltage _flywheelVelocitySetter = new VelocityVoltage(0);
   private final DutyCycleOut _flywheelDutyCycleSetter = new DutyCycleOut(0);
 
-  private final MotionMagicVoltage _hoodAngleSetter = new MotionMagicVoltage(0);
-
   private final StatusSignal<AngularVelocity> _flywheelVelocityGetter =
       _flywheelMotor.getVelocity();
-
-  private final StatusSignal<Angle> _hoodAngleGetter = _hoodMotor.getPosition();
 
   @Logged(name = "Velocity Threshold")
   private final AngularVelocity velocityThreshold = RotationsPerSecond.of(3);
@@ -62,7 +53,6 @@ public class Shooter extends AdvancedSubsystem {
   private final Supplier<ShotParameters> _shotParametersSupplier;
 
   private DCMotorSim _flywheelSim;
-  private DCMotorSim _hoodSim;
 
   private Notifier _simNotifier;
   private double _lastSimTime;
@@ -72,7 +62,6 @@ public class Shooter extends AdvancedSubsystem {
 
     var flywheelMotorConfigs = new TalonFXConfiguration();
     var flywheelFollowerMotorConfigs = new TalonFXConfiguration();
-    var hoodMotorConfigs = new TalonFXConfiguration();
 
     // flywheel motor configs
     flywheelMotorConfigs.CurrentLimits.StatorCurrentLimit = 100;
@@ -98,43 +87,14 @@ public class Shooter extends AdvancedSubsystem {
 
     flywheelFollowerMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-    // hood motor configs
-    hoodMotorConfigs.Slot0.kS = ShooterConstants.hoodkS.in(Volts);
-    hoodMotorConfigs.Slot0.kG = ShooterConstants.hoodkG.in(Volts);
-    hoodMotorConfigs.Slot0.kV = ShooterConstants.hoodkV.in(Volts.per(RotationsPerSecond));
-    hoodMotorConfigs.Slot0.kA = ShooterConstants.hoodkA.in(Volts.per(RotationsPerSecondPerSecond));
-
-    hoodMotorConfigs.Slot0.kP = ShooterConstants.hoodkP.in(Volts.per(Rotations));
-
-    hoodMotorConfigs.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-
-    hoodMotorConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-
-    hoodMotorConfigs.Feedback.SensorToMechanismRatio = ShooterConstants.hoodGearRatio;
-
-    hoodMotorConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-        ShooterConstants.hoodForwardSoftLimitThreshold.in(Rotations);
-    hoodMotorConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-        ShooterConstants.hoodReverseSoftLimitThreshold.in(Rotations);
-
-    hoodMotorConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
-    hoodMotorConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
-
-    hoodMotorConfigs.MotionMagic.MotionMagicCruiseVelocity =
-        ShooterConstants.hoodVelocity.in(RotationsPerSecond);
-    hoodMotorConfigs.MotionMagic.MotionMagicAcceleration =
-        ShooterConstants.hoodAcceleration.in(RotationsPerSecondPerSecond);
-
     CTREUtil.attempt(
         () -> _flywheelMotor.getConfigurator().apply(flywheelMotorConfigs), _flywheelMotor);
     CTREUtil.attempt(
         () -> _flywheelFollowerMotor.getConfigurator().apply(flywheelFollowerMotorConfigs),
         _flywheelFollowerMotor);
-    CTREUtil.attempt(() -> _hoodMotor.getConfigurator().apply(hoodMotorConfigs), _hoodMotor);
 
     CTREUtil.attempt(() -> _flywheelMotor.optimizeBusUtilization(), _flywheelMotor);
     CTREUtil.attempt(() -> _flywheelFollowerMotor.optimizeBusUtilization(), _flywheelFollowerMotor);
-    CTREUtil.attempt(() -> _hoodMotor.optimizeBusUtilization(), _hoodMotor);
 
     CTREUtil.attempt(
         () ->
@@ -147,7 +107,6 @@ public class Shooter extends AdvancedSubsystem {
 
     FaultLogger.register(_flywheelMotor);
     FaultLogger.register(_flywheelFollowerMotor);
-    FaultLogger.register(_hoodMotor);
 
     _flywheelFollowerMotor.setControl(
         new Follower(ShooterConstants.flywheelMotorID, MotorAlignmentValue.Opposed));
@@ -156,33 +115,17 @@ public class Shooter extends AdvancedSubsystem {
 
     if (Robot.isSimulation()) {
       var flywheelMotorSimConfigs = new TalonFXConfiguration();
-      var hoodMotorSimConfigs = new TalonFXConfiguration();
 
       _flywheelMotor.getConfigurator().refresh(flywheelMotorSimConfigs);
-      _hoodMotor.getConfigurator().refresh(hoodMotorSimConfigs);
 
       flywheelMotorSimConfigs.Slot0.kS = 0;
 
-      hoodMotorSimConfigs.Slot0.kS = 0;
-      hoodMotorSimConfigs.Slot0.kG = 0;
-
-      _hoodMotor.setPosition(0);
-      hoodMotorSimConfigs.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
-
       _flywheelMotor.getConfigurator().apply(flywheelMotorSimConfigs);
-      _hoodMotor.getConfigurator().apply(hoodMotorSimConfigs);
 
       _flywheelSim =
           new DCMotorSim(
               LinearSystemId.createDCMotorSystem(
                   MotorConstants.krakenX44, 0.001, ShooterConstants.flywheelGearRatio),
-              MotorConstants.krakenX44);
-
-      _hoodSim =
-          new DCMotorSim(
-              LinearSystemId.createDCMotorSystem(
-                  ShooterConstants.hoodkV.in(Volts.per(RadiansPerSecond)),
-                  ShooterConstants.hoodkA.in(Volts.per(RadiansPerSecondPerSecond))),
               MotorConstants.krakenX44);
 
       startSimThread();
@@ -213,18 +156,6 @@ public class Shooter extends AdvancedSubsystem {
               flywheelMotorSimState.setRotorVelocity(
                   _flywheelSim.getAngularVelocity().times(ShooterConstants.flywheelGearRatio));
 
-              var hoodMotorSimState = _hoodMotor.getSimState();
-
-              hoodMotorSimState.setSupplyVoltage(batteryVolts);
-
-              _hoodSim.setInputVoltage(hoodMotorSimState.getMotorVoltageMeasure().in(Volts));
-              _hoodSim.update(deltaTime);
-
-              hoodMotorSimState.setRawRotorPosition(
-                  _hoodSim.getAngularPosition().times(ShooterConstants.hoodGearRatio));
-              hoodMotorSimState.setRotorVelocity(
-                  _hoodSim.getAngularVelocity().times(ShooterConstants.hoodGearRatio));
-
               _lastSimTime = currentTime;
             });
 
@@ -242,17 +173,12 @@ public class Shooter extends AdvancedSubsystem {
     }
   }
 
-  private void setHoodAngle(Angle angle) {
-    _hoodMotor.setControl(_hoodAngleSetter.withPosition(angle));
-  }
-
-  /** Set hood to shooting angle, flywheels to {@link #idleVelocityPercentage} of shooting speed. */
+  /** Set flywheels to {@link #idleVelocityPercentage} of shooting speed. */
   public Command idle() {
     return run(() -> {
           ShotParameters parameters = _shotParametersSupplier.get();
 
           setFlywheelSpeed(parameters.getFlywheelSpeed().times(idleVelocityPercentage));
-          setHoodAngle(parameters.getHoodAngle());
         })
         .withName("Idle");
   }
@@ -263,7 +189,6 @@ public class Shooter extends AdvancedSubsystem {
           ShotParameters parameters = _shotParametersSupplier.get();
 
           setFlywheelSpeed(parameters.getFlywheelSpeed());
-          setHoodAngle(parameters.getHoodAngle());
         })
         .withName("Shoot");
   }
@@ -272,7 +197,6 @@ public class Shooter extends AdvancedSubsystem {
   public Command spit() {
     return run(() -> {
           setFlywheelSpeed(ShotConstants.spitFlywheelSpeed);
-          setHoodAngle(ShotConstants.spitHoodAngle);
         })
         .withName("Spit");
   }
@@ -280,11 +204,6 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Flywheel Speed")
   public AngularVelocity getFlywheelSpeed() {
     return _flywheelVelocityGetter.refresh().getValue();
-  }
-
-  @Logged(name = "Hood Angle")
-  public Angle getHoodAngle() {
-    return _hoodAngleGetter.refresh().getValue();
   }
 
   @Override
@@ -298,6 +217,5 @@ public class Shooter extends AdvancedSubsystem {
   public void close() {
     _flywheelMotor.close();
     _flywheelFollowerMotor.close();
-    _hoodMotor.close();
   }
 }

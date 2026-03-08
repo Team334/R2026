@@ -9,10 +9,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N4;
-import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -21,9 +19,6 @@ import java.util.function.Supplier;
 public class ShotParameters {
   @Logged(name = "Flywheel Speed")
   private final MutAngularVelocity _flywheelSpeed = RotationsPerSecond.mutable(0);
-
-  @Logged(name = "Hood Angle")
-  private final MutAngle _hoodAngle = Rotations.mutable(0);
 
   @Logged(name = "Roller Speed")
   private final MutAngularVelocity _rollerSpeed = RotationsPerSecond.mutable(0);
@@ -66,15 +61,12 @@ public class ShotParameters {
 
   public ShotParameters(
       Supplier<AngularVelocity> flywheelVelocitySupplier,
-      Supplier<Angle> hoodAngleSupplier,
       Supplier<Rotation2d> headingSupplier,
       AngularVelocity flywheelVelocityTolerance,
-      Angle hoodTolerance,
       Rotation2d headingTolerance) {
     _isReadyToShoot =
         () -> {
           return flywheelVelocitySupplier.get().isNear(_flywheelSpeed, flywheelVelocityTolerance)
-              && hoodAngleSupplier.get().isNear(_hoodAngle, hoodTolerance)
               && Math.abs(_shotHeading.minus(headingSupplier.get()).getDegrees())
                   < headingTolerance.getDegrees();
         };
@@ -82,10 +74,6 @@ public class ShotParameters {
 
   public AngularVelocity getFlywheelSpeed() {
     return _flywheelSpeed;
-  }
-
-  public Angle getHoodAngle() {
-    return _hoodAngle;
   }
 
   public AngularVelocity getRollerSpeed() {
@@ -105,11 +93,10 @@ public class ShotParameters {
     return _isReadyToShoot.getAsBoolean();
   }
 
-  public void setPreset(Matrix<N4, N1> preset) {
+  public void setPreset(Matrix<N3, N1> preset) {
     _flywheelSpeed.mut_setMagnitude(preset.get(0, 0));
-    _hoodAngle.mut_setMagnitude(preset.get(1, 0));
-    _rollerSpeed.mut_setMagnitude(preset.get(2, 0));
-    _floorSpeed.mut_setMagnitude(preset.get(3, 0));
+    _rollerSpeed.mut_setMagnitude(preset.get(1, 0));
+    _floorSpeed.mut_setMagnitude(preset.get(2, 0));
   }
 
   public void setShotHeading(Rotation2d shotHeading) {
