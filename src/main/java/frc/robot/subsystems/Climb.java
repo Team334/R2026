@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -30,6 +31,8 @@ public class Climb extends AdvancedSubsystem {
 
   private final MotionMagicVoltage _heightSetter = new MotionMagicVoltage(0);
   private final StatusSignal<Angle> _heightGetter = _climbMotor.getPosition();
+
+  private final Angle extendedTolerance = Rotations.of(0.5);
 
   public Climb() {
     var climbMotorConfigs = new TalonFXConfiguration();
@@ -85,11 +88,16 @@ public class Climb extends AdvancedSubsystem {
         .withName("Retract");
   }
 
-  /** Retracts the climb under the robot's weight. */
+  /**
+   * Retracts the climb under the robot's weight. Waits until climb is fully extended before
+   * running.
+   */
   public Command climb() {
     return run(() ->
             _climbMotor.setControl(
                 _heightSetter.withPosition(ClimbConstants.retracted.in(Rotations)).withSlot(1)))
+        .beforeStarting(
+            waitUntil(() -> getHeight().isNear(ClimbConstants.extended, extendedTolerance)))
         .withName("Climb");
   }
 

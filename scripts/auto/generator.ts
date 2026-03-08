@@ -336,23 +336,24 @@ const locationParams: Record<GenericLocation, LocationParams> = {
     climb: {
         leftWaypoints: [
             makeWaypoint(2.7496304512023926, 4.047032356262207, 0, true, false),
-            makeWaypoint(2.4865808486938477, 2.7771108150482178, 3.141592653589793),
-            makeWaypoint(0.8038443922996521, 2.7895240783691406, 0, true, false)
+            makeWaypoint(0.8680239319801331, 2.0315675735473633, 3.141592653589793),
+            makeWaypoint(0.8600184917449951, 2.784078598022461, 0, true, false)
         ],
         rightWaypoints: [
             // (same as left)
             makeWaypoint(2.7496304512023926, 4.047032356262207, 0, true, false),
-            makeWaypoint(2.4865808486938477, 2.7771108150482178, 3.141592653589793),
-            makeWaypoint(0.8038443922996521, 2.7895240783691406, 0, true, false)
+            makeWaypoint(0.8680239319801331, 2.0315675735473633, 3.141592653589793),
+            makeWaypoint(0.8600184917449951, 2.784078598022461, 0, true, false)
         ],
         constraints: [
+            makeConstraint(0, 1, {type: "KeepOutCircle", props: {x: toExpr(0.91920355707407, "m"), y: toExpr(3.742240246385336, "m"), r: toExpr(0.8, "m")}}),
             makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}}),
             makeConstraint(1, 2, {type: "MaxAngularVelocity", props: {max: toExpr(0, "rad/s")}}),
             makeConstraint(1, 2, {type: "MaxVelocity", props: {max: toExpr(1, "m/s")}})
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),
-            makeEventMarker("extend", 1, -0.5),
+            makeEventMarker("extend", 0, 0.3),
             makeEventMarker("climb", 2, 0)
         ]
     }
@@ -427,7 +428,7 @@ var baseTraj: Trajectory = {
 
 
 async function main() {
-    const layoutName: string = await prompt("layout to generate: ");
+    const layoutName: string = await prompt("layout (file) to generate: ");
 
     var layout: Layout = loadLayout(layoutName);
     var traj: Trajectory = buildTrajectory(baseTraj, layout.name, layout.layout);

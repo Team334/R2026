@@ -12,7 +12,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Notifier;
@@ -37,11 +36,7 @@ public class IntakePivot extends AdvancedSubsystem {
   private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
 
   private final Trigger _intakeLowered =
-      new Trigger(
-              () ->
-                  MathUtil.isNear(
-                      IntakeConstants.pivotTucked.in(Degrees), getAngle().in(Degrees), 3))
-          .debounce(0.5);
+      new Trigger(() -> getAngle().gte(IntakeConstants.pivotTucked)).debounce(0.5);
 
   private final BooleanSupplier _inBumpZoneSupplier;
 
