@@ -15,6 +15,8 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.numbers.N1;
@@ -38,6 +40,7 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.utils.VisionPoseEstimator.VisionPoseEstimatorConstants;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -120,6 +123,33 @@ public final class Constants {
     public static final double xBoundMargin = 0.01;
     public static final double yBoundMargin = 0.01;
     public static final double zBoundMargin = 0.01;
+
+    public static final String leftArducamName = "Left Arducam";
+    public static final String rightArducamName = "Right Arducam";
+
+    public static final VisionPoseEstimatorConstants leftArducam =
+        new VisionPoseEstimatorConstants(
+            leftArducamName,
+            new Transform3d(
+                -Units.inchesToMeters(10.478),
+                Units.inchesToMeters(10.863),
+                Units.inchesToMeters(18.591),
+                new Rotation3d(0, Units.degreesToRadians(4.472), Units.degreesToRadians(22.060))),
+            0.1,
+            3,
+            7);
+
+    public static final VisionPoseEstimatorConstants rightArducam =
+        new VisionPoseEstimatorConstants(
+            rightArducamName,
+            new Transform3d(
+                -Units.inchesToMeters(10.478),
+                -Units.inchesToMeters(10.863),
+                Units.inchesToMeters(18.591),
+                new Rotation3d(0, Units.degreesToRadians(4.472), Units.degreesToRadians(-22.060))),
+            0.1,
+            3,
+            7);
   }
 
   public static class ShotConstants {

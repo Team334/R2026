@@ -53,6 +53,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.Robot;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
@@ -150,7 +151,15 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   @Logged(name = "Ignore Vision Estimates")
   private boolean _ignoreVisionEstimates = false;
 
-  private final List<VisionPoseEstimator> _cameras = List.of();
+  @Logged(name = VisionConstants.leftArducamName)
+  private final VisionPoseEstimator _leftArducam =
+      VisionPoseEstimator.buildFromConstants(VisionConstants.leftArducam, this::getHeadingAtTime);
+
+  @Logged(name = VisionConstants.rightArducamName)
+  private final VisionPoseEstimator _rightArducam =
+      VisionPoseEstimator.buildFromConstants(VisionConstants.rightArducam, this::getHeadingAtTime);
+
+  private final List<VisionPoseEstimator> _cameras = List.of(_leftArducam, _rightArducam);
 
   private final List<VisionPoseEstimate> _newEstimates = new ArrayList<>();
 
