@@ -53,7 +53,7 @@ import frc.robot.utils.VisionPoseEstimator.VisionPoseEstimatorConstants;
 public final class Constants {
   public static final Frequency simNotifierFrequency = Hertz.of(200);
 
-  public static final CANBus subsystemBus = new CANBus("canivore");
+  public static final CANBus subsystemBus = new CANBus("rio");
 
   public static final Time shotTimeScaler = Seconds.of(0.2);
 
@@ -122,19 +122,19 @@ public final class Constants {
 
     public static final double xBoundMargin = 0.01;
     public static final double yBoundMargin = 0.01;
-    public static final double zBoundMargin = 0.01;
+    public static final double zBoundMargin = 0.1;
 
-    public static final String leftArducamName = "Left Arducam";
-    public static final String rightArducamName = "Right Arducam";
+    public static final String leftArducamName = "left-arducam";
+    public static final String rightArducamName = "right-arducam";
 
     public static final VisionPoseEstimatorConstants leftArducam =
         new VisionPoseEstimatorConstants(
             leftArducamName,
             new Transform3d(
-                -Units.inchesToMeters(10.478),
-                Units.inchesToMeters(10.863),
-                Units.inchesToMeters(18.591),
-                new Rotation3d(0, Units.degreesToRadians(4.472), Units.degreesToRadians(22.060))),
+                -Units.inchesToMeters(9.333),
+                Units.inchesToMeters(9.508),
+                Units.inchesToMeters(18.087),
+                new Rotation3d(0, 0, Units.degreesToRadians(23))),
             0.1,
             3,
             7);
@@ -143,10 +143,10 @@ public final class Constants {
         new VisionPoseEstimatorConstants(
             rightArducamName,
             new Transform3d(
-                -Units.inchesToMeters(10.478),
-                -Units.inchesToMeters(10.863),
-                Units.inchesToMeters(18.591),
-                new Rotation3d(0, Units.degreesToRadians(4.472), Units.degreesToRadians(-22.060))),
+                -Units.inchesToMeters(9.333),
+                -Units.inchesToMeters(9.508),
+                Units.inchesToMeters(18.087),
+                new Rotation3d(0, 0, -Units.degreesToRadians(23))),
             0.1,
             3,
             7);
@@ -182,18 +182,18 @@ public final class Constants {
       ferryPresets.put(5.0, vec3(5.0, 2.0, 2.0));
 
       // hub TOFs
-      hubTOFs.put(1.0, 0.066);
-      hubTOFs.put(10.0, 0.66);
+      hubTOFs.put(0.3, 1 / 10000000.0);
+      hubTOFs.put(10.0, 1 / 10000000.0);
 
       // ferry TOFs
-      ferryTOFs.put(1.0, 0.066);
-      ferryTOFs.put(10.0, 0.66);
+      ferryTOFs.put(0.3, 1 / 10000000.0);
+      ferryTOFs.put(10.0, 1 / 10000000.0);
     }
   }
 
   public static class ShooterConstants {
-    public static final int flywheelMotorID = 42;
-    public static final int flywheelFollowerMotorID = 41;
+    public static final int flywheelMotorID = 59; // 16
+    public static final int flywheelFollowerMotorID = 1; // 1
 
     public static final Voltage flywheelkS = Volts.of(0);
     public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkV =
@@ -205,8 +205,8 @@ public final class Constants {
   }
 
   public static class HopperConstants {
-    public static final int rollerMotorID = 20;
-    public static final int floorMotorID = 21;
+    public static final int rollerMotorID = 0;
+    public static final int floorMotorID = 30;
 
     public static final Voltage rollerkS = Volts.of(0);
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkV =
@@ -226,25 +226,25 @@ public final class Constants {
 
   public static class IntakeConstants {
     public static final int feedMotorID = 10;
-    public static final int pivotMotorID = 11;
+    public static final int pivotMotorID = 15;
 
-    public static final Voltage feedkS = Volts.of(0.3);
+    public static final Voltage feedkS = Volts.of(0);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkV =
-        Volts.per(RotationsPerSecond).ofNative(0.15);
+        Volts.per(RotationsPerSecond).ofNative(0);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
-        Volts.per(RotationsPerSecond).ofNative(0.6);
+        Volts.per(RotationsPerSecond).ofNative(0);
 
-    public static final Voltage pivotkG = Volts.of(0.2);
-    public static final Voltage pivotkS = Volts.of(0.1);
+    public static final Voltage pivotkG = Volts.of(0);
+    public static final Voltage pivotkS = Volts.of(0);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> pivotkV =
-        Volts.per(RotationsPerSecond).ofNative(1);
+        Volts.per(RotationsPerSecond).ofNative(0);
     public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
-        Volts.per(RotationsPerSecondPerSecond).ofNative(0.1);
+        Volts.per(RotationsPerSecondPerSecond).ofNative(0);
 
-    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(0.8);
+    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(0);
 
     public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(2);
     public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(5);
