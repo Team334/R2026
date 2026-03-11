@@ -192,7 +192,7 @@ public final class Constants {
   }
 
   public static class ShooterConstants {
-    public static final int flywheelMotorID = 59; // 16
+    public static final int flywheelMotorID = 16; // 16
     public static final int flywheelFollowerMotorID = 1; // 1
 
     public static final Voltage flywheelkS = Volts.of(0);
@@ -304,14 +304,14 @@ public final class Constants {
     public static final LinearAcceleration profileTranslationalAcceleration =
         MetersPerSecondPerSecond.of(2);
 
-    public static final AngularVelocity profileAngularVelocity = RadiansPerSecond.of(Math.PI);
+    public static final AngularVelocity profileAngularVelocity = RadiansPerSecond.of(Math.PI * 3);
     public static final AngularAcceleration profileAngularAcceleration =
-        RadiansPerSecondPerSecond.of(Math.PI * 2);
+        RadiansPerSecondPerSecond.of(Math.PI * 5);
 
     public static final Per<LinearVelocityUnit, DistanceUnit> poseTranslationalkP =
         MetersPerSecond.per(Meter).ofNative(0);
     public static final Per<AngularVelocityUnit, AngleUnit> poseRotationkP =
-        RadiansPerSecond.per(Radian).ofNative(0);
+        RadiansPerSecond.per(Radian).ofNative(1);
 
     public static final boolean ignorePoseTolerance = true;
 
