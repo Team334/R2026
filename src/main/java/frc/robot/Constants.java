@@ -208,19 +208,19 @@ public final class Constants {
     public static final int rollerMotorID = 0;
     public static final int floorMotorID = 30;
 
-    public static final Voltage rollerkS = Volts.of(0.179);
+    public static final Voltage rollerkS = Volts.of(0.17);
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkV =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(0.235);
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkP =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(0.8);
 
-    public static final Voltage floorkS = Volts.of(0.33984375);
+    public static final Voltage floorkS = Volts.of(0.21);
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkV =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(0.252);
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkP =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(0.5);
 
-    public static final double rollerGearRatio = 3;
+    public static final double rollerGearRatio = 2.25;
     public static final double floorGearRatio = 2;
   }
 
