@@ -174,12 +174,14 @@ public final class Constants {
 
     static {
       // hub presets
-      hubPresets.put(1.0, vec3(1.0, 2.0, 2.0));
-      hubPresets.put(5.0, vec3(5.0, 2.0, 2.0));
+      hubPresets.put(0.0, vec3(0, 0, 0));
+      ferryPresets.put(0.0, vec3(0, 0, 0));
+      //   hubPresets.put(1.0, vec3(1.0, 2.0, 2.0));
+      //   hubPresets.put(5.0, vec3(5.0, 2.0, 2.0));
 
       // ferry presets
-      ferryPresets.put(1.0, vec3(1.0, 2.0, 2.0));
-      ferryPresets.put(5.0, vec3(5.0, 2.0, 2.0));
+      //   ferryPresets.put(1.0, vec3(1.0, 2.0, 2.0));
+      //   ferryPresets.put(5.0, vec3(5.0, 2.0, 2.0));
 
       // hub TOFs
       hubTOFs.put(0.3, 1 / 10000000.0);
@@ -195,13 +197,13 @@ public final class Constants {
     public static final int flywheelMotorID = 16; // 16
     public static final int flywheelFollowerMotorID = 1; // 1
 
-    public static final Voltage flywheelkS = Volts.of(0);
+    public static final Voltage flywheelkS = Volts.of(0.13262);
     public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkV =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(0.13334);
     public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkP =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(0.2);
 
-    public static final double flywheelGearRatio = 3;
+    public static final double flywheelGearRatio = 1.2;
   }
 
   public static class HopperConstants {
@@ -218,7 +220,7 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkV =
         Volts.per(RotationsPerSecond).ofNative(0.252);
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkP =
-        Volts.per(RotationsPerSecond).ofNative(0.5);
+        Volts.per(RotationsPerSecond).ofNative(0.9);
 
     public static final double rollerGearRatio = 2.25;
     public static final double floorGearRatio = 2;

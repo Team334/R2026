@@ -3,12 +3,14 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -17,10 +19,12 @@ import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
@@ -30,6 +34,7 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShotConstants;
 import frc.robot.Robot;
 import frc.robot.utils.ShotParameters;
+import frc.robot.utils.SysId;
 import java.util.function.Supplier;
 
 public class Shooter extends AdvancedSubsystem {
@@ -41,6 +46,11 @@ public class Shooter extends AdvancedSubsystem {
   private final VelocityVoltage _flywheelVelocitySetter = new VelocityVoltage(0);
   private final DutyCycleOut _flywheelDutyCycleSetter = new DutyCycleOut(0);
 
+  private final VoltageOut _flywheelVoltageSetter = new VoltageOut(0);
+
+  private final Follower _flywheelFollower =
+      new Follower(ShooterConstants.flywheelMotorID, MotorAlignmentValue.Opposed);
+
   private final StatusSignal<AngularVelocity> _flywheelVelocityGetter =
       _flywheelMotor.getVelocity();
 
@@ -51,6 +61,19 @@ public class Shooter extends AdvancedSubsystem {
   private final double idleVelocityPercentage = 0.5;
 
   private final Supplier<ShotParameters> _shotParametersSupplier;
+
+  private final SysIdRoutine _flywheelRoutine =
+      new SysIdRoutine(
+          new SysIdRoutine.Config(
+              Volts.per(Second).of(0.5),
+              Volts.of(4),
+              Seconds.of(5),
+              state -> SignalLogger.writeString("state", state.toString())),
+          new SysIdRoutine.Mechanism(
+              (Voltage volts) ->
+                  _flywheelMotor.setControl(_flywheelVoltageSetter.withOutput(volts)),
+              null,
+              this));
 
   private DCMotorSim _flywheelSim;
 
@@ -101,6 +124,8 @@ public class Shooter extends AdvancedSubsystem {
             BaseStatusSignal.setUpdateFrequencyForAll(
                 100,
                 _flywheelVelocityGetter,
+                _flywheelMotor.getMotorVoltage(),
+                _flywheelMotor.getPosition(),
                 _flywheelMotor.getSupplyCurrent(),
                 _flywheelMotor.getStatorCurrent()),
         _flywheelMotor);
@@ -108,8 +133,7 @@ public class Shooter extends AdvancedSubsystem {
     FaultLogger.register(_flywheelMotor);
     FaultLogger.register(_flywheelFollowerMotor);
 
-    _flywheelFollowerMotor.setControl(
-        new Follower(ShooterConstants.flywheelMotorID, MotorAlignmentValue.Opposed));
+    SysId.displayRoutine("Shooter Flywheel", _flywheelRoutine);
 
     setDefaultCommand(idle());
 
@@ -209,7 +233,10 @@ public class Shooter extends AdvancedSubsystem {
   @Override
   public void periodic() {
     DogLog.time("Timing/Shooter/periodic()");
+
     super.periodic();
+    _flywheelFollowerMotor.setControl(_flywheelFollower);
+
     DogLog.timeEnd("Timing/Shooter/periodic()");
   }
 
