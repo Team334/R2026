@@ -53,7 +53,8 @@ import frc.robot.utils.VisionPoseEstimator.VisionPoseEstimatorConstants;
 public final class Constants {
   public static final Frequency simNotifierFrequency = Hertz.of(200);
 
-  public static final CANBus subsystemBus = new CANBus("rio");
+  public static final CANBus subsystemBus = new CANBus("subsystems");
+  //   public static final CANBus subsystemBus = new CANBus("rio");
 
   public static final Time shotTimeScaler = Seconds.of(0.2);
 
@@ -194,8 +195,8 @@ public final class Constants {
   }
 
   public static class ShooterConstants {
-    public static final int flywheelMotorID = 16; // 16
-    public static final int flywheelFollowerMotorID = 1; // 1
+    public static final int flywheelMotorID = 1; // 1
+    public static final int flywheelFollowerMotorID = 2; // 2
 
     public static final Voltage flywheelkS = Volts.of(0.13262);
     public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkV =
@@ -207,8 +208,8 @@ public final class Constants {
   }
 
   public static class HopperConstants {
-    public static final int rollerMotorID = 0;
-    public static final int floorMotorID = 30;
+    public static final int rollerMotorID = 3;
+    public static final int floorMotorID = 4;
 
     public static final Voltage rollerkS = Volts.of(0.17);
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkV =
@@ -227,8 +228,8 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final int feedMotorID = 10;
-    public static final int pivotMotorID = 15;
+    public static final int feedMotorID = 6;
+    public static final int pivotMotorID = 5;
 
     public static final Voltage feedkS = Volts.of(0);
 
@@ -266,7 +267,7 @@ public final class Constants {
 
   public static class ClimbConstants {
     // Change ALL values here after testing
-    public static final int climbMotorID = 20;
+    public static final int climbMotorID = 7;
 
     public static final Voltage kS = Volts.of(0);
     public static final Voltage kG = Volts.of(0);

@@ -48,9 +48,6 @@ public class Shooter extends AdvancedSubsystem {
 
   private final VoltageOut _flywheelVoltageSetter = new VoltageOut(0);
 
-  private final Follower _flywheelFollower =
-      new Follower(ShooterConstants.flywheelMotorID, MotorAlignmentValue.Opposed);
-
   private final StatusSignal<AngularVelocity> _flywheelVelocityGetter =
       _flywheelMotor.getVelocity();
 
@@ -134,6 +131,9 @@ public class Shooter extends AdvancedSubsystem {
     FaultLogger.register(_flywheelFollowerMotor);
 
     SysId.displayRoutine("Shooter Flywheel", _flywheelRoutine);
+
+    _flywheelFollowerMotor.setControl(
+        new Follower(ShooterConstants.flywheelMotorID, MotorAlignmentValue.Opposed));
 
     setDefaultCommand(idle());
 
@@ -235,7 +235,6 @@ public class Shooter extends AdvancedSubsystem {
     DogLog.time("Timing/Shooter/periodic()");
 
     super.periodic();
-    _flywheelFollowerMotor.setControl(_flywheelFollower);
 
     DogLog.timeEnd("Timing/Shooter/periodic()");
   }

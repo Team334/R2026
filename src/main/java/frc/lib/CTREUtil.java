@@ -89,16 +89,16 @@ public class CTREUtil {
 
   /** Returns the name to use when displaying info about a TalonFX. */
   public static String getName(TalonFX talonFX) {
-    return "TalonFX (" + talonFX.getDeviceID() + ")";
+    return "TalonFX (" + talonFX.getDeviceID() + " - " + talonFX.getNetwork().getName() + ")";
   }
 
   /** Returns the name to use when displaying info about a CANcoder. */
   public static String getName(CANcoder cancoder) {
-    return "CANcoder (" + cancoder.getDeviceID() + ")";
+    return "CANcoder (" + cancoder.getDeviceID() + " - " + cancoder.getNetwork().getName() + ")";
   }
 
   /** Retunrs the name to use when displaying info about a Pigeon. */
   public static String getName(Pigeon2 pigeon) {
-    return "Pigeon (" + pigeon.getDeviceID() + ")";
+    return "Pigeon (" + pigeon.getDeviceID() + " - " + pigeon.getNetwork().getName() + ")";
   }
 }

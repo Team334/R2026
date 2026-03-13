@@ -34,7 +34,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.FaultLogger;
 import frc.lib.FaultsTable.FaultType;
 import frc.lib.InputStream;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.ModularAuto;
@@ -286,7 +285,9 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    DogLog.log("fart", FieldConstants.blueHub.getDistance(_swerve.getPose().getTranslation()));
+    DogLog.log(
+        "Distance To Hub",
+        FieldUtil.getHubTarget().getDistance(_swerve.getPose().getTranslation()));
 
     if (DriverStation.isFMSAttached() && !_fileOnlySet) {
       setFileOnly(true);
