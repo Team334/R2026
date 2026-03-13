@@ -1,5 +1,6 @@
 package frc.robot.utils;
 
+import static edu.wpi.first.math.Nat.*;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.epilogue.Logged;
@@ -54,6 +55,10 @@ public class ShotParameters {
 
   @Logged(name = "Newton Iterations")
   public int newtonIterations = 0;
+
+  public static Matrix<N3, N1> vec3(double a, double b, double c) {
+    return new Matrix<N3, N1>(N3(), N1(), new double[] {a, b, c});
+  }
 
   public ShotParameters() {
     _isReadyToShoot = () -> true;

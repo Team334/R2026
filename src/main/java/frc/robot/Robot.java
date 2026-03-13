@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
+import static frc.robot.utils.ShotParameters.vec3;
 
 import com.ctre.phoenix6.SignalLogger;
 import dev.doglog.DogLog;
@@ -19,6 +20,7 @@ import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -106,6 +108,10 @@ public class Robot extends TimedRobot {
           _climb,
           _swerve,
           () -> _shotParameters.getShotHeading());
+
+  private final DoubleSubscriber _flywheelSpeed = DogLog.tunable("Flywheel Speed RPS", 0.0);
+  private final DoubleSubscriber _floorSpeed = DogLog.tunable("Floor Speed RPS", 0.0);
+  private final DoubleSubscriber _rollerSpeed = DogLog.tunable("Roller Speed RPS", 0.0);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -278,6 +284,8 @@ public class Robot extends TimedRobot {
         _swerve.getPose(),
         ChassisSpeeds.fromRobotRelativeSpeeds(_swerve.getChassisSpeeds(), _swerve.getHeading()),
         _shotParameters);
+
+    _shotParameters.setPreset(vec3(_flywheelSpeed.get(), _rollerSpeed.get(), _floorSpeed.get()));
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,

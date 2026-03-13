@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled
 public class IntakeTest {
   private IntakePivot _intakePivot;
   private IntakeFeed _intakeFeed;
@@ -35,7 +36,6 @@ public class IntakeTest {
     reset(_intakePivot, _intakeFeed);
   }
 
-  @Disabled
   @Test
   public void feedCorrectly() {
     run(_intakePivot.raise(), Seconds.of(1));

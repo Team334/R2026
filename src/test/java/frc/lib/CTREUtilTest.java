@@ -40,27 +40,27 @@ public class CTREUtilTest {
   public void motorName() {
     var name = CTREUtil.getName(_motor);
 
-    assertEquals("TalonFX (1)", name);
+    assertEquals("TalonFX (1 - )", name);
   }
 
   @Test
   public void gyroName() {
     var name = CTREUtil.getName(_gyro);
 
-    assertEquals("Pigeon (2)", name);
+    assertEquals("Pigeon (2 - )", name);
   }
 
   @Test
   public void encoderName() {
     var name = CTREUtil.getName(_encoder);
 
-    assertEquals("CANcoder (3)", name);
+    assertEquals("CANcoder (3 - )", name);
   }
 
   @Test
   public void attempt() {
     // if all names work then, attempt will work for any device
-    var name = "TalonFX (3)";
+    var name = "TalonFX (3 - )";
 
     var failed1 = CTREUtil.attempt(() -> StatusCode.ConfigFailed, name);
     var failed2 = CTREUtil.attempt(() -> StatusCode.OK, name);

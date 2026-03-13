@@ -4,14 +4,13 @@
 
 package frc.robot;
 
-import static edu.wpi.first.math.Nat.*;
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.utils.ShotParameters.vec3;
 
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -169,18 +168,14 @@ public final class Constants {
     public static InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
     public static InterpolatingDoubleTreeMap ferryTOFs = new InterpolatingDoubleTreeMap();
 
-    private static Matrix<N3, N1> vec3(double a, double b, double c) {
-      return new Matrix<N3, N1>(N3(), N1(), new double[] {a, b, c});
-    }
-
     static {
       // hub presets
       hubPresets.put(0.0, vec3(0, 0, 0));
-      ferryPresets.put(0.0, vec3(0, 0, 0));
       //   hubPresets.put(1.0, vec3(1.0, 2.0, 2.0));
       //   hubPresets.put(5.0, vec3(5.0, 2.0, 2.0));
 
       // ferry presets
+      ferryPresets.put(0.0, vec3(0, 0, 0));
       //   ferryPresets.put(1.0, vec3(1.0, 2.0, 2.0));
       //   ferryPresets.put(5.0, vec3(5.0, 2.0, 2.0));
 
