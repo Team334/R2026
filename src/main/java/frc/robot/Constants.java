@@ -210,13 +210,13 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkV =
         Volts.per(RotationsPerSecond).ofNative(0.235);
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkP =
-        Volts.per(RotationsPerSecond).ofNative(0.8);
+        Volts.per(RotationsPerSecond).ofNative(0.6);
 
     public static final Voltage floorkS = Volts.of(0.21);
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkV =
         Volts.per(RotationsPerSecond).ofNative(0.252);
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkP =
-        Volts.per(RotationsPerSecond).ofNative(0.9);
+        Volts.per(RotationsPerSecond).ofNative(0.6);
 
     public static final double rollerGearRatio = 2.25;
     public static final double floorGearRatio = 2;

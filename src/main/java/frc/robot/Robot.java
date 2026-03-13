@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
       new CommandXboxController(Ports.driverController);
 
   @Logged(name = "Shot Parameters")
-  private ShotParameters _shotParameters = new ShotParameters();
+  private ShotParameters _shotParameters;
 
   // subsystems
   @Logged(name = "Swerve")
@@ -127,6 +127,13 @@ public class Robot extends TimedRobot {
    */
   public Robot(NetworkTableInstance ntInst) {
     _ntInst = ntInst;
+
+    _shotParameters =
+        new ShotParameters(
+            _shooter::getFlywheelSpeed,
+            _swerve::getHeading,
+            RotationsPerSecond.of(2),
+            Rotation2d.fromDegrees(5));
 
     // set up loggers
     DogLog.setOptions(DogLog.getOptions().withCaptureDs(true));

@@ -107,6 +107,9 @@ public class Shooter extends AdvancedSubsystem {
 
     flywheelFollowerMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
+    flywheelFollowerMotorConfigs.Feedback.SensorToMechanismRatio =
+        ShooterConstants.flywheelGearRatio;
+
     CTREUtil.attempt(
         () -> _flywheelMotor.getConfigurator().apply(flywheelMotorConfigs), _flywheelMotor);
     CTREUtil.attempt(
@@ -119,13 +122,22 @@ public class Shooter extends AdvancedSubsystem {
     CTREUtil.attempt(
         () ->
             BaseStatusSignal.setUpdateFrequencyForAll(
-                100,
+                200,
                 _flywheelVelocityGetter,
                 _flywheelMotor.getMotorVoltage(),
                 _flywheelMotor.getPosition(),
                 _flywheelMotor.getSupplyCurrent(),
                 _flywheelMotor.getStatorCurrent()),
         _flywheelMotor);
+
+    CTREUtil.attempt(
+        () ->
+            BaseStatusSignal.setUpdateFrequencyForAll(
+                100,
+                _flywheelFollowerMotor.getVelocity(),
+                _flywheelFollowerMotor.getSupplyCurrent(),
+                _flywheelFollowerMotor.getStatorCurrent()),
+        _flywheelFollowerMotor);
 
     FaultLogger.register(_flywheelMotor);
     FaultLogger.register(_flywheelFollowerMotor);
@@ -190,8 +202,8 @@ public class Shooter extends AdvancedSubsystem {
   private void setFlywheelSpeed(AngularVelocity speed) {
     double errorRps = speed.minus(getFlywheelSpeed()).in(RotationsPerSecond);
 
-    if (Math.abs(errorRps) > velocityThreshold.in(RotationsPerSecond)) {
-      _flywheelMotor.setControl(_flywheelDutyCycleSetter.withOutput(Math.signum(errorRps)));
+    if (errorRps > velocityThreshold.in(RotationsPerSecond)) {
+      _flywheelMotor.setControl(_flywheelDutyCycleSetter.withOutput(1));
     } else {
       _flywheelMotor.setControl(_flywheelVelocitySetter.withVelocity(speed));
     }
