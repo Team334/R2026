@@ -200,9 +200,9 @@ public class Shooter extends AdvancedSubsystem {
   }
 
   private void setFlywheelSpeed(AngularVelocity speed) {
-    double errorRps = speed.minus(getFlywheelSpeed()).in(RotationsPerSecond);
-
-    if (errorRps > velocityThreshold.in(RotationsPerSecond)) {
+    // asymmetrical bang-bang for speeding up
+    if (speed.minus(getFlywheelSpeed()).in(RotationsPerSecond)
+        > velocityThreshold.in(RotationsPerSecond)) {
       _flywheelMotor.setControl(_flywheelDutyCycleSetter.withOutput(1));
     } else {
       _flywheelMotor.setControl(_flywheelVelocitySetter.withVelocity(speed));

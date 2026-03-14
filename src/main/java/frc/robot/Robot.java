@@ -17,7 +17,6 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.DoubleSubscriber;
@@ -27,6 +26,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -128,16 +128,9 @@ public class Robot extends TimedRobot {
   public Robot(NetworkTableInstance ntInst) {
     _ntInst = ntInst;
 
-    _shotParameters =
-        new ShotParameters(
-            _shooter::getFlywheelSpeed,
-            _swerve::getHeading,
-            RotationsPerSecond.of(2),
-            Rotation2d.fromDegrees(5));
-
     // set up loggers
     DogLog.setOptions(DogLog.getOptions().withCaptureDs(true));
-    // DogLog.setPdh(new PowerDistribution());
+    DogLog.setPdh(new PowerDistribution());
 
     setFileOnly(false); // file-only once connected to fms
 
@@ -147,6 +140,13 @@ public class Robot extends TimedRobot {
     DriverStation.silenceJoystickConnectionWarning(isSimulation());
 
     FaultLogger.setup(_ntInst);
+
+    _shotParameters =
+        new ShotParameters(
+            _shooter::getFlywheelSpeed,
+            _swerve::getHeading,
+            RotationsPerSecond.of(2),
+            Rotation2d.fromDegrees(5));
 
     configureDriverBindings();
 
@@ -163,16 +163,13 @@ public class Robot extends TimedRobot {
                   _driverController.setRumble(RumbleType.kBothRumble, 0);
                 }));
 
-    SmartDashboard.putData(
-        "Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)).ignoringDisable(true));
-    SmartDashboard.putData("Drive to (0, 1)", _swerve.driveTo(new Pose2d(0, 1, Rotation2d.kZero)));
-    SmartDashboard.putData("Drive to (0, 0)", _swerve.driveTo(Pose2d.kZero));
-    SmartDashboard.putData(
-        "Reset to Hub",
-        runOnce(
-                () ->
-                    _swerve.resetPose(new Pose2d(4.343 - 0.6858, 3.157 + 0.6858, Rotation2d.kZero)))
-            .ignoringDisable(true));
+    // SmartDashboard.putData(
+    //     "Reset to Hub",
+    //     runOnce(
+    //             () ->
+    //                 _swerve.resetPose(new Pose2d(4.343 - 0.6858, 3.157 + 0.6858,
+    // Rotation2d.kZero)))
+    //         .ignoringDisable(true));
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
     SmartDashboard.putData("Calculate Wheel COF", _swerve.calculateWheelCOF());
@@ -273,7 +270,9 @@ public class Robot extends TimedRobot {
     _driverController.leftBumper().toggleOnTrue(_intakePivot.lower());
 
     _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
+
     _driverController.x().onTrue(_swerve.toggleFieldOriented());
+    _driverController.y().onTrue(_swerve.resetHeading().ignoringDisable(true));
   }
 
   /**
