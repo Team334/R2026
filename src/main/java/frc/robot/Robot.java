@@ -143,7 +143,7 @@ public class Robot extends TimedRobot {
     _shotParameters =
         new ShotParameters(
             _shooter::getFlywheelSpeed,
-            _swerve::getHeading,
+            _swerve::getPose,
             RotationsPerSecond.of(2),
             Rotation2d.fromDegrees(5));
 

@@ -26,6 +26,8 @@ public class FieldUtil {
           * Math.cos(Math.toRadians(20)) // min overlap angle at worst-case robot velocity
           / projectileHorizontalVelocity.in(MetersPerSecond);
 
+  private static double prevSwitchTime = 110; // starts at first transition shift
+
   /** Gets the alliance from the DS. If the alliance can't be retreived, blue is used by default. */
   public static Alliance getAlliance() {
     var alliance = DriverStation.getAlliance();
@@ -35,6 +37,29 @@ public class FieldUtil {
     }
 
     return Alliance.Blue;
+  }
+
+  public static boolean hubActive() {
+    if (DriverStation.isAutonomous() || DriverStation.getMatchTime() <= 30) {
+      return true;
+    }
+
+    String data = DriverStation.getGameSpecificMessage();
+    boolean active = false;
+
+    switch (getAlliance()) {
+      case Blue:
+        active = data.charAt(0) == 'B';
+      case Red:
+        active = data.charAt(0) == 'R';
+    }
+
+    if (prevSwitchTime - 25 >= DriverStation.getMatchTime()) {
+      active = !active;
+      prevSwitchTime = DriverStation.getMatchTime();
+    }
+
+    return active;
   }
 
   /** Whether the supplied robot pose is in the bump zone(s). */

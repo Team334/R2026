@@ -66,14 +66,15 @@ public class ShotParameters {
 
   public ShotParameters(
       Supplier<AngularVelocity> flywheelVelocitySupplier,
-      Supplier<Rotation2d> headingSupplier,
+      Supplier<Pose2d> robotPoseSupplier,
       AngularVelocity flywheelVelocityTolerance,
       Rotation2d headingTolerance) {
     _isReadyToShoot =
         () -> {
           return flywheelVelocitySupplier.get().isNear(_flywheelSpeed, flywheelVelocityTolerance)
-              && Math.abs(_shotHeading.minus(headingSupplier.get()).getDegrees())
-                  < headingTolerance.getDegrees();
+              && Math.abs(_shotHeading.minus(robotPoseSupplier.get().getRotation()).getDegrees())
+                  < headingTolerance.getDegrees()
+              && (FieldUtil.hubActive() || FieldUtil.inFerryZone(robotPoseSupplier.get()));
         };
   }
 
