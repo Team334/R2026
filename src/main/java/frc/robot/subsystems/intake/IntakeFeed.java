@@ -11,6 +11,8 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -52,6 +54,10 @@ public class IntakeFeed extends AdvancedSubsystem {
     feedMotorConfigs.Slot0.kV = IntakeConstants.feedkV.in(Volts.per(RotationsPerSecond));
 
     feedMotorConfigs.Slot0.kP = IntakeConstants.feedkP.in(Volts.per(RotationsPerSecond));
+
+    feedMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    feedMotorConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     feedMotorConfigs.Feedback.SensorToMechanismRatio = IntakeConstants.feedGearRatio;
 

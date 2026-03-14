@@ -12,11 +12,13 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -131,10 +133,13 @@ public final class Constants {
         new VisionPoseEstimatorConstants(
             leftArducamName,
             new Transform3d(
-                -Units.inchesToMeters(9.333),
-                Units.inchesToMeters(9.508),
-                Units.inchesToMeters(18.087),
-                new Rotation3d(0, 0, Units.degreesToRadians(23))),
+                Pose3d.kZero,
+                new Pose3d(
+                    new Translation3d(
+                        -Units.inchesToMeters(9.8578),
+                        Units.inchesToMeters(9.6913),
+                        Units.inchesToMeters(20.2395)),
+                    new Rotation3d(0, 0, -Units.degreesToRadians(15)))),
             0.1,
             3,
             7);
@@ -143,10 +148,13 @@ public final class Constants {
         new VisionPoseEstimatorConstants(
             rightArducamName,
             new Transform3d(
-                -Units.inchesToMeters(9.333),
-                -Units.inchesToMeters(9.508),
-                Units.inchesToMeters(18.087),
-                new Rotation3d(0, 0, -Units.degreesToRadians(23))),
+                Pose3d.kZero,
+                new Pose3d(
+                    new Translation3d(
+                        -Units.inchesToMeters(9.8578),
+                        -Units.inchesToMeters(9.6913),
+                        Units.inchesToMeters(20.2395)),
+                    new Rotation3d(0, 0, Units.degreesToRadians(15)))),
             0.1,
             3,
             7);
@@ -170,22 +178,16 @@ public final class Constants {
 
     static {
       // hub presets
-      hubPresets.put(0.0, vec3(0, 0, 0));
-      //   hubPresets.put(1.0, vec3(1.0, 2.0, 2.0));
-      //   hubPresets.put(5.0, vec3(5.0, 2.0, 2.0));
+      hubPresets.put(2.767, vec3(40, 20, 20));
+      hubPresets.put(3.682, vec3(45, 20, 20));
 
       // ferry presets
-      ferryPresets.put(0.0, vec3(0, 0, 0));
-      //   ferryPresets.put(1.0, vec3(1.0, 2.0, 2.0));
-      //   ferryPresets.put(5.0, vec3(5.0, 2.0, 2.0));
 
       // hub TOFs
-      hubTOFs.put(0.3, 1 / 10000000.0);
-      hubTOFs.put(10.0, 1 / 10000000.0);
+      hubTOFs.put(2.767, 1.06);
+      hubTOFs.put(3.682, 1.295);
 
       // ferry TOFs
-      ferryTOFs.put(0.3, 1 / 10000000.0);
-      ferryTOFs.put(10.0, 1 / 10000000.0);
     }
   }
 
@@ -214,7 +216,7 @@ public final class Constants {
 
     public static final Voltage floorkS = Volts.of(0.21);
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkV =
-        Volts.per(RotationsPerSecond).ofNative(0.252);
+        Volts.per(RotationsPerSecond).ofNative(0.28);
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkP =
         Volts.per(RotationsPerSecond).ofNative(0.6);
 
@@ -226,13 +228,13 @@ public final class Constants {
     public static final int feedMotorID = 6;
     public static final int pivotMotorID = 5;
 
-    public static final Voltage feedkS = Volts.of(0);
+    public static final Voltage feedkS = Volts.of(0.34);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkV =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(0.205);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(0.6);
 
     public static final Voltage pivotkG = Volts.of(0);
     public static final Voltage pivotkS = Volts.of(0);
@@ -247,7 +249,7 @@ public final class Constants {
     public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(2);
     public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(5);
 
-    public static final double feedGearRatio = 1.5;
+    public static final double feedGearRatio = 2;
     public static final double pivotGearRatio = 20;
 
     public static final Angle pivotRaised = Rotations.of(0.25);
@@ -257,7 +259,7 @@ public final class Constants {
     public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.7);
     public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.2);
 
-    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(30);
+    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(35);
   }
 
   public static class ClimbConstants {
@@ -302,14 +304,14 @@ public final class Constants {
     public static final LinearAcceleration profileTranslationalAcceleration =
         MetersPerSecondPerSecond.of(2);
 
-    public static final AngularVelocity profileAngularVelocity = RadiansPerSecond.of(Math.PI * 3);
+    public static final AngularVelocity profileAngularVelocity = RadiansPerSecond.of(Math.PI * 2);
     public static final AngularAcceleration profileAngularAcceleration =
-        RadiansPerSecondPerSecond.of(Math.PI * 5);
+        RadiansPerSecondPerSecond.of(Math.PI * 3);
 
     public static final Per<LinearVelocityUnit, DistanceUnit> poseTranslationalkP =
         MetersPerSecond.per(Meter).ofNative(0);
     public static final Per<AngularVelocityUnit, AngleUnit> poseRotationkP =
-        RadiansPerSecond.per(Radian).ofNative(1);
+        RadiansPerSecond.per(Radian).ofNative(0.6);
 
     public static final boolean ignorePoseTolerance = true;
 
