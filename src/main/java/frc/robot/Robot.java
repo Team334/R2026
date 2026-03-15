@@ -9,6 +9,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static frc.robot.utils.ShotParameters.vec3;
 
+import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.ctre.phoenix6.SignalLogger;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Epilogue;
@@ -134,7 +135,7 @@ public class Robot extends TimedRobot {
     setFileOnly(false); // file-only once connected to fms
 
     Epilogue.bind(this);
-    SignalLogger.start(); // TODO: log canivore can data as well
+    SignalLogger.start();
 
     DriverStation.silenceJoystickConnectionWarning(isSimulation());
 
@@ -303,6 +304,12 @@ public class Robot extends TimedRobot {
 
       _fileOnlySet = true;
     }
+
+    CANBusStatus swerveBusStatus = TunerConstants.kCANBus.getStatus();
+    CANBusStatus subsystemBusStatus = Constants.subsystemBus.getStatus();
+
+    SignalLogger.writeDouble("Swerve Bus Utilization", swerveBusStatus.BusUtilization);
+    SignalLogger.writeDouble("Subsystem Bus Utilization", subsystemBusStatus.BusUtilization);
 
     FieldUtil.log(_swerve.getPose());
 
