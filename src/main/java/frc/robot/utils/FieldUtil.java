@@ -2,6 +2,7 @@ package frc.robot.utils;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -28,6 +29,15 @@ public class FieldUtil {
 
   private static double prevSwitchTime = 110; // starts at first transition shift
 
+  /** Logs FieldUtil methods. */
+  public static void log(Pose2d robotPose) {
+    DogLog.log("FieldUtil/Alliance", getAlliance());
+    DogLog.log("FieldUtil/Is Hub Active", isHubActive());
+    DogLog.log("FieldUtil/Is Shot Valid", isShotValid(robotPose));
+    DogLog.log("FieldUtil/In Bump Zone", inBumpZone(robotPose));
+    DogLog.log("FieldUtil/In Alliance Zone", inAllianceZone(robotPose));
+  }
+
   /** Gets the alliance from the DS. If the alliance can't be retreived, blue is used by default. */
   public static Alliance getAlliance() {
     var alliance = DriverStation.getAlliance();
@@ -39,7 +49,8 @@ public class FieldUtil {
     return Alliance.Blue;
   }
 
-  public static boolean hubActive() {
+  /** Checks whether this alliance's hub is active. */
+  public static boolean isHubActive() {
     if (DriverStation.isAutonomous() || DriverStation.getMatchTime() <= 30) {
       return true;
     }
@@ -50,8 +61,11 @@ public class FieldUtil {
     switch (getAlliance()) {
       case Blue:
         active = data.charAt(0) == 'B';
+        break;
+
       case Red:
         active = data.charAt(0) == 'R';
+        break;
     }
 
     if (prevSwitchTime - 25 >= DriverStation.getMatchTime()) {
@@ -62,6 +76,18 @@ public class FieldUtil {
     return active;
   }
 
+  /**
+   * Returns true if a shot attempted at this momement is valid. A shot is ALWAYS valid, unless it
+   * is intended for the hub while the hub is inactive.
+   */
+  public static boolean isShotValid(Pose2d robotPose) {
+    if (inAllianceZone(robotPose) && !isHubActive()) {
+      return false;
+    }
+
+    return true;
+  }
+
   /** Whether the supplied robot pose is in the bump zone(s). */
   public static boolean inBumpZone(Pose2d robotPose) {
     if (FieldConstants.blueBumpZone.contains(robotPose.getTranslation())
@@ -70,6 +96,11 @@ public class FieldUtil {
     }
 
     return false;
+  }
+
+  /** Whether the supplied robot pose is in the alliance zone, depending on alliance. */
+  public static boolean inAllianceZone(Pose2d robotPose) {
+    return !inFerryZone(robotPose);
   }
 
   /** Whether the supplied robot pose is in the ferry zone, depending on alliance. */
@@ -101,7 +132,7 @@ public class FieldUtil {
 
   /** Using the robot pose, finds the shot target location (hub / ferry). */
   public static Translation2d getShotTarget(Pose2d robotPose) {
-    return inFerryZone(robotPose) ? getFerryTarget(robotPose) : getHubTarget();
+    return inAllianceZone(robotPose) ? getHubTarget() : getFerryTarget(robotPose);
   }
 
   /**
@@ -111,10 +142,10 @@ public class FieldUtil {
   public static void getShotParameters(
       Pose2d robotPose, ChassisSpeeds robotSpeeds, ShotParameters shotParameters) {
     InterpolatingMatrixTreeMap<Double, N3, N1> presets =
-        inFerryZone(robotPose) ? ShotConstants.ferryPresets : ShotConstants.hubPresets;
+        inAllianceZone(robotPose) ? ShotConstants.hubPresets : ShotConstants.ferryPresets;
 
     InterpolatingDoubleTreeMap TOFs =
-        inFerryZone(robotPose) ? ShotConstants.ferryTOFs : ShotConstants.hubTOFs;
+        inAllianceZone(robotPose) ? ShotConstants.hubTOFs : ShotConstants.ferryTOFs;
 
     Translation2d target = getShotTarget(robotPose);
 

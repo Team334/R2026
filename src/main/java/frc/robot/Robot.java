@@ -298,15 +298,20 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    DogLog.log(
-        "Distance To Hub",
-        FieldUtil.getHubTarget().getDistance(_swerve.getPose().getTranslation()));
-
     if (DriverStation.isFMSAttached() && !_fileOnlySet) {
       setFileOnly(true);
 
       _fileOnlySet = true;
     }
+
+    FieldUtil.log(_swerve.getPose());
+
+    DogLog.log(
+        "Distance To Target",
+        _shotParameters
+            .getTarget()
+            .getTranslation()
+            .getDistance(_swerve.getPose().getTranslation()));
 
     DogLog.timeEnd("Timing/Robot/robotPeriodic()");
 

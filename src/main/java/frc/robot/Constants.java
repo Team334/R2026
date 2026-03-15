@@ -39,7 +39,6 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Per;
-import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.utils.VisionPoseEstimator.VisionPoseEstimatorConstants;
 
@@ -52,12 +51,26 @@ import frc.robot.utils.VisionPoseEstimator.VisionPoseEstimatorConstants;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  // temporary sim can fixes
+  private static final CANBus determineBus(String bus) {
+    if (Robot.isSimulation()) {
+      return new CANBus("");
+    }
+
+    return new CANBus(bus);
+  }
+
+  private static final int determineID(int id) {
+    if (Robot.isSimulation()) {
+      return 20 + id;
+    }
+
+    return id;
+  }
+
   public static final Frequency simNotifierFrequency = Hertz.of(200);
 
-  public static final CANBus subsystemBus = new CANBus("subsystems");
-  //   public static final CANBus subsystemBus = new CANBus("rio");
-
-  public static final Time shotTimeScaler = Seconds.of(0.2);
+  public static final CANBus subsystemBus = determineBus("subsystems");
 
   public static class Ports {
     public static final int driverController = 0;
@@ -182,18 +195,20 @@ public final class Constants {
       hubPresets.put(3.682, vec3(45, 20, 20));
 
       // ferry presets
+      ferryPresets.put(0.0, vec3(0, 0, 0));
 
       // hub TOFs
       hubTOFs.put(2.767, 1.06);
       hubTOFs.put(3.682, 1.295);
 
       // ferry TOFs
+      ferryTOFs.put(0.0, 0.00000001);
     }
   }
 
   public static class ShooterConstants {
-    public static final int flywheelMotorID = 1; // 1
-    public static final int flywheelFollowerMotorID = 2; // 2
+    public static final int flywheelMotorID = determineID(1); // 1
+    public static final int flywheelFollowerMotorID = determineID(2); // 2
 
     public static final Voltage flywheelkS = Volts.of(0.13262);
     public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkV =
@@ -205,8 +220,8 @@ public final class Constants {
   }
 
   public static class HopperConstants {
-    public static final int rollerMotorID = 3;
-    public static final int floorMotorID = 4;
+    public static final int rollerMotorID = determineID(3);
+    public static final int floorMotorID = determineID(4);
 
     public static final Voltage rollerkS = Volts.of(0.17);
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkV =
@@ -225,8 +240,8 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final int feedMotorID = 6;
-    public static final int pivotMotorID = 5;
+    public static final int pivotMotorID = determineID(5);
+    public static final int feedMotorID = determineID(6);
 
     public static final Voltage feedkS = Volts.of(0.34);
 
@@ -240,9 +255,9 @@ public final class Constants {
     public static final Voltage pivotkS = Volts.of(0);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> pivotkV =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(0.1);
     public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
-        Volts.per(RotationsPerSecondPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecondPerSecond).ofNative(0.05);
 
     public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(0);
 
@@ -263,8 +278,7 @@ public final class Constants {
   }
 
   public static class ClimbConstants {
-    // Change ALL values here after testing
-    public static final int climbMotorID = 7;
+    public static final int climbMotorID = determineID(7);
 
     public static final Voltage kS = Volts.of(0);
     public static final Voltage kG = Volts.of(0);

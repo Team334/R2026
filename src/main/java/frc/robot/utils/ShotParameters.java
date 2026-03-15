@@ -74,7 +74,7 @@ public class ShotParameters {
           return flywheelVelocitySupplier.get().isNear(_flywheelSpeed, flywheelVelocityTolerance)
               && Math.abs(_shotHeading.minus(robotPoseSupplier.get().getRotation()).getDegrees())
                   < headingTolerance.getDegrees()
-              && (FieldUtil.hubActive() || FieldUtil.inFerryZone(robotPoseSupplier.get()));
+              && FieldUtil.isShotValid(robotPoseSupplier.get());
         };
   }
 
@@ -94,6 +94,17 @@ public class ShotParameters {
     return _shotHeading;
   }
 
+  public Pose2d getTarget() {
+    return _target;
+  }
+
+  public Pose2d getVirtualTarget() {
+    return _virtualTarget;
+  }
+
+  /**
+   * Checks that shot parameters are within tolerances, and {@link FieldUtil#isShotValid(Pose2d)}.
+   */
   @Logged(name = "Is Ready To Shoot")
   public boolean isReadyToShoot() {
     return _isReadyToShoot.getAsBoolean();
