@@ -51,9 +51,6 @@ public class Shooter extends AdvancedSubsystem {
   private final StatusSignal<AngularVelocity> _flywheelVelocityGetter =
       _flywheelMotor.getVelocity();
 
-  @Logged(name = "Velocity Threshold")
-  private final AngularVelocity velocityThreshold = RotationsPerSecond.of(3);
-
   @Logged(name = "Idle Velocity Percentage")
   private final double idleVelocityPercentage = 0.5;
 
@@ -202,7 +199,7 @@ public class Shooter extends AdvancedSubsystem {
   private void setFlywheelSpeed(AngularVelocity speed) {
     // asymmetrical bang-bang for speeding up
     if (speed.minus(getFlywheelSpeed()).in(RotationsPerSecond)
-        > velocityThreshold.in(RotationsPerSecond)) {
+        > ShotConstants.flywheelVelocityThreshold.in(RotationsPerSecond)) {
       _flywheelMotor.setControl(_flywheelDutyCycleSetter.withOutput(1));
     } else {
       _flywheelMotor.setControl(_flywheelVelocitySetter.withVelocity(speed));

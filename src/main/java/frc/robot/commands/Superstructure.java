@@ -9,20 +9,20 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.InputStream;
+import frc.robot.Constants.ClimbConstants;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.intake.IntakeFeed;
 import frc.robot.subsystems.intake.IntakePivot;
+import frc.robot.utils.FieldUtil;
 import java.util.function.Supplier;
 
 /** All superstructure commands. */
 public class Superstructure {
   private final Shooter _shooter;
   private final Hopper _hopper;
-  private final IntakePivot _intakePivot;
-  private final IntakeFeed _intakeFeed;
   private final Climb _climb;
   private final Swerve _swerve;
 
@@ -38,8 +38,6 @@ public class Superstructure {
       Supplier<Rotation2d> shotHeadingSupplier) {
     _shooter = shooter;
     _hopper = hopper;
-    _intakePivot = intakePivot;
-    _intakeFeed = intakeFeed;
     _climb = climb;
     _swerve = swerve;
 
@@ -65,6 +63,21 @@ public class Superstructure {
    * drives to L1 before climbing.
    */
   public Command climbRoutine() {
-    return run(() -> {}).withName("Climb Routine");
+    return sequence(
+            // drive to pre-climb pose while extending, wait for climb to finish extending,
+            // and finally drive to climb pose and climb
+            parallel(
+                _swerve.driveTo(FieldUtil::getPreClimb),
+                _climb
+                    .extend()
+                    .until(
+                        () ->
+                            _climb
+                                .getHeight()
+                                .isNear(
+                                    ClimbConstants.extended, ClimbConstants.extendedTolerance))),
+            _swerve.driveTo(FieldUtil::getClimb),
+            _climb.climb())
+        .withName("Climb Routine");
   }
 }

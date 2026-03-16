@@ -49,6 +49,18 @@ public class FieldUtil {
     return Alliance.Blue;
   }
 
+  /** Pre-climb pose based on alliance. */
+  public static Pose2d getPreClimb() {
+    return getAlliance() == Alliance.Blue
+        ? FieldConstants.bluePreClimb
+        : FieldConstants.redPreClimb;
+  }
+
+  /** Climb pose based on alliance. */
+  public static Pose2d getClimb() {
+    return getAlliance() == Alliance.Blue ? FieldConstants.blueClimb : FieldConstants.redClimb;
+  }
+
   /** Checks whether this alliance's hub is active. */
   public static boolean isHubActive() {
     if (DriverStation.isAutonomous() || DriverStation.getMatchTime() <= 30) {

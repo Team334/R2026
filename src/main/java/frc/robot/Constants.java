@@ -116,6 +116,12 @@ public final class Constants {
     public static final Rectangle2d blueBumpZone = new Rectangle2d(Pose2d.kZero, 1, 1);
     public static final Rectangle2d redBumpZone = new Rectangle2d(Pose2d.kZero, 1, 1);
 
+    public static final Pose2d bluePreClimb = new Pose2d();
+    public static final Pose2d redPreClimb = new Pose2d();
+
+    public static final Pose2d blueClimb = new Pose2d();
+    public static final Pose2d redClimb = new Pose2d();
+
     // uncomment if using the test tag layout
     // public static final AprilTagFieldLayout tagLayout;
 
@@ -173,6 +179,8 @@ public final class Constants {
 
     public static final AngularVelocity spitRollerSpeed = RotationsPerSecond.of(1);
     public static final AngularVelocity spitFloorSpeed = RotationsPerSecond.of(1);
+
+    public static final AngularVelocity flywheelVelocityThreshold = RotationsPerSecond.of(3);
 
     // distanceMeters : <flywheelRPS, rollerRPS, floorRPS>
     public static InterpolatingMatrixTreeMap<Double, N3, N1> hubPresets =
@@ -291,6 +299,8 @@ public final class Constants {
 
     public static final Angle retracted = Rotations.of(0);
     public static final Angle extended = Rotations.of(10);
+
+    public static final Angle extendedTolerance = Rotations.of(0.5);
 
     public static final Angle forwardSoftLimitThreshold = Rotations.of(11);
     public static final Angle reverseSoftLimitThreshold = Rotations.of(-1);

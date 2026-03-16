@@ -32,8 +32,6 @@ public class Climb extends AdvancedSubsystem {
   private final MotionMagicVoltage _heightSetter = new MotionMagicVoltage(0);
   private final StatusSignal<Angle> _heightGetter = _climbMotor.getPosition();
 
-  private final Angle extendedTolerance = Rotations.of(0.5);
-
   public Climb() {
     var climbMotorConfigs = new TalonFXConfiguration();
     var climbSlotConfigs = new SlotConfigs();
@@ -97,7 +95,9 @@ public class Climb extends AdvancedSubsystem {
             _climbMotor.setControl(
                 _heightSetter.withPosition(ClimbConstants.retracted.in(Rotations)).withSlot(1)))
         .beforeStarting(
-            waitUntil(() -> getHeight().isNear(ClimbConstants.extended, extendedTolerance)))
+            waitUntil(
+                () ->
+                    getHeight().isNear(ClimbConstants.extended, ClimbConstants.extendedTolerance)))
         .withName("Climb");
   }
 
