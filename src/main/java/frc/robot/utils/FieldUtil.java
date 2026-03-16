@@ -20,7 +20,7 @@ import frc.robot.Constants.SwerveConstants;
 public class FieldUtil {
   // newton's method constants
   private static final int maxIter = 10;
-  private static final LinearVelocity projectileHorizontalVelocity = MetersPerSecond.of(100000000);
+  private static final LinearVelocity projectileHorizontalVelocity = MetersPerSecond.of(2.802);
   private static final double E_tolerance = 0.1;
   private static final double dT_dt_tolerance =
       SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)

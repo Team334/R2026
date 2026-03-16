@@ -196,13 +196,17 @@ public final class Constants {
       // hub presets
       hubPresets.put(2.767, vec3(40, 20, 20));
       hubPresets.put(3.682, vec3(45, 20, 20));
+      hubPresets.put(4.0, vec3(48, 25, 25));
+      hubPresets.put(5.5, vec3(53, 30, 30));
 
       // ferry presets
       ferryPresets.put(0.0, vec3(0, 0, 0));
 
       // hub TOFs
-      hubTOFs.put(2.767, 1.06);
+      hubTOFs.put(2.767, 1.060);
       hubTOFs.put(3.682, 1.295);
+      hubTOFs.put(4.0, 1.355);
+      hubTOFs.put(5.5, 0.0);
 
       // ferry TOFs
       ferryTOFs.put(0.0, 0.00000001);

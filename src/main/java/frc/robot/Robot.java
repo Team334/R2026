@@ -7,7 +7,6 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
-import static frc.robot.utils.ShotParameters.vec3;
 
 import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.ctre.phoenix6.SignalLogger;
@@ -28,6 +27,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -131,7 +131,7 @@ public class Robot extends TimedRobot {
 
     // set up loggers
     DogLog.setOptions(DogLog.getOptions().withCaptureDs(true));
-    // DogLog.setPdh(new PowerDistribution());
+    DogLog.setPdh(new PowerDistribution());
 
     setFileOnly(false); // file-only once connected to fms
 
@@ -169,7 +169,7 @@ public class Robot extends TimedRobot {
         runOnce(
                 () ->
                     _swerve.resetPose(
-                        new Pose2d(4.343 - 0.6858, 3.157 + 0.6858, Rotation2d.k180deg)))
+                        new Pose2d(4.343 - 0.6858 - 1, 3.157 + 0.6858, Rotation2d.k180deg)))
             .ignoringDisable(true));
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
@@ -292,7 +292,7 @@ public class Robot extends TimedRobot {
         ChassisSpeeds.fromRobotRelativeSpeeds(_swerve.getChassisSpeeds(), _swerve.getHeading()),
         _shotParameters);
 
-    _shotParameters.setPreset(vec3(_flywheelSpeed.get(), _rollerSpeed.get(), _floorSpeed.get()));
+    // _shotParameters.setPreset(vec3(_flywheelSpeed.get(), _rollerSpeed.get(), _floorSpeed.get()));
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
