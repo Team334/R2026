@@ -325,12 +325,17 @@ public final class Constants {
 
     public static final AngularVelocity profileAngularVelocity = RadiansPerSecond.of(Math.PI * 2);
     public static final AngularAcceleration profileAngularAcceleration =
-        RadiansPerSecondPerSecond.of(Math.PI * 3);
+        RadiansPerSecondPerSecond.of(4);
 
     public static final Per<LinearVelocityUnit, DistanceUnit> poseTranslationalkP =
         MetersPerSecond.per(Meter).ofNative(0);
+    public static final Per<LinearVelocityUnit, LinearVelocityUnit> poseTranslationalkD =
+        MetersPerSecond.per(MetersPerSecond).ofNative(0);
+
     public static final Per<AngularVelocityUnit, AngleUnit> poseRotationkP =
-        RadiansPerSecond.per(Radian).ofNative(0.6);
+        RadiansPerSecond.per(Radian).ofNative(4.5);
+    public static final Per<AngularVelocityUnit, AngularVelocityUnit> poseRotationkD =
+        RadiansPerSecond.per(RadiansPerSecond).ofNative(0.2);
 
     public static final boolean ignorePoseTolerance = true;
 

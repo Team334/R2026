@@ -371,6 +371,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
         .beforeStarting(
             runOnce(
                 () -> {
+                  isOpenLoop = false;
+
                   _poseController.resetRotation(
                       getHeading(), getChassisSpeeds().omegaRadiansPerSecond);
 

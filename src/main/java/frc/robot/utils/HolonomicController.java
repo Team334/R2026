@@ -42,12 +42,21 @@ public class HolonomicController {
   private Pose2d _startPose = Pose2d.kZero;
 
   private final PIDController _xController =
-      new PIDController(SwerveConstants.poseTranslationalkP.in(MetersPerSecond.per(Meter)), 0, 0);
+      new PIDController(
+          SwerveConstants.poseTranslationalkP.in(MetersPerSecond.per(Meter)),
+          0,
+          SwerveConstants.poseTranslationalkD.in(MetersPerSecond.per(MetersPerSecond)));
   private final PIDController _yController =
-      new PIDController(SwerveConstants.poseTranslationalkP.in(MetersPerSecond.per(Meter)), 0, 0);
+      new PIDController(
+          SwerveConstants.poseTranslationalkP.in(MetersPerSecond.per(Meter)),
+          0,
+          SwerveConstants.poseTranslationalkD.in(MetersPerSecond.per(MetersPerSecond)));
 
   private final PIDController _headingController =
-      new PIDController(SwerveConstants.poseRotationkP.in(RadiansPerSecond.per(Radian)), 0, 0);
+      new PIDController(
+          SwerveConstants.poseRotationkP.in(RadiansPerSecond.per(Radian)),
+          0,
+          SwerveConstants.poseRotationkD.in(RadiansPerSecond.per(RadiansPerSecond)));
 
   private final WheelForceCalculator _wheelForceCalculator;
   private Feedforwards _wheelForces = new Feedforwards(4);
