@@ -18,6 +18,7 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.DoubleSubscriber;
@@ -163,13 +164,13 @@ public class Robot extends TimedRobot {
                   _driverController.setRumble(RumbleType.kBothRumble, 0);
                 }));
 
-    // SmartDashboard.putData(
-    //     "Reset to Hub",
-    //     runOnce(
-    //             () ->
-    //                 _swerve.resetPose(new Pose2d(4.343 - 0.6858, 3.157 + 0.6858,
-    // Rotation2d.kZero)))
-    //         .ignoringDisable(true));
+    SmartDashboard.putData(
+        "Reset to Hub",
+        runOnce(
+                () ->
+                    _swerve.resetPose(
+                        new Pose2d(4.343 - 0.6858, 3.157 + 0.6858, Rotation2d.k180deg)))
+            .ignoringDisable(true));
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
     SmartDashboard.putData("Calculate Wheel COF", _swerve.calculateWheelCOF());

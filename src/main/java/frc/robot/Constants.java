@@ -12,7 +12,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -146,13 +145,11 @@ public final class Constants {
         new VisionPoseEstimatorConstants(
             leftArducamName,
             new Transform3d(
-                Pose3d.kZero,
-                new Pose3d(
-                    new Translation3d(
-                        -Units.inchesToMeters(9.8578),
-                        Units.inchesToMeters(9.6913),
-                        Units.inchesToMeters(20.2395)),
-                    new Rotation3d(0, 0, -Units.degreesToRadians(15)))),
+                new Translation3d(
+                    -Units.inchesToMeters(9.8578),
+                    Units.inchesToMeters(9.6913),
+                    Units.inchesToMeters(20.2395)),
+                new Rotation3d(0, 0, -Units.degreesToRadians(15))),
             0.1,
             3,
             7);
@@ -161,13 +158,11 @@ public final class Constants {
         new VisionPoseEstimatorConstants(
             rightArducamName,
             new Transform3d(
-                Pose3d.kZero,
-                new Pose3d(
-                    new Translation3d(
-                        -Units.inchesToMeters(9.8578),
-                        -Units.inchesToMeters(9.6913),
-                        Units.inchesToMeters(20.2395)),
-                    new Rotation3d(0, 0, Units.degreesToRadians(15)))),
+                new Translation3d(
+                    -Units.inchesToMeters(9.8578),
+                    -Units.inchesToMeters(9.6913),
+                    Units.inchesToMeters(20.2395)),
+                new Rotation3d(0, 0, Units.degreesToRadians(15))),
             0.1,
             3,
             7);
