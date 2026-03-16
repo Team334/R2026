@@ -6,50 +6,7 @@
       "name": "Dashboard",
       "grid_layout": {
         "layouts": [],
-        "containers": [
-          {
-            "title": "Reset Pose",
-            "x": 540.0,
-            "y": 180.0,
-            "width": 360.0,
-            "height": 180.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/Reset Pose",
-              "period": 0.06,
-              "show_type": true,
-              "maximize_button_space": false
-            }
-          },
-          {
-            "title": "Drive to (0, 0)",
-            "x": 360.0,
-            "y": 0.0,
-            "width": 360.0,
-            "height": 180.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/Drive to (0, 0)",
-              "period": 0.06,
-              "show_type": true,
-              "maximize_button_space": false
-            }
-          },
-          {
-            "title": "Drive to (0, 1)",
-            "x": 720.0,
-            "y": 0.0,
-            "width": 360.0,
-            "height": 180.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/Drive to (0, 1)",
-              "period": 0.06,
-              "show_type": true,
-              "maximize_button_space": false
-            }
-          }
-        ]
+        "containers": []
       }
     },
     {
@@ -124,6 +81,13 @@
             }
           }
         ]
+      }
+    },
+    {
+      "name": "Tab 3",
+      "grid_layout": {
+        "layouts": [],
+        "containers": []
       }
     }
   ]
