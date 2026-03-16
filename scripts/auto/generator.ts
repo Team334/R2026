@@ -171,7 +171,7 @@ type GenericLocation = "start" | "neutralbump" | "neutralmiddle" | "trench" | "d
 
 type Location = `${Side}_${GenericLocation}`;
 
-type EventName = "pivot out" | "pivot in" | "feed in" | "feed stop" | "shoot" | "stop shooting" | "extend" | "climb";
+type EventName = "pivot lower" | "pivot raise" | "feed in" | "feed stop" | "shoot" | "stop shooting" | "extend" | "climb";
 
 interface LocationParams {
     leftWaypoints?: Waypoint<Expr>[],
@@ -261,7 +261,7 @@ const locationParams: Record<GenericLocation, LocationParams> = {
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),
-            makeEventMarker("pivot out", 0, 0),
+            makeEventMarker("pivot lower", 0, 0),
             makeEventMarker("feed in", 1, 0),
             makeEventMarker("feed stop", 4, 0.4),
             makeEventMarker("shoot", 5, 0)
@@ -290,7 +290,7 @@ const locationParams: Record<GenericLocation, LocationParams> = {
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),
-            makeEventMarker("pivot out", 1, 0),
+            makeEventMarker("pivot raise", 1, 0),
             makeEventMarker("feed in", 2, 0),
             makeEventMarker("feed stop", 3, 0.4),
             makeEventMarker("shoot", 5, 0)
@@ -327,7 +327,7 @@ const locationParams: Record<GenericLocation, LocationParams> = {
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),
-            makeEventMarker("pivot out", 0, 0),
+            makeEventMarker("pivot lower", 0, 0),
             makeEventMarker("feed in", 1, 0),
             makeEventMarker("feed stop", 3, 0.4),
             makeEventMarker("shoot", 3, 0)

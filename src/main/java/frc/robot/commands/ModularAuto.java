@@ -86,9 +86,9 @@ public class ModularAuto {
         "stop shooting",
         sequence(runOnce(() -> _aimAtTarget = false), parallel(hopper.feedStop(), shooter.idle())));
 
-    _factory.bind("pivot out", intakePivot.lower());
+    _factory.bind("pivot lower", intakePivot.lower());
 
-    _factory.bind("pivot in", intakePivot.raise());
+    _factory.bind("pivot raise", intakePivot.raise());
 
     _factory.bind("feed in", intakeFeed.feedIn());
 
