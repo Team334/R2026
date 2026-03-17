@@ -36,6 +36,9 @@ public class ShotParameters {
   @Logged(name = "Virtual Target")
   private Pose2d _virtualTarget = Pose2d.kZero;
 
+  @Logged(name = "In Bounds")
+  public boolean inBounds = false;
+
   /**
    * If the robot-relative projectile velocity and the robot velocity vectors are strongly coupled,
    * the field-relative projectile velocity will have a larger error, given errors in the
@@ -74,7 +77,8 @@ public class ShotParameters {
           return flywheelVelocitySupplier.get().isNear(_flywheelSpeed, flywheelVelocityTolerance)
               && Math.abs(_shotHeading.minus(robotPoseSupplier.get().getRotation()).getDegrees())
                   < headingTolerance.getDegrees()
-              && FieldUtil.isShotValid(robotPoseSupplier.get());
+              && FieldUtil.isShotValid(robotPoseSupplier.get())
+              && inBounds;
         };
   }
 

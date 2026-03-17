@@ -1,5 +1,6 @@
 package frc.robot.utils;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import dev.doglog.DogLog;
@@ -195,13 +196,25 @@ public class FieldUtil {
       if (Math.abs(new_t - t) < E_tolerance) {
         Translation2d virtualTarget = target.minus(robotVelocity.times(new_t));
 
-        shotParameters.setPreset(
-            presets.get(virtualTarget.getDistance(robotPose.getTranslation())));
+        double distanceToVirtualTarget = virtualTarget.getDistance(robotPose.getTranslation());
+
+        shotParameters.setPreset(presets.get(distanceToVirtualTarget));
 
         shotParameters.setShotHeading(virtualTarget.minus(robotPose.getTranslation()).getAngle());
         shotParameters.setVirtualTarget(virtualTarget);
 
         shotParameters.newtonIterations = i + 1;
+
+        // check if shot is in bounds
+        if (inAllianceZone(robotPose)) {
+          shotParameters.inBounds =
+              ShotConstants.hubMinDistance.in(Meters) <= distanceToVirtualTarget
+                  && distanceToVirtualTarget <= ShotConstants.hubMaxDistance.in(Meters);
+        } else {
+          shotParameters.inBounds =
+              ShotConstants.ferryMinDistance.in(Meters) <= distanceToVirtualTarget
+                  && distanceToVirtualTarget <= ShotConstants.ferryMaxDistance.in(Meters);
+        }
 
         break;
       }

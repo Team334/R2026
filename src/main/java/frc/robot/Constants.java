@@ -32,6 +32,7 @@ import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -188,6 +189,12 @@ public final class Constants {
     public static InterpolatingMatrixTreeMap<Double, N3, N1> ferryPresets =
         new InterpolatingMatrixTreeMap<>();
 
+    public static final Distance hubMinDistance = Meters.of(2.767);
+    public static final Distance hubMaxDistance = Meters.of(4.0);
+
+    public static final Distance ferryMinDistance = Meters.of(2.767);
+    public static final Distance ferryMaxDistance = Meters.of(4.0);
+
     // distanceMeters : TOFSecs
     public static InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
     public static InterpolatingDoubleTreeMap ferryTOFs = new InterpolatingDoubleTreeMap();
@@ -281,7 +288,7 @@ public final class Constants {
     public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.7);
     public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.2);
 
-    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(35);
+    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(30);
   }
 
   public static class ClimbConstants {
