@@ -84,7 +84,8 @@ public class Shooter extends AdvancedSubsystem {
     flywheelMotorConfigs.CurrentLimits.StatorCurrentLimit = 100;
     flywheelMotorConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    flywheelMotorConfigs.CurrentLimits.SupplyCurrentLimitEnable = false;
+    flywheelMotorConfigs.CurrentLimits.SupplyCurrentLimit = 50;
+    flywheelMotorConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     flywheelMotorConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     flywheelMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -100,7 +101,8 @@ public class Shooter extends AdvancedSubsystem {
     flywheelFollowerMotorConfigs.CurrentLimits.StatorCurrentLimit = 100;
     flywheelFollowerMotorConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    flywheelFollowerMotorConfigs.CurrentLimits.SupplyCurrentLimitEnable = false;
+    flywheelFollowerMotorConfigs.CurrentLimits.SupplyCurrentLimit = 50;
+    flywheelFollowerMotorConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     flywheelFollowerMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 

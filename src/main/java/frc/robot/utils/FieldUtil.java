@@ -15,14 +15,13 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShotConstants;
 import frc.robot.Constants.SwerveConstants;
 
 public class FieldUtil {
   // newton's method constants
   private static final int maxIter = 10;
-  private static final LinearVelocity projectileHorizontalVelocity = MetersPerSecond.of(2.802);
+  private static final LinearVelocity projectileHorizontalVelocity = MetersPerSecond.of(2.722);
   private static final double E_tolerance = 0.1;
   private static final double dT_dt_tolerance =
       SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)
@@ -169,15 +168,6 @@ public class FieldUtil {
 
     Translation2d robotVelocity =
         new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
-
-    // compensate for off-centered shooter
-    robotVelocity =
-        robotVelocity.plus(
-            new Translation2d(
-                    // (omega, 0, 0) x (sx, sy, 0) = (-omega * sy, -omega * sx, 0)
-                    -robotSpeeds.omegaRadiansPerSecond * ShooterConstants.shooterToCenter.getY(),
-                    robotSpeeds.omegaRadiansPerSecond * ShooterConstants.shooterToCenter.getX())
-                .rotateBy(robotPose.getRotation()));
 
     Translation2d robotToVirtualTarget =
         target.minus(robotPose.getTranslation()).minus(robotVelocity.times(t));

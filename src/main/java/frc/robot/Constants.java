@@ -189,8 +189,8 @@ public final class Constants {
     public static InterpolatingMatrixTreeMap<Double, N3, N1> ferryPresets =
         new InterpolatingMatrixTreeMap<>();
 
-    public static final Distance hubMinDistance = Meters.of(2.767);
-    public static final Distance hubMaxDistance = Meters.of(4.0);
+    public static final Distance hubMinDistance = Meters.of(1.89);
+    public static final Distance hubMaxDistance = Meters.of(5.252);
 
     public static final Distance ferryMinDistance = Meters.of(2.767);
     public static final Distance ferryMaxDistance = Meters.of(4.0);
@@ -201,19 +201,21 @@ public final class Constants {
 
     static {
       // hub presets
-      hubPresets.put(2.767, vec3(40, 20, 20));
-      hubPresets.put(3.682, vec3(45, 20, 20));
-      hubPresets.put(4.0, vec3(48, 25, 25));
-      hubPresets.put(5.5, vec3(53, 30, 30));
+      hubPresets.put(1.89, vec3(38, 50, 40));
+      hubPresets.put(2.665, vec3(43, 50, 40));
+      hubPresets.put(3.768, vec3(47.75, 50, 40));
+      hubPresets.put(4.574, vec3(51.8, 50, 40));
+      hubPresets.put(5.252, vec3(52, 50, 40));
 
       // ferry presets
       ferryPresets.put(0.0, vec3(0, 0, 0));
 
       // hub TOFs
-      hubTOFs.put(2.767, 1.060);
-      hubTOFs.put(3.682, 1.295);
-      hubTOFs.put(4.0, 1.355);
-      hubTOFs.put(5.5, 0.0);
+      hubTOFs.put(1.89, 0.955);
+      hubTOFs.put(2.665, 1.08);
+      hubTOFs.put(3.768, 1.38);
+      hubTOFs.put(4.574, 1.53);
+      hubTOFs.put(5.252, 1.525);
 
       // ferry TOFs
       ferryTOFs.put(0.0, 0.00000001);
@@ -231,8 +233,6 @@ public final class Constants {
         Volts.per(RotationsPerSecond).ofNative(0.2);
 
     public static final double flywheelGearRatio = 1.2;
-
-    public static final Translation2d shooterToCenter = new Translation2d();
   }
 
   public static class HopperConstants {
@@ -348,7 +348,7 @@ public final class Constants {
     public static final Per<AngularVelocityUnit, AngleUnit> poseRotationkP =
         RadiansPerSecond.per(Radian).ofNative(4.5);
     public static final Per<AngularVelocityUnit, AngularVelocityUnit> poseRotationkD =
-        RadiansPerSecond.per(RadiansPerSecond).ofNative(0.2);
+        RadiansPerSecond.per(RadiansPerSecond).ofNative(0);
 
     public static final boolean ignorePoseTolerance = true;
 
