@@ -15,6 +15,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShotConstants;
 import frc.robot.Constants.SwerveConstants;
 
@@ -168,6 +169,14 @@ public class FieldUtil {
 
     Translation2d robotVelocity =
         new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
+
+    // compensate for off-centered shooter
+    robotVelocity =
+        robotVelocity.plus(
+            new Translation2d(
+                    0,
+                    robotSpeeds.omegaRadiansPerSecond * ShooterConstants.shooterToCenter.in(Meters))
+                .rotateBy(robotPose.getRotation()));
 
     Translation2d robotToVirtualTarget =
         target.minus(robotPose.getTranslation()).minus(robotVelocity.times(t));

@@ -20,7 +20,6 @@ import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -110,9 +109,9 @@ public class Robot extends TimedRobot {
           _swerve,
           () -> _shotParameters.getShotHeading());
 
-  private final DoubleSubscriber _flywheelSpeed = DogLog.tunable("Flywheel Speed RPS", 0.0);
-  private final DoubleSubscriber _floorSpeed = DogLog.tunable("Floor Speed RPS", 0.0);
-  private final DoubleSubscriber _rollerSpeed = DogLog.tunable("Roller Speed RPS", 0.0);
+  // private final DoubleSubscriber _flywheelSpeed = DogLog.tunable("Flywheel Speed RPS", 0.0);
+  // private final DoubleSubscriber _floorSpeed = DogLog.tunable("Floor Speed RPS", 0.0);
+  // private final DoubleSubscriber _rollerSpeed = DogLog.tunable("Roller Speed RPS", 0.0);
 
   /**
    * This function is run when the robot is first started up and should be used for any

@@ -231,6 +231,8 @@ public final class Constants {
         Volts.per(RotationsPerSecond).ofNative(0.2);
 
     public static final double flywheelGearRatio = 1.2;
+
+    public static final Distance shooterToCenter = Meters.of(0.2);
   }
 
   public static class HopperConstants {
