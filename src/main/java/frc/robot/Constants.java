@@ -232,7 +232,7 @@ public final class Constants {
 
     public static final double flywheelGearRatio = 1.2;
 
-    public static final Distance shooterToCenter = Meters.of(0.2);
+    public static final Translation2d shooterToCenter = new Translation2d();
   }
 
   public static class HopperConstants {

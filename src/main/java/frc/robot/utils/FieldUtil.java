@@ -174,8 +174,9 @@ public class FieldUtil {
     robotVelocity =
         robotVelocity.plus(
             new Translation2d(
-                    0,
-                    robotSpeeds.omegaRadiansPerSecond * ShooterConstants.shooterToCenter.in(Meters))
+                    // (omega, 0, 0) x (sx, sy, 0) = (-omega * sy, -omega * sx, 0)
+                    -robotSpeeds.omegaRadiansPerSecond * ShooterConstants.shooterToCenter.getY(),
+                    robotSpeeds.omegaRadiansPerSecond * ShooterConstants.shooterToCenter.getX())
                 .rotateBy(robotPose.getRotation()));
 
     Translation2d robotToVirtualTarget =
