@@ -479,9 +479,15 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     return run(() -> {
           _poseController.nextSetpoint(getHeading());
 
+          ChassisSpeeds desiredSpeeds =
+              _poseController.calculate(
+                  _poseController.getSetpointSpeeds(),
+                  _poseController.getSetpointPose(),
+                  getPose());
+
           setControl(
               _fieldSpeedsRequest
-                  .withSpeeds(_poseController.getSetpointSpeeds())
+                  .withSpeeds(desiredSpeeds)
                   .withWheelForceFeedforwardsX(_poseController.getWheelForces().x_newtons)
                   .withWheelForceFeedforwardsY(_poseController.getWheelForces().y_newtons));
         })

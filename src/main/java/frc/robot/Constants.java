@@ -324,7 +324,7 @@ public final class Constants {
   public static class SwerveConstants {
     public static final Frequency odometryFrequency = Hertz.of(250);
 
-    public static final Mass mass = Pounds.of(68);
+    public static final Mass mass = Pounds.of(103);
     public static final MomentOfInertia moi = KilogramSquareMeters.of(0);
 
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
@@ -341,7 +341,7 @@ public final class Constants {
         RadiansPerSecondPerSecond.of(4);
 
     public static final Per<LinearVelocityUnit, DistanceUnit> poseTranslationalkP =
-        MetersPerSecond.per(Meter).ofNative(0);
+        MetersPerSecond.per(Meter).ofNative(2);
     public static final Per<LinearVelocityUnit, LinearVelocityUnit> poseTranslationalkD =
         MetersPerSecond.per(MetersPerSecond).ofNative(0);
 
