@@ -137,7 +137,8 @@ public class ModularAuto {
     // put choosers on nt
     SmartDashboard.putData("Auto Chooser", _layoutChooser);
 
-    generateAuto(_layoutChooser.getSelected());
+    // generateAuto(_layoutChooser.getSelected());
+    generateAuto("test");
   }
 
   /** The auto generated from the specified layout. */
