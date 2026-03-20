@@ -313,20 +313,6 @@ public class Robot extends TimedRobot {
 
     FieldUtil.log(_swerve.getPose());
 
-    DogLog.log(
-        "Distance To Target",
-        _shotParameters
-            .getTarget()
-            .getTranslation()
-            .getDistance(_swerve.getPose().getTranslation()));
-
-    DogLog.log(
-        "Distance To Virtual Target",
-        _shotParameters
-            .getVirtualTarget()
-            .getTranslation()
-            .getDistance(_swerve.getPose().getTranslation()));
-
     DogLog.timeEnd("Timing/Robot/robotPeriodic()");
 
     DogLog.timeEnd("Timing/Robot/Full Loop");

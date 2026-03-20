@@ -20,7 +20,7 @@ import frc.robot.Constants.SwerveConstants;
 
 public class FieldUtil {
   // newton's method constants
-  private static final int maxIter = 10;
+  private static final int maxIter = 20;
   private static final LinearVelocity projectileHorizontalVelocity = MetersPerSecond.of(2.722);
   private static final double E_tolerance = 0.1;
   private static final double dT_dt_tolerance =
@@ -183,6 +183,7 @@ public class FieldUtil {
 
       double new_t = t - (E / dE_dt);
 
+      // figure out error sensitivity on first iteration
       if (i == 0) {
         shotParameters.isErrorSensitive = Math.abs(dT_dt) > dT_dt_tolerance;
         shotParameters.couplingDegrees =
@@ -193,6 +194,7 @@ public class FieldUtil {
                             / (robotToVirtualTarget.getNorm() * robotVelocity.getNorm()))));
       }
 
+      // finish and update shot parameters converged on E(t) = 0
       if (Math.abs(new_t - t) < E_tolerance) {
         Translation2d virtualTarget = target.minus(robotVelocity.times(new_t));
 
@@ -204,6 +206,7 @@ public class FieldUtil {
         shotParameters.setVirtualTarget(virtualTarget);
 
         shotParameters.newtonIterations = i + 1;
+        shotParameters.failedToConverge = false;
 
         // check if shot is in bounds
         if (inAllianceZone(robotPose)) {
@@ -216,11 +219,13 @@ public class FieldUtil {
                   && distanceToVirtualTarget <= ShotConstants.ferryMaxDistance.in(Meters);
         }
 
-        break;
+        return;
       }
 
       t = new_t;
       robotToVirtualTarget = target.minus(robotPose.getTranslation()).minus(robotVelocity.times(t));
     }
+
+    shotParameters.failedToConverge = true;
   }
 }

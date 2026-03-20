@@ -59,6 +59,9 @@ public class ShotParameters {
   @Logged(name = "Newton Iterations")
   public int newtonIterations = 0;
 
+  @Logged(name = "Failed To Converge")
+  public boolean failedToConverge = false;
+
   public static Matrix<N3, N1> vec3(double a, double b, double c) {
     return new Matrix<N3, N1>(N3(), N1(), new double[] {a, b, c});
   }
@@ -78,7 +81,8 @@ public class ShotParameters {
               && Math.abs(_shotHeading.minus(robotPoseSupplier.get().getRotation()).getDegrees())
                   < headingTolerance.getDegrees()
               && FieldUtil.isShotValid(robotPoseSupplier.get())
-              && inBounds;
+              && inBounds
+              && !failedToConverge;
         };
   }
 
