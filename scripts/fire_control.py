@@ -7,6 +7,7 @@ class LookupTable:
         """
         Initialize with a dictionary of key to values.
         """
+        self.data = data
         self.keys = sorted(data.keys())
         self.values = [data[k] for k in self.keys]
     
@@ -29,6 +30,15 @@ class LookupTable:
                 return y0 + (key - x0) * (y1 - y0) / (x1 - x0)
         
         return self.values[-1]
+    
+    def diff(self):
+        thing = LookupTable(self.data)
+
+        thing.values = [
+            (self.values[i] - self.values[i - 1]) / (self.keys[i] - self.keys[i - 1]) for i in range(1, len(self.keys))
+        ]
+
+        return thing
 
 def TOF(v: np.ndarray, g: np.ndarray, t: float) -> float:
     virtual_goal = g - (v * t)
@@ -44,7 +54,7 @@ def dTOF_dt(v: np.ndarray, g: np.ndarray, t: float) -> float:
         return 0
 
 
-    return -np.dot(v, virtual_goal) / (distance * projectile_velocity)
+    return -np.dot(v, virtual_goal) / (distance * projectile_EPRIME_lookup.get(distance))
 
 
 def FPI(max_iter: int):
@@ -103,7 +113,7 @@ def Newton(max_iter: int):
         virtual_goal = g - (v * t)
         distance = np.linalg.norm(virtual_goal)
 
-        dE_dt = 1 + (virtual_goal[0] * v[0] + virtual_goal[1] * v[1]) / (projectile_velocity * distance)
+        dE_dt = 1 + (virtual_goal[0] * v[0] + virtual_goal[1] * v[1]) / (projectile_EPRIME_lookup.get(distance) * distance)
 
         # print(1 - dT_dt == dE_dt)
 
@@ -154,8 +164,8 @@ def Newton(max_iter: int):
 
     # axs = plt.subplots(1, 1, figsize=(6, 4))[1]
 
-    # axs.plot(t_values, E_values, label='E(t)')
-    # axs.plot(t_values, dE_dt_values, label='E\'(t)')
+    axs.plot(t_values, E_values, label='E(t)')
+    axs.plot(t_values, dE_dt_values, label='E\'(t)')
 
     # for i, tg in enumerate(t_guesses):
     #     axs.plot(tg, tg - TOF(v, g, tg), 'o', color=colors[i], markersize=6)
@@ -176,6 +186,7 @@ projectile_velocity = 2.722
 max_iter = 1000
 
 projectile_tof_lookup = LookupTable({
+    0: 0,
     1.89: 0.955,
     2.665: 1.08,
     3.768: 1.38,
@@ -183,9 +194,12 @@ projectile_tof_lookup = LookupTable({
     5.252: 1.7
 })
 
-# t_values = np.linspace(-20, 20, 100)
-# E_values = [t - TOF(v, g, t) for t in t_values]
-# dE_dt_values = [1 - dTOF_dt(v, g, t) for t in t_values]
+projectile_EPRIME_lookup = projectile_tof_lookup.diff()
+print(projectile_EPRIME_lookup.get(1.89))
+
+t_values = np.linspace(-20, 20, 100)
+E_values = [t - TOF(v, g, t) for t in t_values]
+dE_dt_values = [1 - dTOF_dt(v, g, t) for t in t_values]
 
 Newton(max_iter)
 
