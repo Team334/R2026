@@ -325,12 +325,13 @@ public final class Constants {
     public static final Frequency odometryFrequency = Hertz.of(250);
 
     public static final Mass mass = Pounds.of(103);
-    public static final MomentOfInertia moi = KilogramSquareMeters.of(0);
+    public static final MomentOfInertia moi = KilogramSquareMeters.of(8);
 
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
     public static final AngularVelocity driverAngularVelocity = RadiansPerSecond.of(Math.PI);
 
-    public static final LinearVelocity driverTranslationalShootingVelocity = MetersPerSecond.of(2);
+    public static final LinearVelocity driverTranslationalShootingVelocity =
+        MetersPerSecond.of(1.5);
 
     public static final LinearVelocity profileTranslationalVelocity = MetersPerSecond.of(1);
     public static final LinearAcceleration profileTranslationalAcceleration =

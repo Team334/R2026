@@ -79,6 +79,10 @@ public class HolonomicController {
         new WheelForceCalculator(moduleLocations, SwerveConstants.mass, SwerveConstants.moi);
   }
 
+  public Feedforwards calculateWheelForces(double ax, double ay, double alpha) {
+    return _wheelForceCalculator.calculate(ax, ay, alpha);
+  }
+
   /** The wheel forces based on the acceleration of the profiles. */
   public Feedforwards getWheelForces() {
     return _wheelForces;

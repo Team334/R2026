@@ -17,6 +17,7 @@ import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest.*;
+import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -462,11 +463,17 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
     desiredSpeeds = _poseController.calculate(desiredSpeeds, desiredPose, getPose());
 
+    Feedforwards sampleWheelForces = _poseController.calculateWheelForces(sample.ax, sample.ay, 0);
+
     setControl(
         _fieldSpeedsRequest
             .withSpeeds(desiredSpeeds)
-            .withWheelForceFeedforwardsX(sample.moduleForcesX())
-            .withWheelForceFeedforwardsY(sample.moduleForcesY()));
+            .withWheelForceFeedforwardsX(
+                combineFeedforwards(
+                    sampleWheelForces.x_newtons, _poseController.getWheelForces().x_newtons))
+            .withWheelForceFeedforwardsY(
+                combineFeedforwards(
+                    sampleWheelForces.y_newtons, _poseController.getWheelForces().y_newtons)));
   }
 
   /** Drives the robot in a straight line to some given goal pose. */
@@ -522,6 +529,17 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   /** Wrapper for getting current robot-relative chassis speeds. */
   public ChassisSpeeds getChassisSpeeds() {
     return getState().Speeds;
+  }
+
+  /** Combines the FeedForwards from all the modules from two {@link FeedForwards} */
+  public double[] combineFeedforwards(double[] sampleFeedforwards, double[] poseFeedforwards) {
+    double[] combined = new double[sampleFeedforwards.length];
+
+    for (int i = 0; i < combined.length; i++) {
+      combined[i] = sampleFeedforwards[i] + poseFeedforwards[i];
+    }
+
+    return combined;
   }
 
   // updates pose estimator with vision

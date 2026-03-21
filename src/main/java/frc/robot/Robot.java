@@ -145,7 +145,7 @@ public class Robot extends TimedRobot {
         new ShotParameters(
             _shooter::getFlywheelSpeed,
             _swerve::getPose,
-            RotationsPerSecond.of(2),
+            RotationsPerSecond.of(6),
             Rotation2d.fromDegrees(5));
 
     configureDriverBindings();
@@ -176,6 +176,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Calculate Chassis MOI", _swerve.calculateMOI());
     SmartDashboard.putData(
         "Calculate Motor Max Speed And Torque", _swerve.calculateMotorMaxSpeedAndTorque());
+
+    SmartDashboard.putData("Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)));
 
     SmartDashboard.putData(
         "Robot Self Check",
