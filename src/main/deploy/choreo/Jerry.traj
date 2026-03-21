@@ -1,5 +1,5 @@
 {
- "name":"Jerry.traj",
+ "name":"Jerry",
  "version":3,
  "snapshot":{
   "waypoints":[
@@ -71,16 +71,16 @@
     {"from":"first", "to":"last", "data":{"type":"KeepOutCircle", "props":{"x":{"exp":"4.625668669119477 m", "val":4.625668669119477}, "y":{"exp":"1.8539987854 m", "val":1.8539987854}, "r":{"exp":"0.826396949005302 m", "val":0.826396949005302}}}, "enabled":true},
     {"from":"first", "to":"last", "data":{"type":"KeepInRectangle", "props":{"x":{"exp":"0 m", "val":0.0}, "y":{"exp":"0 m", "val":0.0}, "w":{"exp":"16.541 m", "val":16.541}, "h":{"exp":"8.0629 m", "val":8.0629}}}, "enabled":true},
     {"from":6, "to":7, "data":{"type":"PointAt", "props":{"x":{"exp":"4.624067783355713 m", "val":4.624067783355713}, "y":{"exp":"4.038748741149902 m", "val":4.038748741149902}, "tolerance":{"exp":"0.017 rad", "val":0.017}, "flip":false}}, "enabled":true},
-    {"from":6, "to":7, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"2 m/s", "val":2.0}}}, "enabled":true},
+    {"from":6, "to":7, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"2 m / s", "val":2.0}}}, "enabled":true},
     {"from":8, "to":9, "data":{"type":"KeepInLane", "props":{"tolerance":{"exp":"0.03 m", "val":0.03}}}, "enabled":true},
     {"from":10, "to":11, "data":{"type":"PointAt", "props":{"x":{"exp":"4.624067783355713 m", "val":4.624067783355713}, "y":{"exp":"4.038748741149902 m", "val":4.038748741149902}, "tolerance":{"exp":"0.071 rad", "val":0.071}, "flip":false}}, "enabled":true},
-    {"from":10, "to":11, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"2 m/s", "val":2.0}}}, "enabled":true},
+    {"from":10, "to":11, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"2 m / s", "val":2.0}}}, "enabled":true},
     {"from":16, "to":17, "data":{"type":"PointAt", "props":{"x":{"exp":"4.624067783355713 m", "val":4.624067783355713}, "y":{"exp":"4.038748741149902 m", "val":4.038748741149902}, "tolerance":{"exp":"0.017 rad", "val":0.017}, "flip":false}}, "enabled":true},
-    {"from":16, "to":17, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"2 m/s", "val":2.0}}}, "enabled":true},
+    {"from":16, "to":17, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"2 m / s", "val":2.0}}}, "enabled":true},
     {"from":17, "to":18, "data":{"type":"KeepOutCircle", "props":{"x":{"exp":"0.91920355707407 m", "val":0.91920355707407}, "y":{"exp":"3.742240246385336 m", "val":3.742240246385336}, "r":{"exp":"0.8 m", "val":0.8}}}, "enabled":true},
     {"from":18, "to":19, "data":{"type":"KeepInLane", "props":{"tolerance":{"exp":"0.03 m", "val":0.03}}}, "enabled":true},
-    {"from":18, "to":19, "data":{"type":"MaxAngularVelocity", "props":{"max":{"exp":"0 rad/s", "val":0.0}}}, "enabled":true},
-    {"from":18, "to":19, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"1 m/s", "val":1.0}}}, "enabled":true}],
+    {"from":18, "to":19, "data":{"type":"MaxAngularVelocity", "props":{"max":{"exp":"0 rad / s", "val":0.0}}}, "enabled":true},
+    {"from":18, "to":19, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"1 m / s", "val":1.0}}}, "enabled":true}],
   "targetDt":{
    "exp":"0.05 s",
    "val":0.05

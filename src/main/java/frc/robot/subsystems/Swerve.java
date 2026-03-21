@@ -17,6 +17,7 @@ import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest.*;
+import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -462,15 +463,17 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
     desiredSpeeds = _poseController.calculate(desiredSpeeds, desiredPose, getPose());
 
+    Feedforwards sampleWheelForces = _poseController.calculateWheelForces(sample.ax, sample.ay, 0);
+
     setControl(
         _fieldSpeedsRequest
             .withSpeeds(desiredSpeeds)
             .withWheelForceFeedforwardsX(
                 combineFeedforwards(
-                    sample.moduleForcesX(), _poseController.getWheelForces().x_newtons))
+                    sampleWheelForces.x_newtons, _poseController.getWheelForces().x_newtons))
             .withWheelForceFeedforwardsY(
                 combineFeedforwards(
-                    sample.moduleForcesY(), _poseController.getWheelForces().y_newtons)));
+                    sampleWheelForces.y_newtons, _poseController.getWheelForces().y_newtons)));
   }
 
   /** Drives the robot in a straight line to some given goal pose. */
@@ -528,6 +531,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     return getState().Speeds;
   }
 
+  /** Combines the FeedForwards from all the modules from two {@link FeedForwards} */
   public double[] combineFeedforwards(double[] sampleFeedforwards, double[] poseFeedforwards) {
     double[] combined = new double[sampleFeedforwards.length];
 

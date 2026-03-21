@@ -325,7 +325,7 @@ public final class Constants {
     public static final Frequency odometryFrequency = Hertz.of(250);
 
     public static final Mass mass = Pounds.of(103);
-    public static final MomentOfInertia moi = KilogramSquareMeters.of(0);
+    public static final MomentOfInertia moi = KilogramSquareMeters.of(8);
 
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
     public static final AngularVelocity driverAngularVelocity = RadiansPerSecond.of(Math.PI);

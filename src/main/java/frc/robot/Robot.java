@@ -177,6 +177,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData(
         "Calculate Motor Max Speed And Torque", _swerve.calculateMotorMaxSpeedAndTorque());
 
+    SmartDashboard.putData("Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)));
+
     SmartDashboard.putData(
         "Robot Self Check",
         sequence(
