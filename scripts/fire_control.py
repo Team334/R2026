@@ -82,7 +82,7 @@ def FPI(max_iter: int):
 def Newton(max_iter: int):
     print("\nNewton")
 
-    t = 0
+    t = np.linalg.norm(g) / (np.dot(g, v) / np.norm(g) + projectile_velocity)
 
     for i in range(max_iter):
         E = t - TOF(v, g, t)
@@ -124,20 +124,23 @@ def Newton(max_iter: int):
 v = np.array([5, 25])
 g = np.array([0, 15])
 
-projectile_velocity = 30
+projectile_velocity = 2.722
 
-max_iter = 200
+max_iter = 20
 
 projectile_tof_lookup = LookupTable({
-    i: i / (projectile_velocity * random.uniform(0.8, 1.2))
-    for i in range(1, 21)  # 1 through 20 inclusive
+    1.89: 0.955,
+    2.665: 1.08,
+    3.768: 1.38,
+    4.574: 1.53,
+    5.252: 1.525
 })
 
 t_values = np.linspace(0, 20, 100)
 tof_values = [TOF(v, g, t) for t in t_values]
 dtof_dt_values = [dTOF_dt(v, g, t) for t in t_values]
 
-FPI(max_iter)
+# FPI(max_iter)
 Newton(max_iter)
 
 plt.show()
