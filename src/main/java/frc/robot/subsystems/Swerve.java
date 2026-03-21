@@ -465,8 +465,12 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     setControl(
         _fieldSpeedsRequest
             .withSpeeds(desiredSpeeds)
-            .withWheelForceFeedforwardsX(sample.moduleForcesX())
-            .withWheelForceFeedforwardsY(sample.moduleForcesY()));
+            .withWheelForceFeedforwardsX(
+                combineFeedforwards(
+                    sample.moduleForcesX(), _poseController.getWheelForces().x_newtons))
+            .withWheelForceFeedforwardsY(
+                combineFeedforwards(
+                    sample.moduleForcesY(), _poseController.getWheelForces().y_newtons)));
   }
 
   /** Drives the robot in a straight line to some given goal pose. */
@@ -522,6 +526,16 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   /** Wrapper for getting current robot-relative chassis speeds. */
   public ChassisSpeeds getChassisSpeeds() {
     return getState().Speeds;
+  }
+
+  public double[] combineFeedforwards(double[] sampleFeedforwards, double[] poseFeedforwards) {
+    double[] combined = new double[sampleFeedforwards.length];
+
+    for (int i = 0; i < combined.length; i++) {
+      combined[i] = sampleFeedforwards[i] + poseFeedforwards[i];
+    }
+
+    return combined;
   }
 
   // updates pose estimator with vision
