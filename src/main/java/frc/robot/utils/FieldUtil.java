@@ -164,15 +164,22 @@ public class FieldUtil {
 
     shotParameters.setTarget(target);
 
-    double t = 0;
-
     Translation2d robotVelocity =
         new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
 
-    Translation2d robotToVirtualTarget =
-        target.minus(robotPose.getTranslation()).minus(robotVelocity.times(t));
+    Translation2d robotToVirtualTarget = target.minus(robotPose.getTranslation());
+
+    // initial guess for t
+    double t =
+        robotToVirtualTarget.getNorm()
+            / (robotToVirtualTarget.dot(robotVelocity) / robotToVirtualTarget.getNorm()
+                + projectileHorizontalVelocity.in(MetersPerSecond));
+
+    t = Math.abs(t);
 
     for (int i = 0; i < maxIter; i++) {
+      robotToVirtualTarget = target.minus(robotPose.getTranslation()).minus(robotVelocity.times(t));
+
       double T = TOFs.get(robotToVirtualTarget.getNorm());
       double dT_dt =
           -robotToVirtualTarget.dot(robotVelocity)
@@ -180,8 +187,6 @@ public class FieldUtil {
 
       double E = t - T;
       double dE_dt = 1 - dT_dt;
-
-      double new_t = t - (E / dE_dt);
 
       // figure out error sensitivity on first iteration
       if (i == 0) {
@@ -194,9 +199,9 @@ public class FieldUtil {
                             / (robotToVirtualTarget.getNorm() * robotVelocity.getNorm()))));
       }
 
-      // finish and update shot parameters converged on E(t) = 0
-      if (Math.abs(new_t - t) < E_tolerance) {
-        Translation2d virtualTarget = target.minus(robotVelocity.times(new_t));
+      // finish and update shot parameters once converged on E(t) = 0
+      if (Math.abs(E) < E_tolerance) {
+        Translation2d virtualTarget = target.minus(robotVelocity.times(t));
 
         double distanceToVirtualTarget = virtualTarget.getDistance(robotPose.getTranslation());
 
@@ -222,8 +227,7 @@ public class FieldUtil {
         return;
       }
 
-      t = new_t;
-      robotToVirtualTarget = target.minus(robotPose.getTranslation()).minus(robotVelocity.times(t));
+      t = t - (E / dE_dt);
     }
 
     shotParameters.failedToConverge = true;
