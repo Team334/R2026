@@ -195,6 +195,9 @@ public final class Constants {
     public static final Distance ferryMinDistance = Meters.of(2.767);
     public static final Distance ferryMaxDistance = Meters.of(4.0);
 
+    public static final LinearVelocity hubProjectileHorizontalVelocity = MetersPerSecond.of(2.722);
+    public static final LinearVelocity ferryProjectileHorizontalVelocity = MetersPerSecond.of(2);
+
     // distanceMeters : TOFSecs
     public static InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
     public static InterpolatingDoubleTreeMap ferryTOFs = new InterpolatingDoubleTreeMap();

@@ -5,28 +5,23 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShotConstants;
-import frc.robot.Constants.SwerveConstants;
 
 public class FieldUtil {
   // newton's method constants
-  private static final int maxIter = 20;
-  private static final LinearVelocity projectileHorizontalVelocity = MetersPerSecond.of(2.722);
+  private static final int maxIter = 15;
   private static final double E_tolerance = 0.1;
-  private static final double dT_dt_tolerance =
-      SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)
-          * Math.cos(Math.toRadians(20)) // min overlap angle at worst-case robot velocity
-          / projectileHorizontalVelocity.in(MetersPerSecond);
+  private static final double dT_dt_tolerance = 0.7;
 
   private static double prevSwitchTime = 110; // starts at first transition shift
 
@@ -160,6 +155,19 @@ public class FieldUtil {
     InterpolatingDoubleTreeMap TOFs =
         inAllianceZone(robotPose) ? ShotConstants.hubTOFs : ShotConstants.ferryTOFs;
 
+    double minDistance =
+        (inAllianceZone(robotPose) ? ShotConstants.hubMinDistance : ShotConstants.ferryMinDistance)
+            .in(Meters);
+    double maxDistance =
+        (inAllianceZone(robotPose) ? ShotConstants.hubMaxDistance : ShotConstants.ferryMaxDistance)
+            .in(Meters);
+
+    double projectileHorizontalVelocity =
+        (inAllianceZone(robotPose)
+                ? ShotConstants.hubProjectileHorizontalVelocity
+                : ShotConstants.ferryProjectileHorizontalVelocity)
+            .in(MetersPerSecond);
+
     Translation2d target = getShotTarget(robotPose);
 
     shotParameters.setTarget(target);
@@ -173,23 +181,28 @@ public class FieldUtil {
     double t =
         robotToVirtualTarget.getNorm()
             / (robotToVirtualTarget.dot(robotVelocity) / robotToVirtualTarget.getNorm()
-                + projectileHorizontalVelocity.in(MetersPerSecond));
-
-    t = Math.abs(t);
+                + projectileHorizontalVelocity);
 
     for (int i = 0; i < maxIter; i++) {
       robotToVirtualTarget = target.minus(robotPose.getTranslation()).minus(robotVelocity.times(t));
 
       double T = TOFs.get(robotToVirtualTarget.getNorm());
-      double dT_dt =
-          -robotToVirtualTarget.dot(robotVelocity)
-              / (projectileHorizontalVelocity.in(MetersPerSecond) * robotToVirtualTarget.getNorm());
+      double dT_dt = 0;
+
+      // if D is within LUT
+      if (robotToVirtualTarget.getNorm()
+          == MathUtil.clamp(robotToVirtualTarget.getNorm(), minDistance, maxDistance)) {
+        dT_dt =
+            -robotToVirtualTarget.dot(robotVelocity)
+                / (projectileHorizontalVelocity * robotToVirtualTarget.getNorm());
+      }
 
       double E = t - T;
       double dE_dt = 1 - dT_dt;
 
-      // figure out error sensitivity on first iteration
-      if (i == 0) {
+      // finish and update shot parameters once converged to E(t) = 0
+      if (Math.abs(E) < E_tolerance) {
+        // check if robot velocity vector and projectile velocity vector are strongly aligned
         shotParameters.isErrorSensitive = Math.abs(dT_dt) > dT_dt_tolerance;
         shotParameters.couplingDegrees =
             Math.toDegrees(
@@ -197,10 +210,7 @@ public class FieldUtil {
                     Math.abs(
                         robotToVirtualTarget.dot(robotVelocity)
                             / (robotToVirtualTarget.getNorm() * robotVelocity.getNorm()))));
-      }
 
-      // finish and update shot parameters once converged on E(t) = 0
-      if (Math.abs(E) < E_tolerance) {
         Translation2d virtualTarget = target.minus(robotVelocity.times(t));
 
         double distanceToVirtualTarget = virtualTarget.getDistance(robotPose.getTranslation());
@@ -214,15 +224,8 @@ public class FieldUtil {
         shotParameters.failedToConverge = false;
 
         // check if shot is in bounds
-        if (inAllianceZone(robotPose)) {
-          shotParameters.inBounds =
-              ShotConstants.hubMinDistance.in(Meters) <= distanceToVirtualTarget
-                  && distanceToVirtualTarget <= ShotConstants.hubMaxDistance.in(Meters);
-        } else {
-          shotParameters.inBounds =
-              ShotConstants.ferryMinDistance.in(Meters) <= distanceToVirtualTarget
-                  && distanceToVirtualTarget <= ShotConstants.ferryMaxDistance.in(Meters);
-        }
+        shotParameters.inBounds =
+            minDistance <= distanceToVirtualTarget && distanceToVirtualTarget <= maxDistance;
 
         return;
       }

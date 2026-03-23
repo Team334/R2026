@@ -48,6 +48,7 @@ def dTOF_dt(v: np.ndarray, g: np.ndarray, t: float) -> float:
 
     return -np.dot(v, virtual_goal) / (distance * projectile_velocity)
 
+# TODO fix later to account for out of bounds TOF inputs, and add the new visualizations
 
 # def FPI(max_iter: int):
 #     print("\nFPI")
@@ -98,20 +99,17 @@ def Newton(max_iter: int):
         dT_dt = dTOF_dt(v, g, t)
 
         if np.linalg.norm(g - v * t) != clamp(np.linalg.norm(g - v * t), min_shot_distance, max_shot_distance):
-            print(f"out of bounds iteration {i+1}, D {np.linalg.norm(g - v * t) != clamp(np.linalg.norm(g - v * t), min_shot_distance, max_shot_distance)}")
             dT_dt = 0
 
         E = t - T
         dE_dt = 1 - dT_dt
 
-        print(f"newton iteration {i+1}: t = {t}, E={E}, E'={dE_dt}")
-
-        # input()
+        print(f"newton iteration {i+1}: t = {t}, E={E}, E'={dE_dt}, D = {np.linalg.norm(g - v * t)}")
 
         t = t - (E / dE_dt)
 
         if abs(E) < 0.1:
-            print("t has been found - converged after {} iterations.".format(i + 1))
+            print(f"t has been found - converged after {i + 1} iterations")
             break
 
     # plot everything
@@ -130,10 +128,8 @@ def Newton(max_iter: int):
     axs_vec.set_title("Newton Method Virtual Targets")
 
     axs_vec.plot(g[0], g[1], 'o', color='blue', markersize=8)
-
-    n = len(virtual_targets)
     
-    alphas = np.linspace(0.01, 1.0, n)
+    alphas = np.linspace(0.2, 1.0, len(virtual_targets)) # light to dark
     
     for i, vt in enumerate(virtual_targets):
         axs_vec.plot(vt[0], vt[1], 'o', color='green', alpha=alphas[i], markersize=6)
@@ -153,19 +149,19 @@ def Newton(max_iter: int):
     axs.legend()
 
 
-v = np.array([0, -2])
-g = np.array([0, 5])
+v = np.array([-2, 2])
+g = np.array([-1.5, 1.5])
 
 projectile_velocity = 2.722
 
-max_iter = 100
+max_iter = 15
 
 projectile_tof_lookup = LookupTable({
     1.89: 0.955,
     2.665: 1.08,
     3.768: 1.38,
     4.574: 1.53,
-    5.252: 1.51
+    5.252: 1.51 # this point is ass
 })
 
 min_shot_distance = 1.89
@@ -175,8 +171,8 @@ t_values = np.linspace(-20, 20, 100)
 
 E_values = [t - TOF(v, g, t) for t in t_values]
 dE_dt_values = []
-dE_dt_values_wrong = [1 - dTOF_dt(v, g, t) for t in t_values]
 
+# build dE_dt CORRECTLY
 for t in t_values:
     if np.linalg.norm(g - v * t) != clamp(np.linalg.norm(g - v * t), min_shot_distance, max_shot_distance):
         dE_dt_values.append(1)
@@ -184,16 +180,6 @@ for t in t_values:
 
     dE_dt_values.append(1 - dTOF_dt(v, g, t))
 
-# Newton(max_iter)
-
-fig, ax = plt.subplots(figsize=(8, 6))
-ax.plot(t_values, E_values, label='E(t)', linewidth=2)
-ax.plot(t_values, dE_dt_values, label="E'(t)", linewidth=2)
-ax.plot(t_values, dE_dt_values_wrong, label="E'(t) wrong", linewidth=2)
-ax.set_xlabel('t')
-ax.set_ylabel('Value')
-ax.set_title('E(t) and E\'(t)')
-ax.grid(True) 
-ax.legend()
+Newton(max_iter)
 
 plt.show()
