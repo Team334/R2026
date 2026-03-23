@@ -71,13 +71,12 @@ public class ShotParameters {
   }
 
   public ShotParameters(
-      Supplier<AngularVelocity> flywheelVelocitySupplier,
+      BooleanSupplier shooterInTolerance,
       Supplier<Pose2d> robotPoseSupplier,
-      AngularVelocity flywheelVelocityTolerance,
       Rotation2d headingTolerance) {
     _isReadyToShoot =
         () -> {
-          return flywheelVelocitySupplier.get().isNear(_flywheelSpeed, flywheelVelocityTolerance)
+          return shooterInTolerance.getAsBoolean()
               && Math.abs(_shotHeading.minus(robotPoseSupplier.get().getRotation()).getDegrees())
                   < headingTolerance.getDegrees()
               && FieldUtil.isShotValid(robotPoseSupplier.get())

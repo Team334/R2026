@@ -55,6 +55,8 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Idle Velocity Percentage")
   private final double idleVelocityPercentage = 0.5;
 
+  private boolean _inTolerance = false;
+
   private final Supplier<ShotParameters> _shotParametersSupplier;
 
   private final SysIdRoutine _flywheelRoutine =
@@ -204,12 +206,19 @@ public class Shooter extends AdvancedSubsystem {
   }
 
   private void setFlywheelSpeed(AngularVelocity speed) {
+    double errorRPS = speed.minus(getFlywheelSpeed()).in(RotationsPerSecond);
+    double toleranceRPS =
+        _inTolerance
+            ? ShooterConstants.shootingVelocityTolerance.in(RotationsPerSecond)
+            : ShooterConstants.windupVelocityTolerance.in(RotationsPerSecond);
+
     // asymmetrical bang-bang for speeding up
-    if (speed.minus(getFlywheelSpeed()).in(RotationsPerSecond)
-        > ShotConstants.flywheelVelocityThreshold.in(RotationsPerSecond)) {
+    if (errorRPS > toleranceRPS) {
       _flywheelMotor.setControl(_flywheelDutyCycleSetter.withOutput(1));
+      _inTolerance = false;
     } else {
       _flywheelMotor.setControl(_flywheelVelocitySetter.withVelocity(speed));
+      _inTolerance = true;
     }
   }
 
@@ -239,6 +248,11 @@ public class Shooter extends AdvancedSubsystem {
           setFlywheelSpeed(ShotConstants.spitFlywheelSpeed);
         })
         .withName("Spit");
+  }
+
+  @Logged(name = "In Tolerance")
+  public boolean inTolerance() {
+    return _inTolerance;
   }
 
   @Logged(name = "Flywheel Speed")

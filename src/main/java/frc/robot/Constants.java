@@ -181,8 +181,6 @@ public final class Constants {
     public static final AngularVelocity spitRollerSpeed = RotationsPerSecond.of(1);
     public static final AngularVelocity spitFloorSpeed = RotationsPerSecond.of(1);
 
-    public static final AngularVelocity flywheelVelocityThreshold = RotationsPerSecond.of(3);
-
     // distanceMeters : <flywheelRPS, rollerRPS, floorRPS>
     public static InterpolatingMatrixTreeMap<Double, N3, N1> hubPresets =
         new InterpolatingMatrixTreeMap<>();
@@ -234,6 +232,9 @@ public final class Constants {
         Volts.per(RotationsPerSecond).ofNative(0.13334);
     public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkP =
         Volts.per(RotationsPerSecond).ofNative(0.2);
+
+    public static final AngularVelocity windupVelocityTolerance = RotationsPerSecond.of(3);
+    public static final AngularVelocity shootingVelocityTolerance = RotationsPerSecond.of(6);
 
     public static final double flywheelGearRatio = 1.2;
   }

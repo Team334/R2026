@@ -142,11 +142,7 @@ public class Robot extends TimedRobot {
     FaultLogger.setup(_ntInst);
 
     _shotParameters =
-        new ShotParameters(
-            _shooter::getFlywheelSpeed,
-            _swerve::getPose,
-            RotationsPerSecond.of(6),
-            Rotation2d.fromDegrees(5));
+        new ShotParameters(_shooter::inTolerance, _swerve::getPose, Rotation2d.fromDegrees(5));
 
     configureDriverBindings();
 
