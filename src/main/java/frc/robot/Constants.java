@@ -233,7 +233,9 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkP =
         Volts.per(RotationsPerSecond).ofNative(0.2);
 
-    public static final AngularVelocity windupVelocityTolerance = RotationsPerSecond.of(3);
+    public static final AngularVelocity bangBangVelocityTolerance = RotationsPerSecond.of(3);
+
+    public static final AngularVelocity windupVelocityTolerance = RotationsPerSecond.of(1);
     public static final AngularVelocity shootingVelocityTolerance = RotationsPerSecond.of(6);
 
     public static final double flywheelGearRatio = 1.2;

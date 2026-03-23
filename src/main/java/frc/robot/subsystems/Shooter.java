@@ -212,17 +212,22 @@ public class Shooter extends AdvancedSubsystem {
             ? ShooterConstants.shootingVelocityTolerance.in(RotationsPerSecond)
             : ShooterConstants.windupVelocityTolerance.in(RotationsPerSecond);
 
-    // asymmetrical bang-bang for speeding up
+    // in tolerance for shooting
     if (errorRPS > toleranceRPS) {
-      _flywheelMotor.setControl(_flywheelDutyCycleSetter.withOutput(1));
       _inTolerance = false;
     } else {
-      _flywheelMotor.setControl(_flywheelVelocitySetter.withVelocity(speed));
       _inTolerance = true;
+    }
+
+    // asymmetrical bang-bang for speeding up
+    if (errorRPS > ShooterConstants.bangBangVelocityTolerance.in(RotationsPerSecond)) {
+      _flywheelMotor.setControl(_flywheelDutyCycleSetter.withOutput(1));
+    } else {
+      _flywheelMotor.setControl(_flywheelVelocitySetter.withVelocity(speed));
     }
   }
 
-  /** Set flywheels to {@link #idleVelocityPercentage} of shooting speed. */
+  /** Set flywheel to {@link #idleVelocityPercentage} of shooting speed. */
   public Command idle() {
     return run(() -> {
           ShotParameters parameters = _shotParametersSupplier.get();
@@ -250,6 +255,7 @@ public class Shooter extends AdvancedSubsystem {
         .withName("Spit");
   }
 
+  /** Whether the shooter flywheel is in velocity tolerance for shooting. */
   @Logged(name = "In Tolerance")
   public boolean inTolerance() {
     return _inTolerance;
