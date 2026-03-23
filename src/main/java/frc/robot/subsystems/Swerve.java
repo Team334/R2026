@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
@@ -219,6 +220,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     SysId.displayRoutine("Swerve Rotation", _rotationRoutine);
 
     registerFallibles();
+
+    autonomous().onTrue(Commands.runOnce(() -> _mustResetRotationTrajectory = true));
 
     if (Robot.isSimulation()) {
       startSimThread();
