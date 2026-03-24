@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
@@ -88,7 +87,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   // for drive facing
   private Rotation2d _previousRotationGoal = Rotation2d.kZero;
   private double _lastRotationLoopTime = 0;
-  private boolean _mustResetRotationController = true;
 
   private double _lastSimTime = 0;
   private Notifier _simNotifier;
@@ -224,8 +222,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     SysId.displayRoutine("Swerve Rotation", _rotationRoutine);
 
     registerFallibles();
-
-    autonomous().onTrue(Commands.runOnce(() -> _mustResetRotationController = true));
 
     if (Robot.isSimulation()) {
       startSimThread();
@@ -381,13 +377,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
                       .omegaRadiansPerSecond
                   + omegaFeedforward;
             })
-        .beforeStarting(
-            runOnce(
-                () -> {
-                  isOpenLoop = false;
-
-                  _poseController.resetPID();
-                }))
+        .beforeStarting(runOnce(() -> isOpenLoop = false))
         .withName("Drive Facing");
   }
 
@@ -428,8 +418,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param sample The SwerveSample.
    */
   public void followTrajectory(SwerveSample sample) {
-    _mustResetRotationController = true;
-
     ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
     Pose2d desiredPose = sample.getPose();
 
@@ -450,12 +438,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param heading Heading to follow.
    */
   public void followTrajectoryFacing(SwerveSample sample, Rotation2d heading) {
-    if (_mustResetRotationController) {
-      _poseController.resetPID();
-
-      _mustResetRotationController = false;
-    }
-
     ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
     Pose2d desiredPose = sample.getPose();
 
@@ -473,18 +455,15 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
     desiredSpeeds = _poseController.calculate(desiredSpeeds, desiredPose, getPose());
 
+    // assume shot heading second deriv is low (and choreo accel is low) and set alpha to 0
     Feedforwards sampleLinearForces =
         _poseController.getWheelForceCalculator().calculate(sample.ax, sample.ay, 0);
 
     setControl(
         _fieldSpeedsRequest
             .withSpeeds(desiredSpeeds)
-            .withWheelForceFeedforwardsX(
-                combineFeedforwards(
-                    sampleLinearForces.x_newtons, _poseController.getWheelForces().x_newtons))
-            .withWheelForceFeedforwardsY(
-                combineFeedforwards(
-                    sampleLinearForces.y_newtons, _poseController.getWheelForces().y_newtons)));
+            .withWheelForceFeedforwardsX(sampleLinearForces.x_newtons)
+            .withWheelForceFeedforwardsY(sampleLinearForces.y_newtons));
   }
 
   /** Drives the robot in a straight line to some given goal pose. */
@@ -515,8 +494,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
                   getPose(),
                   goalPose.get(),
                   ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getHeading()));
-
-              _poseController.resetPID();
             })
         .until(_poseController::isFinished)
         .withName("Drive To");
@@ -540,17 +517,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   /** Wrapper for getting current robot-relative chassis speeds. */
   public ChassisSpeeds getChassisSpeeds() {
     return getState().Speeds;
-  }
-
-  /** Combines the FeedForwards from all the modules from two {@link FeedForwards} */
-  public double[] combineFeedforwards(double[] sampleFeedforwards, double[] poseFeedforwards) {
-    double[] combined = new double[sampleFeedforwards.length];
-
-    for (int i = 0; i < combined.length; i++) {
-      combined[i] = sampleFeedforwards[i] + poseFeedforwards[i];
-    }
-
-    return combined;
   }
 
   // updates pose estimator with vision

@@ -107,14 +107,6 @@ public class HolonomicController {
         && _headingProfile.getSetpoint().equals(_headingProfile.getGoal());
   }
 
-  /** Resets the PID controllers. */
-  public void resetPID() {
-    _xController.reset();
-    _yController.reset();
-
-    _headingController.reset();
-  }
-
   /**
    * Resets the profiles.
    *
