@@ -87,8 +87,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   // for drive facing
   private Rotation2d _previousRotationGoal = Rotation2d.kZero;
-  private boolean _mustResetRotationController = true;
   private double _lastRotationLoopTime = 0;
+  private boolean _mustResetRotationController = true;
 
   private double _lastSimTime = 0;
   private Notifier _simNotifier;
@@ -373,6 +373,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
                       / (Timer.getFPGATimestamp() - _lastRotationLoopTime);
 
               _previousRotationGoal = heading.get();
+              _lastRotationLoopTime = Timer.getFPGATimestamp();
 
               return _poseController.calculate(
                           new Pose2d(Translation2d.kZero, heading.get()),
@@ -384,9 +385,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
             runOnce(
                 () -> {
                   isOpenLoop = false;
-
-                  _previousRotationGoal = getHeading();
-                  _lastRotationLoopTime = Timer.getFPGATimestamp();
 
                   _poseController.resetPID();
                 }))
