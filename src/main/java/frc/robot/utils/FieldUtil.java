@@ -23,8 +23,6 @@ public class FieldUtil {
   private static final double E_tolerance = 0.1;
   private static final double dT_dt_tolerance = 0.7;
 
-  private static double prevSwitchTime = 110; // starts at first transition shift
-
   /** Logs FieldUtil methods. */
   public static void log(Pose2d robotPose) {
     DogLog.log("FieldUtil/Alliance", getAlliance());
@@ -59,26 +57,31 @@ public class FieldUtil {
 
   /** Checks whether this alliance's hub is active. */
   public static boolean isHubActive() {
-    if (DriverStation.isAutonomous() || DriverStation.getMatchTime() <= 30) {
+    double time = DriverStation.getMatchTime();
+
+    if (DriverStation.isAutonomous() || time <= 30 || time >= 130) {
       return true;
     }
 
     String data = DriverStation.getGameSpecificMessage();
+    if (data.isEmpty()) return true;
+
     boolean active = false;
 
     switch (getAlliance()) {
       case Blue:
-        active = data.charAt(0) == 'B';
+        active = data.charAt(0) != 'B';
         break;
 
       case Red:
-        active = data.charAt(0) == 'R';
+        active = data.charAt(0) != 'R';
         break;
     }
 
-    if (prevSwitchTime - 25 >= DriverStation.getMatchTime()) {
+    int flips = (int) ((130 - time) / 25.0);
+
+    if (flips % 2 == 1) {
       active = !active;
-      prevSwitchTime = DriverStation.getMatchTime();
     }
 
     return active;
