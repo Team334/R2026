@@ -41,6 +41,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -84,7 +85,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   private final HolonomicController _poseController =
       new HolonomicController(getKinematics().getModules());
 
-  private boolean _mustResetRotationTrajectory = true;
+  private Rotation2d _previousRotationGoal = Rotation2d.kZero;
+  private boolean _mustResetRotationController = true;
+
+  private double _lastLoopTime = 0;
 
   private double _lastSimTime = 0;
   private Notifier _simNotifier;
@@ -221,7 +225,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
     registerFallibles();
 
-    autonomous().onTrue(Commands.runOnce(() -> _mustResetRotationTrajectory = true));
+    autonomous().onTrue(Commands.runOnce(() -> _mustResetRotationController = true));
 
     if (Robot.isSimulation()) {
       startSimThread();
@@ -364,21 +368,24 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
             velX,
             velY,
             () -> {
-              _poseController.nextSetpointRotation(getHeading(), heading.get());
+              double omegaFeedforward =
+                  (heading.get().getRadians() - _previousRotationGoal.getRadians())
+                      / (Timer.getFPGATimestamp() - _lastLoopTime);
+
+              _previousRotationGoal = heading.get();
 
               return _poseController.calculate(
-                      _poseController.getSetpointSpeeds(),
-                      _poseController.getSetpointPose(),
-                      new Pose2d(Translation2d.kZero, getHeading()))
-                  .omegaRadiansPerSecond;
+                          new Pose2d(Translation2d.kZero, heading.get()),
+                          new Pose2d(Translation2d.kZero, getHeading()))
+                      .omegaRadiansPerSecond
+                  + omegaFeedforward;
             })
         .beforeStarting(
             runOnce(
                 () -> {
                   isOpenLoop = false;
 
-                  _poseController.resetRotation(
-                      getHeading(), getChassisSpeeds().omegaRadiansPerSecond);
+                  _previousRotationGoal = getHeading();
 
                   _poseController.resetPID();
                 }))
@@ -422,7 +429,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param sample The SwerveSample.
    */
   public void followTrajectory(SwerveSample sample) {
-    _mustResetRotationTrajectory = true;
+    _mustResetRotationController = true;
 
     ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
     Pose2d desiredPose = sample.getPose();
@@ -444,39 +451,40 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param heading Heading to follow.
    */
   public void followTrajectoryFacing(SwerveSample sample, Rotation2d heading) {
-    if (_mustResetRotationTrajectory) {
-      _poseController.resetRotation(getHeading(), getChassisSpeeds().omegaRadiansPerSecond);
+    if (_mustResetRotationController) {
+      _poseController.resetPID();
 
-      _mustResetRotationTrajectory = false;
+      _mustResetRotationController = false;
     }
 
     ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
     Pose2d desiredPose = sample.getPose();
 
-    _poseController.nextSetpointRotation(getHeading(), heading);
-
     desiredSpeeds =
         new ChassisSpeeds(
             desiredSpeeds.vxMetersPerSecond,
             desiredSpeeds.vyMetersPerSecond,
-            _poseController.getSetpointSpeeds().omegaRadiansPerSecond);
+            (heading.getRadians() - _previousRotationGoal.getRadians())
+                / (Timer.getFPGATimestamp() - _lastLoopTime));
 
-    desiredPose =
-        new Pose2d(desiredPose.getTranslation(), _poseController.getSetpointPose().getRotation());
+    _previousRotationGoal = heading;
+
+    desiredPose = new Pose2d(desiredPose.getTranslation(), heading);
 
     desiredSpeeds = _poseController.calculate(desiredSpeeds, desiredPose, getPose());
 
-    Feedforwards sampleWheelForces = _poseController.calculateWheelForces(sample.ax, sample.ay, 0);
+    Feedforwards sampleLinearForces =
+        _poseController.getWheelForceCalculator().calculate(sample.ax, sample.ay, 0);
 
     setControl(
         _fieldSpeedsRequest
             .withSpeeds(desiredSpeeds)
             .withWheelForceFeedforwardsX(
                 combineFeedforwards(
-                    sampleWheelForces.x_newtons, _poseController.getWheelForces().x_newtons))
+                    sampleLinearForces.x_newtons, _poseController.getWheelForces().x_newtons))
             .withWheelForceFeedforwardsY(
                 combineFeedforwards(
-                    sampleWheelForces.y_newtons, _poseController.getWheelForces().y_newtons)));
+                    sampleLinearForces.y_newtons, _poseController.getWheelForces().y_newtons)));
   }
 
   /** Drives the robot in a straight line to some given goal pose. */
@@ -580,6 +588,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   @Override
   public void periodic() {
     DogLog.time("Timing/Swerve/periodic()");
+
+    _lastLoopTime = Timer.getFPGATimestamp();
 
     updateVisionPoseEstimates();
 

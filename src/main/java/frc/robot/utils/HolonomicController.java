@@ -66,6 +66,8 @@ public class HolonomicController {
 
   private ChassisSpeeds _prevSetpointSpeeds = new ChassisSpeeds();
 
+  private final ChassisSpeeds zeroSpeeds = new ChassisSpeeds();
+
   /**
    * Creates a new HolonomicController.
    *
@@ -79,8 +81,9 @@ public class HolonomicController {
         new WheelForceCalculator(moduleLocations, SwerveConstants.mass, SwerveConstants.moi);
   }
 
-  public Feedforwards calculateWheelForces(double ax, double ay, double alpha) {
-    return _wheelForceCalculator.calculate(ax, ay, alpha);
+  /** Wheel force calculator for any external calculations. */
+  public WheelForceCalculator getWheelForceCalculator() {
+    return _wheelForceCalculator;
   }
 
   /** The wheel forces based on the acceleration of the profiles. */
@@ -182,19 +185,6 @@ public class HolonomicController {
   }
 
   /**
-   * Resets the profiles for a rotation-only profile.
-   *
-   * @param currentHeading The current chassis heading.
-   * @param currentOmega The current chassis omega in rad/s.
-   */
-  public void resetRotation(Rotation2d currentHeading, double currentOmega) {
-    reset(
-        new Pose2d(Translation2d.kZero, currentHeading),
-        Pose2d.kZero,
-        new ChassisSpeeds(0, 0, currentOmega));
-  }
-
-  /**
    * Samples the motions profiles at the next setpoint.
    *
    * @param currentHeading The current heading, needed for heading profile.
@@ -228,16 +218,15 @@ public class HolonomicController {
   }
 
   /**
-   * Seperately calculates an omega if the profile only involves rotation. Requires an initial
-   * {@link #resetRotation(Rotation2d, double)} call.
+   * Finds field-relative chassis speeds the chassis is to bring the chassis closer to the desired
+   * pose.
    *
-   * @param currentHeading The current heading, needed for heading profile.
-   * @param desiredHeading Desired chassis heading as the profile goal.
+   * @param desiredPose The desired pose.
+   * @param currentPose The current pose.
+   * @return New field-relative speeds.
    */
-  public void nextSetpointRotation(Rotation2d currentHeading, Rotation2d desiredHeading) {
-    _headingProfile.setGoal(desiredHeading.getRadians());
-
-    nextSetpoint(currentHeading);
+  public ChassisSpeeds calculate(Pose2d desiredPose, Pose2d currentPose) {
+    return calculate(zeroSpeeds, desiredPose, currentPose);
   }
 
   /**
