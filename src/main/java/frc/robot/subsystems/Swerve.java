@@ -85,10 +85,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   private final HolonomicController _poseController =
       new HolonomicController(getKinematics().getModules());
 
+  // for drive facing
   private Rotation2d _previousRotationGoal = Rotation2d.kZero;
   private boolean _mustResetRotationController = true;
-
-  private double _lastLoopTime = 0;
+  private double _lastRotationLoopTime = 0;
 
   private double _lastSimTime = 0;
   private Notifier _simNotifier;
@@ -370,7 +370,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
             () -> {
               double omegaFeedforward =
                   (heading.get().getRadians() - _previousRotationGoal.getRadians())
-                      / (Timer.getFPGATimestamp() - _lastLoopTime);
+                      / (Timer.getFPGATimestamp() - _lastRotationLoopTime);
 
               _previousRotationGoal = heading.get();
 
@@ -386,6 +386,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
                   isOpenLoop = false;
 
                   _previousRotationGoal = getHeading();
+                  _lastRotationLoopTime = Timer.getFPGATimestamp();
 
                   _poseController.resetPID();
                 }))
@@ -465,9 +466,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
             desiredSpeeds.vxMetersPerSecond,
             desiredSpeeds.vyMetersPerSecond,
             (heading.getRadians() - _previousRotationGoal.getRadians())
-                / (Timer.getFPGATimestamp() - _lastLoopTime));
+                / (Timer.getFPGATimestamp() - _lastRotationLoopTime));
 
     _previousRotationGoal = heading;
+    _lastRotationLoopTime = Timer.getFPGATimestamp();
 
     desiredPose = new Pose2d(desiredPose.getTranslation(), heading);
 
@@ -588,8 +590,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   @Override
   public void periodic() {
     DogLog.time("Timing/Swerve/periodic()");
-
-    _lastLoopTime = Timer.getFPGATimestamp();
 
     updateVisionPoseEstimates();
 
