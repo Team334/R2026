@@ -21,7 +21,7 @@ public class FieldUtil {
   // newton's method constants
   private static final int maxIter = 15;
   private static final double E_tolerance = 0.1;
-  private static final double dT_dt_tolerance = 0.7;
+  private static final double couplingTolerance = 20;
 
   /** Logs FieldUtil methods. */
   public static void log(Pose2d robotPose) {
@@ -206,13 +206,13 @@ public class FieldUtil {
       // finish and update shot parameters once converged to E(t) = 0
       if (Math.abs(E) < E_tolerance) {
         // check if robot velocity vector and projectile velocity vector are strongly aligned
-        shotParameters.isErrorSensitive = Math.abs(dT_dt) > dT_dt_tolerance;
         shotParameters.couplingDegrees =
             Math.toDegrees(
                 Math.acos(
                     Math.abs(
                         robotToVirtualTarget.dot(robotVelocity)
                             / (robotToVirtualTarget.getNorm() * robotVelocity.getNorm()))));
+        shotParameters.isErrorSensitive = shotParameters.couplingDegrees < couplingTolerance;
 
         Translation2d virtualTarget = target.minus(robotVelocity.times(t));
 

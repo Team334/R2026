@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
@@ -136,6 +137,8 @@ public class ModularAuto {
 
     // put choosers on nt
     SmartDashboard.putData("Auto Chooser", _layoutChooser);
+
+    autonomous().onTrue(runOnce(() -> _aimAtTarget = false));
 
     // generateAuto(_layoutChooser.getSelected());
     generateAuto("test");

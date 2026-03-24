@@ -365,7 +365,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
             velY,
             () -> {
               double omegaFeedforward =
-                  (heading.get().getRadians() - _previousRotationGoal.getRadians())
+                  (heading.get().minus(_previousRotationGoal).getRadians())
                       / (Timer.getFPGATimestamp() - _lastRotationLoopTime);
 
               _previousRotationGoal = heading.get();
@@ -445,7 +445,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
         new ChassisSpeeds(
             desiredSpeeds.vxMetersPerSecond,
             desiredSpeeds.vyMetersPerSecond,
-            (heading.getRadians() - _previousRotationGoal.getRadians())
+            (heading.minus(_previousRotationGoal).getRadians())
                 / (Timer.getFPGATimestamp() - _lastRotationLoopTime));
 
     _previousRotationGoal = heading;
