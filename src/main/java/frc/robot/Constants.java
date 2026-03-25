@@ -277,14 +277,18 @@ public final class Constants {
     public static final Voltage pivotkS = Volts.of(0);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> pivotkV =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(1);
     public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
-        Volts.per(RotationsPerSecondPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecondPerSecond).ofNative(1);
 
     public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(0);
 
     public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(2);
     public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(5);
+
+    public static final AngularVelocity shootingPivotVelocity = RotationsPerSecond.of(1);
+    public static final AngularAcceleration shootingPivotAcceleration =
+        RotationsPerSecondPerSecond.of(1);
 
     public static final double feedGearRatio = 2;
     public static final double pivotGearRatio = 20;

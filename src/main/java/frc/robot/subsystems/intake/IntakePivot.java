@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -32,11 +32,16 @@ public class IntakePivot extends AdvancedSubsystem {
   private final TalonFX _pivotMotor =
       new TalonFX(IntakeConstants.pivotMotorID, Constants.subsystemBus);
 
-  private final MotionMagicVoltage _pivotAngleSetter = new MotionMagicVoltage(0);
+  private final DynamicMotionMagicVoltage _pivotAngleSetter =
+      new DynamicMotionMagicVoltage(
+          Rotations.of(0), RotationsPerSecond.of(0), RotationsPerSecondPerSecond.of(0));
   private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
 
   private final Trigger _intakeLowered =
       new Trigger(() -> getAngle().gte(IntakeConstants.pivotTucked)).debounce(0.5);
+
+  @Logged(name = "Lower Default")
+  private boolean _lowerDefault = true;
 
   private final BooleanSupplier _inBumpZoneSupplier;
 
@@ -72,12 +77,11 @@ public class IntakePivot extends AdvancedSubsystem {
     pivotMotorConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     pivotMotorConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 
-    pivotMotorConfigs.MotionMagic.MotionMagicCruiseVelocity =
-        IntakeConstants.pivotVelocity.in(RotationsPerSecond);
-    pivotMotorConfigs.MotionMagic.MotionMagicAcceleration =
-        IntakeConstants.pivotAcceleration.in(RotationsPerSecondPerSecond);
-
     pivotMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    _pivotAngleSetter
+        .withVelocity(IntakeConstants.pivotVelocity)
+        .withAcceleration(IntakeConstants.pivotAcceleration);
 
     CTREUtil.attempt(() -> _pivotMotor.getConfigurator().apply(pivotMotorConfigs), _pivotMotor);
     CTREUtil.attempt(() -> _pivotMotor.setPosition(IntakeConstants.pivotRaised), _pivotMotor);
@@ -117,7 +121,7 @@ public class IntakePivot extends AdvancedSubsystem {
       startSimThread();
     }
 
-    setDefaultCommand(raise());
+    setDefaultCommand(lower());
   }
 
   private void startSimThread() {
@@ -161,12 +165,37 @@ public class IntakePivot extends AdvancedSubsystem {
     return _pivotAngleGetter.refresh().getValue();
   }
 
+  /** Toggles the lower default. */
+  public Command toggleLowerDefault() {
+    return runOnce(
+        () -> {
+          _lowerDefault = !_lowerDefault;
+          setDefaultCommand(_lowerDefault ? lower() : raise());
+        });
+  }
+
   /** Raises the intake. */
   public Command raise() {
     return run(() -> {
-          _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotRaised));
+          _pivotMotor.setControl(
+              _pivotAngleSetter
+                  .withPosition(IntakeConstants.pivotRaised)
+                  .withVelocity(IntakeConstants.pivotVelocity)
+                  .withAcceleration(IntakeConstants.pivotAcceleration));
         })
         .withName("Raise");
+  }
+
+  /** Raises the intake slower while shooting */
+  public Command raiseShooting() {
+    return run(() -> {
+          _pivotMotor.setControl(
+              _pivotAngleSetter
+                  .withPosition(IntakeConstants.pivotRaised)
+                  .withVelocity(IntakeConstants.shootingPivotVelocity)
+                  .withAcceleration(IntakeConstants.shootingPivotAcceleration));
+        })
+        .withName("Raise Shooting");
   }
 
   /** Lowers the intake, tucking it if necessary. */
