@@ -419,7 +419,7 @@ var baseTraj: Trajectory = {
     },
     trajectory: {
         config: null,
-        sampleType: undefined,
+        sampleType: "Swerve",
         waypoints: [],
         samples: [],
         splits: []
