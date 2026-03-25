@@ -312,17 +312,18 @@ const locationParams: Record<GenericLocation, LocationParams> = {
         leftWaypoints: [
             makeWaypoint(1.206515908241272, 6.921103477478027, -1.5707963267948966, true, false),
             makeWaypoint(0.4468134641647339, 7.149000644683838, -1.5707963267948966),
-            makeWaypoint(0.4468134641647339, 5.474844455718994, -1.5707963267948966),
+            makeWaypoint(0.4468134641647339, 5.474844455718994, -1.5707963267948966, true, false),
             makeWaypoint(1.004274845123291, 5.474844455718994, 0.0, true, false)
         ],
         rightWaypoints: [
             makeWaypoint(1.5006606578826904, 5.137444972991943, 0.0, true, false),
             makeWaypoint(0.43300509452819824, 4.9178547859191895, 1.5708),
-            makeWaypoint(0.44392159581184387, 6.838572978973389, 1.5708),
-            makeWaypoint(1.206515908241272, 6.921103477478027, -1.5707963267948966, true, false)
+            makeWaypoint(0.44392159581184387, 6.838572978973389, 1.5708, true, false),
+            makeWaypoint(1.206515908241272, 6.921103477478027, -1.5707963267948966)
         ],
         constraints: [
             makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}}),
+            makeConstraint(1, 2, {type: "MaxAngularVelocity", props: {max: toExpr(0, "rad")}}),
             makeConstraint(3, -1, {type: "PointAt", props: {x: toExpr(4.624067783355713, "m"), y: toExpr(4.038748741149902, "m"), tolerance: toExpr(0.071, "rad"), flip: false}}),
             makeConstraint(3, -1, {type: "MaxVelocity", props: {max: toExpr(2, "m/s")}})
         ],
