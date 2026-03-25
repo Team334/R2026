@@ -183,7 +183,8 @@ interface LocationParams {
 
 interface Layout {
     name: string,
-    layout: Location[]
+    layout: Location[],
+    splitCommands: Record<number, EventName[]>
 }
 
 const reflectWaypoints = (...waypoints: Waypoint<Expr>[]) => {
@@ -194,13 +195,13 @@ const reflectWaypoints = (...waypoints: Waypoint<Expr>[]) => {
     }));
 };
 
-const makeWaypoint = (x: number, y: number, heading: number, fixTranslation: boolean = true, fixHeading: boolean = true) : Waypoint<Expr> => {
+const makeWaypoint = (x: number, y: number, heading: number, fixTranslation: boolean = true, fixHeading: boolean = true, split: boolean = false) : Waypoint<Expr> => {
     return {
         x: toExpr(x, "m"),
         y: toExpr(y, "m"),
         heading: toExpr(heading, "rad"),
         intervals: 0,
-        split: false,
+        split: split,
         fixTranslation: fixTranslation,
         fixHeading: fixHeading,
         overrideIntervals: false

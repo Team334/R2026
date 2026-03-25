@@ -6,5 +6,6 @@
         "l_depot",
         "l_neutralbump",
         "l_climb"
-    ]
+    ],
+    "splitCommands": []
 }
