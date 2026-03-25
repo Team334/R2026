@@ -163,7 +163,13 @@ public class ModularAuto {
     AutoRoutine routine = _factory.newRoutine(layoutName);
     AutoTrajectory trajectory = routine.trajectory(layoutName);
 
-    Map<String, Object> layout = _layouts.get(layoutName);
+    @SuppressWarnings("unchecked")
+    Map<Integer, String[]> splitCommands =
+        (Map<Integer, String[]>) _layouts.get(layoutName).get("splitCommands");
+
+    if (splitCommands == null) {
+      throw new RuntimeException(); // blank error to trigger catch
+    }
 
     for (int split : routine.trajectory(layoutName).getRawTrajectory().splits()) {
       // todo
