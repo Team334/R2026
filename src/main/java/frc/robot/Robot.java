@@ -265,7 +265,8 @@ public class Robot extends TimedRobot {
     _driverController.rightBumper().whileTrue(_superstructure.spit());
 
     _driverController.leftTrigger().whileTrue(_intakeFeed.feedIn());
-    _driverController.leftBumper().toggleOnTrue(_intakePivot.lower());
+
+    _driverController.leftBumper().onTrue(_intakePivot.toggleLowerDefault());
 
     _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
 

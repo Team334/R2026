@@ -23,6 +23,7 @@ import java.util.function.Supplier;
 public class Superstructure {
   private final Shooter _shooter;
   private final Hopper _hopper;
+  private final IntakePivot _intakePivot;
   private final Climb _climb;
   private final Swerve _swerve;
 
@@ -38,6 +39,7 @@ public class Superstructure {
       Supplier<Rotation2d> shotHeadingSupplier) {
     _shooter = shooter;
     _hopper = hopper;
+    _intakePivot = intakePivot;
     _climb = climb;
     _swerve = swerve;
 
@@ -49,6 +51,7 @@ public class Superstructure {
     return parallel(
             _shooter.shoot(),
             _hopper.feedShot(),
+            _intakePivot.raiseShooting(),
             _swerve.driveFacing(velX, velY, () -> _shotHeadingSupplier.get()))
         .withName("Shoot");
   }
