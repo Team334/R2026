@@ -33,8 +33,7 @@ public class IntakePivot extends AdvancedSubsystem {
       new TalonFX(IntakeConstants.pivotMotorID, Constants.subsystemBus);
 
   private final DynamicMotionMagicVoltage _pivotAngleSetter =
-      new DynamicMotionMagicVoltage(
-          Rotations.of(0), RotationsPerSecond.of(0), RotationsPerSecondPerSecond.of(0));
+      new DynamicMotionMagicVoltage(0, 0, 0);
   private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
 
   private final Trigger _intakeLowered =
@@ -202,11 +201,19 @@ public class IntakePivot extends AdvancedSubsystem {
   public Command lower() {
     return run(() -> {
           if (_inBumpZoneSupplier.getAsBoolean()) {
-            _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotTucked));
+            _pivotMotor.setControl(
+                _pivotAngleSetter
+                    .withPosition(IntakeConstants.pivotTucked)
+                    .withVelocity(IntakeConstants.pivotVelocity)
+                    .withAcceleration(IntakeConstants.pivotAcceleration));
             return;
           }
 
-          _pivotMotor.setControl(_pivotAngleSetter.withPosition(IntakeConstants.pivotLowered));
+          _pivotMotor.setControl(
+              _pivotAngleSetter
+                  .withPosition(IntakeConstants.pivotLowered)
+                  .withVelocity(IntakeConstants.pivotVelocity)
+                  .withAcceleration(IntakeConstants.pivotAcceleration));
         })
         .withName("Lower");
   }

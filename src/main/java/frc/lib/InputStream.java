@@ -15,6 +15,8 @@ import java.util.function.DoubleUnaryOperator;
 /** A functional interface to aid in modifying double suppliers, such as from a joystick. */
 @FunctionalInterface
 public interface InputStream extends DoubleSupplier {
+  public static final InputStream zero = of(() -> 0);
+
   /**
    * Creates an input stream from another.
    *

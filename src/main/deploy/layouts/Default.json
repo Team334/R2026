@@ -1,0 +1,10 @@
+{
+    "name": "Default",
+    "layout": [
+        "l_start",
+        "l_depot"
+    ],
+    "splitCommands": {
+        "0": []
+    }
+}

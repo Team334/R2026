@@ -107,7 +107,8 @@ public class Robot extends TimedRobot {
           _intakeFeed,
           _climb,
           _swerve,
-          () -> _shotParameters.getShotHeading());
+          () -> _shotParameters.getShotHeading(),
+          r -> addPeriodic(r, kDefaultPeriod));
 
   // private final DoubleSubscriber _flywheelSpeed = DogLog.tunable("Flywheel Speed RPS", 0.0);
   // private final DoubleSubscriber _floorSpeed = DogLog.tunable("Floor Speed RPS", 0.0);
