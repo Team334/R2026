@@ -103,7 +103,8 @@ public class ModularAuto {
                     _swerve.driveFacing(InputStream.zero, InputStream.zero, shotHeadingSupplier),
                     hopper.feedShot(),
                     shooter.shoot())
-                .withTimeout(1));
+                .withTimeout(1)
+                .andThen(parallel(hopper.feedStop(), shooter.idle()).withTimeout(0.1)));
 
     _bindings.put(
         "stop shooting",
@@ -196,31 +197,23 @@ public class ModularAuto {
 
     routine.active().onTrue(sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
-    // don't chain next trajectory if there is only 1 trajectory
-    if (splits.size() == 1) {
-      SequentialCommandGroup splitCommand = new SequentialCommandGroup();
-
-      for (String command : splitCommands.get("0")) {
-        splitCommand.addCommands(_bindings.get(command).get());
-      }
-
-      trajectory.done().onTrue(splitCommand);
-    }
-
-    for (int i = 0; i < splits.size() - 1; i++) {
-      AutoTrajectory nextTrajectory = routine.trajectory(layoutName, i + 1);
-
+    for (int i = 0; i < splits.size(); i++) {
       SequentialCommandGroup splitCommand = new SequentialCommandGroup();
 
       for (String command : splitCommands.get(Integer.toString(i))) {
         splitCommand.addCommands(_bindings.get(command).get());
       }
 
-      splitCommand.addCommands(nextTrajectory.cmd());
+      if (i + 1 < splits.size()) {
+        AutoTrajectory newTrajectory = routine.trajectory(layoutName, i + 1);
+
+        splitCommand.addCommands(newTrajectory.cmd());
+        trajectory.done().onTrue(splitCommand);
+        trajectory = newTrajectory;
+        continue;
+      }
 
       trajectory.done().onTrue(splitCommand);
-
-      trajectory = nextTrajectory;
     }
 
     _routineCmd = routine.cmd();
