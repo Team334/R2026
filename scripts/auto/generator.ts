@@ -455,6 +455,7 @@ const locationParams: Record<GenericLocation, LocationParams> = {
             makeWaypoint(1.206515908241272, 6.921103477478027, -1.5707963267948966)
         ],
         constraints: [
+            makeConstraint(0, 0, {type: "StopPoint", props: {}})
             makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}}),
             makeConstraint(1, 2, {type: "MaxAngularVelocity", props: {max: toExpr(0, "rad")}}),
             makeConstraint(3, -1, {type: "PointAt", props: {x: toExpr(4.624067783355713, "m"), y: toExpr(4.038748741149902, "m"), tolerance: toExpr(0.071, "rad"), flip: false}}),
