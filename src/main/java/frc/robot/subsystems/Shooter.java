@@ -7,7 +7,6 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -149,11 +148,7 @@ public class Shooter extends AdvancedSubsystem {
     _flywheelFollowerMotor.setControl(
         new Follower(ShooterConstants.flywheelMotorID, MotorAlignmentValue.Opposed));
 
-    // setDefaultCommand(idle());
-
-    var coast = new CoastOut();
-
-    setDefaultCommand(run(() -> _flywheelMotor.setControl(coast)));
+    setDefaultCommand(idle());
 
     if (Robot.isSimulation()) {
       var flywheelMotorSimConfigs = new TalonFXConfiguration();
