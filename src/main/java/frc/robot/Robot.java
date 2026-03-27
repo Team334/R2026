@@ -249,8 +249,16 @@ public class Robot extends TimedRobot {
     _swerve.setDefaultCommand(
         _swerve
             .drive(
-                baseVelX.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
-                baseVelY.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+                baseVelX.scale(
+                    () ->
+                        FieldUtil.inBumpZone(_swerve.getPose())
+                            ? SwerveConstants.driverTranslationalVelocityBump.in(MetersPerSecond)
+                            : SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+                baseVelY.scale(
+                    () ->
+                        FieldUtil.inBumpZone(_swerve.getPose())
+                            ? SwerveConstants.driverTranslationalVelocityBump.in(MetersPerSecond)
+                            : SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
                 baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
             .beforeStarting(() -> _swerve.isOpenLoop = true));
 

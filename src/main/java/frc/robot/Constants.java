@@ -114,8 +114,10 @@ public final class Constants {
 
     public static final double ferryYThreshold = tagLayout.getFieldWidth() / 2.0;
 
-    public static final Rectangle2d blueBumpZone = new Rectangle2d(Pose2d.kZero, 1, 1);
-    public static final Rectangle2d redBumpZone = new Rectangle2d(Pose2d.kZero, 1, 1);
+    public static final Rectangle2d blueBumpZone =
+        new Rectangle2d(new Translation2d(4.0626, 1.5844), new Translation2d(5.1844, 6.4898));
+    public static final Rectangle2d redBumpZone =
+        new Rectangle2d(new Translation2d(11.3493, 1.5844), new Translation2d(12.475, 6.4898));
 
     public static final Pose2d bluePreClimb = new Pose2d();
     public static final Pose2d redPreClimb = new Pose2d();
@@ -338,6 +340,7 @@ public final class Constants {
     public static final MomentOfInertia moi = KilogramSquareMeters.of(8);
 
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
+    public static final LinearVelocity driverTranslationalVelocityBump = MetersPerSecond.of(1.5);
     public static final AngularVelocity driverAngularVelocity = RadiansPerSecond.of(Math.PI);
 
     public static final LinearVelocity driverTranslationalShootingVelocity =
