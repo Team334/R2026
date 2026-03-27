@@ -189,7 +189,7 @@ const reflectWaypoints = (...waypoints: Waypoint<Expr>[]) => {
     return waypoints.map(waypoint => ({
         ...waypoint,
         y: toExpr(FIELD_WIDTH - waypoint.y.val, "m"),
-        heading: toExpr(waypoint.heading.val, "rad")
+        heading: toExpr(-waypoint.heading.val, "rad")
     }));
 };
 
@@ -361,6 +361,7 @@ const locationParams: Record<GenericLocation, LocationParams> = {
 }
 */
 
+// SNM
 const locationParams: Record<GenericLocation, LocationParams> = {
     start: {
         leftWaypoints: [
@@ -424,13 +425,13 @@ const locationParams: Record<GenericLocation, LocationParams> = {
     },
     trench: {
         leftWaypoints: [
-            makeWaypoint(2.7739968299865723, 6.4496846199035645, 0, true, false)
+            // makeWaypoint(2.7739968299865723, 6.4496846199035645, 0, true, false)
         ],
         rightWaypoints: reflectWaypoints( 
-            makeWaypoint(2.7739968299865723, 6.4496846199035645, 0, true, false)
+            // makeWaypoint(2.7739968299865723, 6.4496846199035645, 0, true, false)
         ),
         constraints: [
-            makeConstraint(0, -1, {type: "MaxVelocity", props: {max: toExpr(2, "m/s")}})
+            // makeConstraint(0, -1, {type: "MaxVelocity", props: {max: toExpr(2, "m/s")}})
         ]
     },
     depot: {

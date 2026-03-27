@@ -13,6 +13,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,6 +28,7 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.intake.IntakeFeed;
 import frc.robot.subsystems.intake.IntakePivot;
+import frc.robot.utils.FieldUtil;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +86,11 @@ public class ModularAuto {
             true,
             _swerve,
             (traj, isActive) -> {
-              DogLog.log("Auto/Current Trajectory", traj.getPoses());
+              DogLog.log(
+                  "Auto/Current Trajectory",
+                  FieldUtil.getAlliance() == Alliance.Blue
+                      ? traj.getPoses()
+                      : traj.flipped().getPoses());
               DogLog.log("Auto/Current Trajectory Name", traj.name());
               DogLog.log("Auto/Current Trajectory Duration", traj.getTotalTime());
               DogLog.log("Auto/Current Trajectory Is Active", isActive);
@@ -205,11 +211,11 @@ public class ModularAuto {
       }
 
       if (i + 1 < splits.size()) {
-        AutoTrajectory newTrajectory = routine.trajectory(layoutName, i + 1);
+        AutoTrajectory nextTrajectory = routine.trajectory(layoutName, i + 1);
 
-        splitCommand.addCommands(newTrajectory.cmd());
+        splitCommand.addCommands(nextTrajectory.cmd());
         trajectory.done().onTrue(splitCommand);
-        trajectory = newTrajectory;
+        trajectory = nextTrajectory;
         continue;
       }
 
