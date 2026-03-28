@@ -7,6 +7,7 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -61,7 +62,7 @@ public class Shooter extends AdvancedSubsystem {
   private final SysIdRoutine _flywheelRoutine =
       new SysIdRoutine(
           new SysIdRoutine.Config(
-              Volts.per(Second).of(0.5),
+              null,
               Volts.of(4),
               Seconds.of(5),
               state -> SignalLogger.writeString("state", state.toString())),
@@ -89,7 +90,7 @@ public class Shooter extends AdvancedSubsystem {
     flywheelMotorConfigs.CurrentLimits.SupplyCurrentLimit = 50;
     flywheelMotorConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    flywheelMotorConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    flywheelMotorConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     flywheelMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     flywheelMotorConfigs.Slot0.kS = ShooterConstants.flywheelkS.in(Volts);
@@ -148,7 +149,10 @@ public class Shooter extends AdvancedSubsystem {
     _flywheelFollowerMotor.setControl(
         new Follower(ShooterConstants.flywheelMotorID, MotorAlignmentValue.Opposed));
 
-    setDefaultCommand(idle());
+    // setDefaultCommand(idle());
+    CoastOut coast = new CoastOut();
+
+    setDefaultCommand(run(() -> _flywheelMotor.setControl(coast)));
 
     if (Robot.isSimulation()) {
       var flywheelMotorSimConfigs = new TalonFXConfiguration();

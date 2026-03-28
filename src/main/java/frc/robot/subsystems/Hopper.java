@@ -10,6 +10,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
@@ -47,6 +48,8 @@ public class Hopper extends AdvancedSubsystem {
 
     // roller motor configs
     rollerMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    rollerMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     rollerMotorConfig.Slot0.kS = HopperConstants.rollerkS.in(Volts);
     rollerMotorConfig.Slot0.kV = HopperConstants.rollerkV.in(Volts.per(RotationsPerSecond));

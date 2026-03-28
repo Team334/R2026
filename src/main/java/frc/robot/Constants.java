@@ -229,37 +229,37 @@ public final class Constants {
     public static final int flywheelMotorID = determineID(1); // 1
     public static final int flywheelFollowerMotorID = determineID(2); // 2
 
-    public static final Voltage flywheelkS = Volts.of(0.13262);
+    public static final Voltage flywheelkS = Volts.of(0.23);
     public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkV =
-        Volts.per(RotationsPerSecond).ofNative(0.13334);
+        Volts.per(RotationsPerSecond).ofNative(0.11);
     public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkP =
-        Volts.per(RotationsPerSecond).ofNative(0.2);
+        Volts.per(RotationsPerSecond).ofNative(0.3);
 
     public static final AngularVelocity bangBangVelocityTolerance = RotationsPerSecond.of(3);
 
     public static final AngularVelocity windupVelocityTolerance = RotationsPerSecond.of(1);
     public static final AngularVelocity shootingVelocityTolerance = RotationsPerSecond.of(6);
 
-    public static final double flywheelGearRatio = 1.2;
+    public static final double flywheelGearRatio = 1;
   }
 
   public static class HopperConstants {
     public static final int rollerMotorID = determineID(3);
     public static final int floorMotorID = determineID(4);
 
-    public static final Voltage rollerkS = Volts.of(0.17);
+    public static final Voltage rollerkS = Volts.of(0.2);
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkV =
-        Volts.per(RotationsPerSecond).ofNative(0.235);
+        Volts.per(RotationsPerSecond).ofNative(0.112);
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkP =
-        Volts.per(RotationsPerSecond).ofNative(0.6);
+        Volts.per(RotationsPerSecond).ofNative(0.4);
 
-    public static final Voltage floorkS = Volts.of(0.21);
+    public static final Voltage floorkS = Volts.of(0.3);
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkV =
-        Volts.per(RotationsPerSecond).ofNative(0.28);
+        Volts.per(RotationsPerSecond).ofNative(0.23);
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkP =
         Volts.per(RotationsPerSecond).ofNative(0.6);
 
-    public static final double rollerGearRatio = 2.25;
+    public static final double rollerGearRatio = 1;
     public static final double floorGearRatio = 2;
   }
 

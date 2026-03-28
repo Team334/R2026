@@ -390,24 +390,29 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param velOmega The rotational velocity in radians per second.
    */
   public Command drive(InputStream velX, InputStream velY, InputStream velOmega) {
+    Idle idle = new Idle();
+
     return run(() -> {
-          if (isFieldOriented) {
-            setControl(
-                _fieldCentricRequest
-                    .withVelocityX(velX.get())
-                    .withVelocityY(velY.get())
-                    .withRotationalRate(velOmega.get())
-                    .withDriveRequestType(
-                        isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
-          } else {
-            setControl(
-                _robotCentricRequest
-                    .withVelocityX(velX.get())
-                    .withVelocityY(velY.get())
-                    .withRotationalRate(velOmega.get())
-                    .withDriveRequestType(
-                        isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
-          }
+          setControl(idle);
+          // if (isFieldOriented) {
+          //   setControl(
+          //       _fieldCentricRequest
+          //           .withVelocityX(velX.get())
+          //           .withVelocityY(velY.get())
+          //           .withRotationalRate(velOmega.get())
+          //           .withDriveRequestType(
+          //               isOpenLoop ? DriveRequestType.OpenLoopVoltage :
+          // DriveRequestType.Velocity));
+          // } else {
+          //   setControl(
+          //       _robotCentricRequest
+          //           .withVelocityX(velX.get())
+          //           .withVelocityY(velY.get())
+          //           .withRotationalRate(velOmega.get())
+          //           .withDriveRequestType(
+          //               isOpenLoop ? DriveRequestType.OpenLoopVoltage :
+          // DriveRequestType.Velocity));
+          // }
         })
         .withName("Drive");
   }

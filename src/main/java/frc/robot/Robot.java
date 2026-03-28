@@ -279,7 +279,7 @@ public class Robot extends TimedRobot {
 
     _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
 
-    _driverController.x().onTrue(_swerve.toggleFieldOriented());
+    // _driverController.x().onTrue(_swerve.toggleFieldOriented());
     _driverController.y().onTrue(_swerve.resetHeading().ignoringDisable(true));
   }
 
