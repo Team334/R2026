@@ -77,11 +77,11 @@ public class ShotParameters {
     _isReadyToShoot =
         () -> {
           return shooterInTolerance.getAsBoolean()
-              && Math.abs(_shotHeading.minus(robotPoseSupplier.get().getRotation()).getDegrees())
-                  < headingTolerance.getDegrees()
-              && FieldUtil.isShotValid(robotPoseSupplier.get())
-              && inBounds
-              && !failedToConverge;
+              // && Math.abs(_shotHeading.minus(robotPoseSupplier.get().getRotation()).getDegrees())
+              //     < headingTolerance.getDegrees()
+              && FieldUtil.isShotValid(robotPoseSupplier.get());
+          // && inBounds
+          // && !failedToConverge;
         };
   }
 
