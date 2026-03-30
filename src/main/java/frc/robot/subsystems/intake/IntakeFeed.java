@@ -57,7 +57,7 @@ public class IntakeFeed extends AdvancedSubsystem {
 
     feedMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    feedMotorConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    feedMotorConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     feedMotorConfigs.Feedback.SensorToMechanismRatio = IntakeConstants.feedGearRatio;
 

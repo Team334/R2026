@@ -267,13 +267,13 @@ public final class Constants {
     public static final int pivotMotorID = determineID(5);
     public static final int feedMotorID = determineID(6);
 
-    public static final Voltage feedkS = Volts.of(0.34);
+    public static final Voltage feedkS = Volts.of(0.3);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkV =
-        Volts.per(RotationsPerSecond).ofNative(0.205);
+        Volts.per(RotationsPerSecond).ofNative(0.0928117314);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
-        Volts.per(RotationsPerSecond).ofNative(0.6);
+        Volts.per(RotationsPerSecond).ofNative(0.4);
 
     public static final Voltage pivotkG = Volts.of(0);
     public static final Voltage pivotkS = Volts.of(0);
@@ -292,8 +292,8 @@ public final class Constants {
     public static final AngularAcceleration shootingPivotAcceleration =
         RotationsPerSecondPerSecond.of(1);
 
-    public static final double feedGearRatio = 2;
-    public static final double pivotGearRatio = 20;
+    public static final double feedGearRatio = 1;
+    public static final double pivotGearRatio = 72;
 
     public static final Angle pivotRaised = Rotations.of(0.25);
     public static final Angle pivotTucked = Rotations.of(0.5);
