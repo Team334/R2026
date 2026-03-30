@@ -1,17 +1,14 @@
 {
     "name": "Default",
     "layout": [
-        "r_start",
-        "r_neutralmiddle",
-        "r_depot",
-        "r_neutralbump",
-        "r_neutralbump"
+        "l_start",
+        "l_neutralmiddle",
+        "l_depot",
+        "l_neutralbump",
+        "l_trench"
     ],
     "splitCommands": {
         "0": ["shoot still"],
-        "1": ["shoot still"],
-        "2": ["shoot still"],
-        "3": ["shoot still"],
-        "4": []
+        "1": []
     }
 }

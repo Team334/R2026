@@ -228,7 +228,7 @@ const makeEventMarker = (name: EventName, target: number, offset: number) : Even
 }
 
 // SOTM
-/*
+
 const locationParams: Record<GenericLocation, LocationParams> = {
     start: {
         leftWaypoints: [
@@ -243,16 +243,16 @@ const locationParams: Record<GenericLocation, LocationParams> = {
             makeWaypoint(2.9307680130004883, 7.31110954284668, 0, true, false),
             makeWaypoint(5.697521209716797, 7.402477741241455, -0.006293),
             makeWaypoint(5.955106735229492, 5.9437713623046875, -1.5707963267948966),
-            makeWaypoint(5.971709251403809, 4.325946807861328, -1.6095124425448013),
-            makeWaypoint(5.905695915222168, 7.3172287940979, 3.131788918491988),
+            makeWaypoint(5.955106735229492, 4.313876152038574, -1.5707963267948966),
+            makeWaypoint(5.693442344665527, 7.406031608581543, 3.131788918491988),
             makeWaypoint(2.770551919937134, 7.13850736618042, 0, true, false)
         ],
         rightWaypoints: reflectWaypoints(
             makeWaypoint(2.9307680130004883, 7.31110954284668, 0, true, false),
             makeWaypoint(5.697521209716797, 7.402477741241455, -0.006293),
             makeWaypoint(5.955106735229492, 5.9437713623046875, -1.5707963267948966),
-            makeWaypoint(5.971709251403809, 4.325946807861328, -1.6095124425448013),
-            makeWaypoint(5.905695915222168, 7.3172287940979, 3.131788918491988),
+            makeWaypoint(5.955106735229492, 4.313876152038574, -1.5707963267948966),
+            makeWaypoint(5.693442344665527, 7.406031608581543, 3.131788918491988),
             makeWaypoint(2.770551919937134, 7.13850736618042, 0, true, false)
         ),
         constraints: [
@@ -298,33 +298,35 @@ const locationParams: Record<GenericLocation, LocationParams> = {
     },
     trench: {
         leftWaypoints: [
-            makeWaypoint(2.7739968299865723, 6.4496846199035645, 0, true, false)
+            makeWaypoint(2.7739968299865723, 6.4496846199035645, 0, true, false, true)
         ],
         rightWaypoints: reflectWaypoints( 
-            makeWaypoint(2.7739968299865723, 6.4496846199035645, 0, true, false)
+            makeWaypoint(2.7739968299865723, 6.4496846199035645, 0, true, false, true)
         ),
         constraints: [
-            makeConstraint(0, -1, {type: "MaxVelocity", props: {max: toExpr(2, "m/s")}})
+            makeConstraint(0, -1, {type: "MaxVelocity", props: {max: toExpr(2, "m/s")}}),
+            makeConstraint(5, undefined, {type: "StopPoint", props: {}})
         ]
     },
     depot: {
         leftWaypoints: [
-            makeWaypoint(1.206515908241272, 6.921103477478027, -1.5707963267948966, true, false),
+            makeWaypoint(1.1794016361236572, 7.166106700897217, -1.5707963267948966, true, false),
             makeWaypoint(0.4468134641647339, 7.149000644683838, -1.5707963267948966),
             makeWaypoint(0.4468134641647339, 5.474844455718994, -1.5707963267948966, true, false),
-            makeWaypoint(1.004274845123291, 5.474844455718994, 0.0, true, false)
+            makeWaypoint(0.6906939148902893, 5.215888500213623, 0, true, false),
+            makeWaypoint(0.99637770652771, 5.633697986602783, 0.0, true, false)
         ],
         rightWaypoints: [
             makeWaypoint(1.5006606578826904, 5.137444972991943, 0.0, true, false),
             makeWaypoint(0.43300509452819824, 4.9178547859191895, 1.5708),
             makeWaypoint(0.44392159581184387, 6.838572978973389, 1.5708, true, false),
-            makeWaypoint(1.206515908241272, 6.921103477478027, -1.5707963267948966, true, false)
+            makeWaypoint(0.99637770652771, 5.633697986602783, -1.5707963267948966, true, false)
         ],
         constraints: [
             makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}}),
             makeConstraint(1, 2, {type: "MaxAngularVelocity", props: {max: toExpr(0, "rad")}}),
-            makeConstraint(3, -1, {type: "PointAt", props: {x: toExpr(4.624067783355713, "m"), y: toExpr(4.038748741149902, "m"), tolerance: toExpr(0.071, "rad"), flip: false}}),
-            makeConstraint(3, -1, {type: "MaxVelocity", props: {max: toExpr(2, "m/s")}})
+            makeConstraint(4, -1, {type: "PointAt", props: {x: toExpr(4.624067783355713, "m"), y: toExpr(4.038748741149902, "m"), tolerance: toExpr(0.071, "rad"), flip: false}}),
+            makeConstraint(4, -1, {type: "MaxVelocity", props: {max: toExpr(2, "m/s")}})
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),
@@ -359,130 +361,130 @@ const locationParams: Record<GenericLocation, LocationParams> = {
         ]
     }
 }
-*/
+
 
 // SNM
-const locationParams: Record<GenericLocation, LocationParams> = {
-    start: {
-        leftWaypoints: [
-            makeWaypoint(3.419274091720581, 7.474021911621094, 0.0)
-        ],
-        rightWaypoints: reflectWaypoints(
-            makeWaypoint(3.419274091720581, 7.474021911621094, 0.0)
-        )
-    },
-    neutralbump: {
-        leftWaypoints: [
-            makeWaypoint(3.039606809616089, 7.349939346313477, 0, true, false),
-            makeWaypoint(5.757914066314697, 7.407426357269287, -0.006293),
-            makeWaypoint(5.9221625328063965, 5.8634934425354 , -1.5707963267948966),
-            makeWaypoint(5.939408302307129 , 4.336455821990967, -1.6095124425448013),
-            makeWaypoint(5.806182384490967, 7.400650978088379, 3.131788918491988),
-            makeWaypoint(2.770551919937134, 7.13850736618042, -1.0386641789200184, true, true, true)
-        ],
-        rightWaypoints: reflectWaypoints(
-            makeWaypoint(3.039606809616089, 7.349939346313477, 0, true, false),
-            makeWaypoint(5.757914066314697, 7.407426357269287, -0.006293),
-            makeWaypoint(5.9221625328063965, 5.8634934425354 , -1.5707963267948966),
-            makeWaypoint(5.939408302307129 , 4.336455821990967, -1.6095124425448013),
-            makeWaypoint(5.806182384490967, 7.400650978088379, 3.131788918491988),
-            makeWaypoint(2.770551919937134, 7.13850736618042, -1.0386641789200184, true, true, true)
-        ),
-        constraints: [
-           makeConstraint(5, undefined, {type: "StopPoint", props: {}})
-        ],
-        eventMarkers: [
-            makeEventMarker("pivot lower", 0, 0),
-            makeEventMarker("feed in", 1, 0),
-            makeEventMarker("feed stop", 4, 0.4),
-        ]
-    },
-    neutralmiddle: {
-        leftWaypoints: [
-            makeWaypoint(3.7149038314819336, 7.477536201477051, 0.0, true, false),
-            makeWaypoint(4.809019565582275, 7.465332508087158, 0.0),
-            makeWaypoint(7.484222412109375, 6.948218822479248, -1.4711286226200226),
-            makeWaypoint(7.468718528747559, 4.425135612487793, -2.0576957311828057),
-            makeWaypoint(5.6979265213012695, 7.4296064376831055, 3.141592653589793),
-            makeWaypoint(3.2754716873168945, 7.364711284637451, -1.1918971550206048, true, true, true)
-        ],
-        rightWaypoints: reflectWaypoints(
-            makeWaypoint(3.7149038314819336, 7.477536201477051, 0.0, true, false),
-            makeWaypoint(4.809019565582275, 7.465332508087158, 0.0),
-            makeWaypoint(7.484222412109375, 6.948218822479248, -1.4711286226200226),
-            makeWaypoint(7.468718528747559, 4.425135612487793, -2.0576957311828057),
-            makeWaypoint(5.6979265213012695, 7.4296064376831055, 3.141592653589793),
-            makeWaypoint(3.2754716873168945, 7.364711284637451, -1.1918971550206048, true, true, true)
-        ),
-        constraints: [
-            makeConstraint(5, undefined, {type: "StopPoint", props: {}})
-        ],
-        eventMarkers: [
-            makeEventMarker("pivot raise", 1, 0),
-            makeEventMarker("feed in", 2, 0),
-            makeEventMarker("feed stop", 3, 0.4)
-        ]
-    },
-    trench: {
-        leftWaypoints: [
-            // makeWaypoint(2.7739968299865723, 6.4496846199035645, 0, true, false)
-        ],
-        rightWaypoints: reflectWaypoints( 
-            // makeWaypoint(2.7739968299865723, 6.4496846199035645, 0, true, false)
-        ),
-        constraints: [
-            // makeConstraint(0, -1, {type: "MaxVelocity", props: {max: toExpr(2, "m/s")}})
-        ]
-    },
-    depot: {
-        leftWaypoints: [
-            makeWaypoint(1.206515908241272, 6.921103477478027, -1.5707963267948966, true, false),
-            makeWaypoint(0.4468134641647339, 7.149000644683838, -1.5707963267948966),
-            makeWaypoint(0.4468134641647339, 5.474844455718994, -1.5707963267948966, true, false),
-            makeWaypoint(1.004274845123291, 5.474844455718994, -0.36116766723513044, true, true, true)
-        ],
-        rightWaypoints: [
-            makeWaypoint(1.5006606578826904, 5.137444972991943, 0.0, true, false),
-            makeWaypoint(0.43300509452819824, 4.9178547859191895, 1.5708),
-            makeWaypoint(0.44392159581184387, 6.838572978973389, 1.5708, true, false),
-            makeWaypoint(1.206515908241272, 6.921103477478027, -0.36116766723513044, true, true, true)
-        ],
-        constraints: [
-            makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}}),
-            makeConstraint(1, 2, {type: "MaxAngularVelocity", props: {max: toExpr(0, "rad")}}),
-            makeConstraint(3, undefined, {type: "StopPoint", props: {}})
-        ],
-        eventMarkers: [
-            makeEventMarker("pivot lower", 0, 0),
-            makeEventMarker("feed in", 1, 0),
-            makeEventMarker("feed stop", 3, 0.4)
-        ]
-    },
-    climb: {
-        leftWaypoints: [
-            makeWaypoint(2.7496304512023926, 4.047032356262207, 0, true, false),
-            makeWaypoint(0.8680239319801331, 2.0315675735473633, 3.141592653589793),
-            makeWaypoint(0.8600184917449951, 2.784078598022461, 0, true, false)
-        ],
-        rightWaypoints: [
-            // (same as left)
-            makeWaypoint(2.7496304512023926, 4.047032356262207, 0, true, false),
-            makeWaypoint(0.8680239319801331, 2.0315675735473633, 3.141592653589793),
-            makeWaypoint(0.8600184917449951, 2.784078598022461, 0, true, false)
-        ],
-        constraints: [
-            makeConstraint(0, 1, {type: "KeepOutCircle", props: {x: toExpr(0.91920355707407, "m"), y: toExpr(3.742240246385336, "m"), r: toExpr(0.8, "m")}}),
-            makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}}),
-            makeConstraint(1, 2, {type: "MaxAngularVelocity", props: {max: toExpr(0, "rad/s")}}),
-            makeConstraint(1, 2, {type: "MaxVelocity", props: {max: toExpr(1, "m/s")}})
-        ],
-        eventMarkers: [
-            makeEventMarker("stop shooting", 0, 0),
-            makeEventMarker("extend", 0, 0.3),
-            makeEventMarker("climb", 2, 0)
-        ]
-    }
-}
+// const locationParams: Record<GenericLocation, LocationParams> = {
+//     start: {
+//         leftWaypoints: [
+//             makeWaypoint(3.419274091720581, 7.474021911621094, 0.0)
+//         ],
+//         rightWaypoints: reflectWaypoints(
+//             makeWaypoint(3.419274091720581, 7.474021911621094, 0.0)
+//         )
+//     },
+//     neutralbump: {
+//         leftWaypoints: [
+//             makeWaypoint(3.039606809616089, 7.349939346313477, 0, true, false),
+//             makeWaypoint(5.757914066314697, 7.407426357269287, -0.006293),
+//             makeWaypoint(5.9221625328063965, 5.8634934425354 , -1.5707963267948966),
+//             makeWaypoint(5.939408302307129 , 4.336455821990967, -1.6095124425448013),
+//             makeWaypoint(5.806182384490967, 7.400650978088379, 3.131788918491988),
+//             makeWaypoint(2.770551919937134, 7.13850736618042, -1.0386641789200184, true, true, true)
+//         ],
+//         rightWaypoints: reflectWaypoints(
+//             makeWaypoint(3.039606809616089, 7.349939346313477, 0, true, false),
+//             makeWaypoint(5.757914066314697, 7.407426357269287, -0.006293),
+//             makeWaypoint(5.9221625328063965, 5.8634934425354 , -1.5707963267948966),
+//             makeWaypoint(5.939408302307129 , 4.336455821990967, -1.6095124425448013),
+//             makeWaypoint(5.806182384490967, 7.400650978088379, 3.131788918491988),
+//             makeWaypoint(2.770551919937134, 7.13850736618042, -1.0386641789200184, true, true, true)
+//         ),
+//         constraints: [
+//            makeConstraint(5, undefined, {type: "StopPoint", props: {}})
+//         ],
+//         eventMarkers: [
+//             makeEventMarker("pivot lower", 0, 0),
+//             makeEventMarker("feed in", 1, 0),
+//             makeEventMarker("feed stop", 4, 0.4),
+//         ]
+//     },
+//     neutralmiddle: {
+//         leftWaypoints: [
+//             makeWaypoint(3.7149038314819336, 7.477536201477051, 0.0, true, false),
+//             makeWaypoint(4.809019565582275, 7.465332508087158, 0.0),
+//             makeWaypoint(7.484222412109375, 6.948218822479248, -1.4711286226200226),
+//             makeWaypoint(7.468718528747559, 4.425135612487793, -2.0576957311828057),
+//             makeWaypoint(5.6979265213012695, 7.4296064376831055, 3.141592653589793),
+//             makeWaypoint(3.2754716873168945, 7.364711284637451, -1.1918971550206048, true, true, true)
+//         ],
+//         rightWaypoints: reflectWaypoints(
+//             makeWaypoint(3.7149038314819336, 7.477536201477051, 0.0, true, false),
+//             makeWaypoint(4.809019565582275, 7.465332508087158, 0.0),
+//             makeWaypoint(7.484222412109375, 6.948218822479248, -1.4711286226200226),
+//             makeWaypoint(7.468718528747559, 4.425135612487793, -2.0576957311828057),
+//             makeWaypoint(5.6979265213012695, 7.4296064376831055, 3.141592653589793),
+//             makeWaypoint(3.2754716873168945, 7.364711284637451, -1.1918971550206048, true, true, true)
+//         ),
+//         constraints: [
+//             makeConstraint(5, undefined, {type: "StopPoint", props: {}})
+//         ],
+//         eventMarkers: [
+//             makeEventMarker("pivot raise", 1, 0),
+//             makeEventMarker("feed in", 2, 0),
+//             makeEventMarker("feed stop", 3, 0.4)
+//         ]
+//     },
+//     trench: {
+//         leftWaypoints: [
+//             // makeWaypoint(2.7739968299865723, 6.4496846199035645, 0, true, false)
+//         ],
+//         rightWaypoints: reflectWaypoints( 
+//             // makeWaypoint(2.7739968299865723, 6.4496846199035645, 0, true, false)
+//         ),
+//         constraints: [
+//             // makeConstraint(0, -1, {type: "MaxVelocity", props: {max: toExpr(2, "m/s")}})
+//         ]
+//     },
+//     depot: {
+//         leftWaypoints: [
+//             makeWaypoint(1.206515908241272, 6.921103477478027, -1.5707963267948966, true, false),
+//             makeWaypoint(0.4468134641647339, 7.149000644683838, -1.5707963267948966),
+//             makeWaypoint(0.4468134641647339, 5.474844455718994, -1.5707963267948966, true, false),
+//             makeWaypoint(1.004274845123291, 5.474844455718994, -0.36116766723513044, true, true, true)
+//         ],
+//         rightWaypoints: [
+//             makeWaypoint(1.5006606578826904, 5.137444972991943, 0.0, true, false),
+//             makeWaypoint(0.43300509452819824, 4.9178547859191895, 1.5708),
+//             makeWaypoint(0.44392159581184387, 6.838572978973389, 1.5708, true, false),
+//             makeWaypoint(1.206515908241272, 6.921103477478027, -0.36116766723513044, true, true, true)
+//         ],
+//         constraints: [
+//             makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}}),
+//             makeConstraint(1, 2, {type: "MaxAngularVelocity", props: {max: toExpr(0, "rad")}}),
+//             makeConstraint(3, undefined, {type: "StopPoint", props: {}})
+//         ],
+//         eventMarkers: [
+//             makeEventMarker("pivot lower", 0, 0),
+//             makeEventMarker("feed in", 1, 0),
+//             makeEventMarker("feed stop", 3, 0.4)
+//         ]
+//     },
+//     climb: {
+//         leftWaypoints: [
+//             makeWaypoint(2.7496304512023926, 4.047032356262207, 0, true, false),
+//             makeWaypoint(0.8680239319801331, 2.0315675735473633, 3.141592653589793),
+//             makeWaypoint(0.8600184917449951, 2.784078598022461, 0, true, false)
+//         ],
+//         rightWaypoints: [
+//             // (same as left)
+//             makeWaypoint(2.7496304512023926, 4.047032356262207, 0, true, false),
+//             makeWaypoint(0.8680239319801331, 2.0315675735473633, 3.141592653589793),
+//             makeWaypoint(0.8600184917449951, 2.784078598022461, 0, true, false)
+//         ],
+//         constraints: [
+//             makeConstraint(0, 1, {type: "KeepOutCircle", props: {x: toExpr(0.91920355707407, "m"), y: toExpr(3.742240246385336, "m"), r: toExpr(0.8, "m")}}),
+//             makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}}),
+//             makeConstraint(1, 2, {type: "MaxAngularVelocity", props: {max: toExpr(0, "rad/s")}}),
+//             makeConstraint(1, 2, {type: "MaxVelocity", props: {max: toExpr(1, "m/s")}})
+//         ],
+//         eventMarkers: [
+//             makeEventMarker("stop shooting", 0, 0),
+//             makeEventMarker("extend", 0, 0.3),
+//             makeEventMarker("climb", 2, 0)
+//         ]
+//     }
+// }
 
 var baseTraj: Trajectory = {
     name: "",
