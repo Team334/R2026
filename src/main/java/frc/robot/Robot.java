@@ -281,7 +281,7 @@ public class Robot extends TimedRobot {
 
     _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
 
-    // _driverController.x().onTrue(_swerve.toggleFieldOriented());
+    _driverController.x().onTrue(_swerve.toggleFieldOriented());
     _driverController.y().onTrue(_swerve.resetHeading().ignoringDisable(true));
   }
 
@@ -302,6 +302,13 @@ public class Robot extends TimedRobot {
         _shotParameters);
 
     _shotParameters.setPreset(vec3(_flywheelSpeed.get(), _rollerSpeed.get(), _floorSpeed.get()));
+
+    DogLog.log(
+        "Virtual Target Distance",
+        _shotParameters
+            .getVirtualTarget()
+            .getTranslation()
+            .getDistance(_swerve.getPose().getTranslation()));
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,

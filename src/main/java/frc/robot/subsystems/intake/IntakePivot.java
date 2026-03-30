@@ -36,8 +36,9 @@ public class IntakePivot extends AdvancedSubsystem {
       new DynamicMotionMagicVoltage(0, 0, 0);
   private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
 
-  private final Trigger _intakeLowered =
-      new Trigger(() -> getAngle().gte(IntakeConstants.pivotTucked)).debounce(0.5);
+  // private final Trigger _intakeLowered =
+  //     new Trigger(() -> getAngle().gte(IntakeConstants.pivotTucked)).debounce(0.5);
+  private final Trigger _intakeLowered = new Trigger(() -> true);
 
   @Logged(name = "Lower Default")
   private boolean _lowerDefault = true;
