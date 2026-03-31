@@ -2,10 +2,13 @@ package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -14,11 +17,13 @@ import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
@@ -26,6 +31,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Robot;
+import frc.robot.utils.SysId;
 import java.util.function.BooleanSupplier;
 
 public class IntakePivot extends AdvancedSubsystem {
@@ -34,11 +40,12 @@ public class IntakePivot extends AdvancedSubsystem {
 
   private final DynamicMotionMagicVoltage _pivotAngleSetter =
       new DynamicMotionMagicVoltage(0, 0, 0);
-  private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
 
-  // private final Trigger _intakeLowered =
-  //     new Trigger(() -> getAngle().gte(IntakeConstants.pivotTucked)).debounce(0.5);
-  private final Trigger _intakeLowered = new Trigger(() -> true);
+  private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
+  private final VoltageOut _pivotVoltageSetter = new VoltageOut(0);
+
+  private final Trigger _intakeLowered =
+      new Trigger(() -> getAngle().gte(IntakeConstants.pivotTucked)).debounce(0.3);
 
   @Logged(name = "Lower Default")
   private boolean _lowerDefault = true;
@@ -49,6 +56,18 @@ public class IntakePivot extends AdvancedSubsystem {
 
   private Notifier _simNotifier;
   private double _lastSimTime;
+
+  private final SysIdRoutine _pivotRoutine =
+      new SysIdRoutine(
+          new SysIdRoutine.Config(
+              Volts.of(0.5).per(Seconds),
+              Volts.of(2),
+              null,
+              state -> SignalLogger.writeString("state", state.toString())),
+          new SysIdRoutine.Mechanism(
+              (Voltage volts) -> _pivotMotor.setControl(_pivotVoltageSetter.withOutput(volts)),
+              null,
+              this));
 
   public IntakePivot(BooleanSupplier inBumpZoneSupplier) {
     _inBumpZoneSupplier = inBumpZoneSupplier;
@@ -84,11 +103,26 @@ public class IntakePivot extends AdvancedSubsystem {
         .withAcceleration(IntakeConstants.pivotAcceleration);
 
     CTREUtil.attempt(() -> _pivotMotor.getConfigurator().apply(pivotMotorConfigs), _pivotMotor);
-    CTREUtil.attempt(() -> _pivotMotor.setPosition(IntakeConstants.pivotRaised), _pivotMotor);
+    CTREUtil.attempt(() -> _pivotMotor.setPosition(Rotations.of(0.22)), _pivotMotor);
 
     CTREUtil.attempt(() -> _pivotMotor.optimizeBusUtilization(), _pivotMotor);
 
+    CTREUtil.attempt(
+        () ->
+            BaseStatusSignal.setUpdateFrequencyForAll(
+                100,
+                _pivotMotor.getMotorVoltage(),
+                _pivotMotor.getVelocity(),
+                _pivotMotor.getPosition()),
+        _pivotMotor);
+
     FaultLogger.register(_pivotMotor);
+
+    SysId.displayRoutine(
+        "Intake Pivot",
+        _pivotRoutine,
+        () -> _pivotAngleGetter.isNear(Rotations.of(0.47), Degrees.of(5)),
+        () -> _pivotAngleGetter.isNear(Rotations.of(0.2), Degrees.of(5)));
 
     if (Robot.isSimulation()) {
       // rely on sim to control the position
@@ -201,14 +235,14 @@ public class IntakePivot extends AdvancedSubsystem {
   /** Lowers the intake, tucking it if necessary. */
   public Command lower() {
     return run(() -> {
-          if (_inBumpZoneSupplier.getAsBoolean()) {
-            _pivotMotor.setControl(
-                _pivotAngleSetter
-                    .withPosition(IntakeConstants.pivotTucked)
-                    .withVelocity(IntakeConstants.pivotVelocity)
-                    .withAcceleration(IntakeConstants.pivotAcceleration));
-            return;
-          }
+          // if (_inBumpZoneSupplier.getAsBoolean()) {
+          //   _pivotMotor.setControl(
+          //       _pivotAngleSetter
+          //           .withPosition(IntakeConstants.pivotTucked)
+          //           .withVelocity(IntakeConstants.pivotVelocity)
+          //           .withAcceleration(IntakeConstants.pivotAcceleration));
+          //   return;
+          // }
 
           _pivotMotor.setControl(
               _pivotAngleSetter

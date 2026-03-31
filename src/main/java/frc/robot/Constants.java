@@ -273,32 +273,32 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
         Volts.per(RotationsPerSecond).ofNative(0.4);
 
-    public static final Voltage pivotkG = Volts.of(0);
-    public static final Voltage pivotkS = Volts.of(0);
+    public static final Voltage pivotkG = Volts.of(0.25062);
+    public static final Voltage pivotkS = Volts.of(0.27011);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> pivotkV =
-        Volts.per(RotationsPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecond).ofNative(7.8768);
     public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
-        Volts.per(RotationsPerSecondPerSecond).ofNative(0);
+        Volts.per(RotationsPerSecondPerSecond).ofNative(1.7828);
 
     public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(0);
 
-    public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(2);
-    public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(5);
+    public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(0.8);
+    public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(1);
 
-    public static final AngularVelocity shootingPivotVelocity = RotationsPerSecond.of(1);
+    public static final AngularVelocity shootingPivotVelocity = RotationsPerSecond.of(0.5);
     public static final AngularAcceleration shootingPivotAcceleration =
-        RotationsPerSecondPerSecond.of(1);
+        RotationsPerSecondPerSecond.of(0.5);
 
     public static final double feedGearRatio = 1;
     public static final double pivotGearRatio = 72;
 
     public static final Angle pivotRaised = Rotations.of(0.25);
-    public static final Angle pivotTucked = Rotations.of(0.5);
-    public static final Angle pivotLowered = Rotations.of(0.6);
+    public static final Angle pivotTucked = Rotations.of(0.4);
+    public static final Angle pivotLowered = Rotations.of(0.5);
 
-    public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.7);
-    public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.2);
+    public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.15);
+    public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.6);
 
     public static final AngularVelocity feedSpeed = RotationsPerSecond.of(30);
   }
@@ -334,8 +334,8 @@ public final class Constants {
   public static class SwerveConstants {
     public static final Frequency odometryFrequency = Hertz.of(250);
 
-    public static final Mass mass = Pounds.of(103);
-    public static final MomentOfInertia moi = KilogramSquareMeters.of(8);
+    public static final Mass mass = Pounds.of(132);
+    public static final MomentOfInertia moi = KilogramSquareMeters.of(8.83);
 
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
     public static final LinearVelocity driverTranslationalVelocityBump = MetersPerSecond.of(1.5);
@@ -353,14 +353,14 @@ public final class Constants {
         RadiansPerSecondPerSecond.of(4);
 
     public static final Per<LinearVelocityUnit, DistanceUnit> poseTranslationalkP =
-        MetersPerSecond.per(Meter).ofNative(2);
+        MetersPerSecond.per(Meter).ofNative(3);
     public static final Per<LinearVelocityUnit, LinearVelocityUnit> poseTranslationalkD =
-        MetersPerSecond.per(MetersPerSecond).ofNative(0);
+        MetersPerSecond.per(MetersPerSecond).ofNative(0.0);
 
     public static final Per<AngularVelocityUnit, AngleUnit> poseRotationkP =
-        RadiansPerSecond.per(Radian).ofNative(4.5);
+        RadiansPerSecond.per(Radian).ofNative(5.5);
     public static final Per<AngularVelocityUnit, AngularVelocityUnit> poseRotationkD =
-        RadiansPerSecond.per(RadiansPerSecond).ofNative(0);
+        RadiansPerSecond.per(RadiansPerSecond).ofNative(0.3);
 
     public static final boolean ignorePoseTolerance = true;
 
