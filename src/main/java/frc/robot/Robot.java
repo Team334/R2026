@@ -81,7 +81,8 @@ public class Robot extends TimedRobot {
 
   @Logged(name = "IntakePivot")
   private final IntakePivot _intakePivot =
-      new IntakePivot(() -> FieldUtil.inBumpZone(_swerve.getPose()));
+      new IntakePivot(
+          _shotParameters::isReadyToShoot, () -> FieldUtil.inBumpZone(_swerve.getPose()));
 
   @Logged(name = "IntakeFeed")
   private final IntakeFeed _intakeFeed = new IntakeFeed(_intakePivot.intakeLowered());

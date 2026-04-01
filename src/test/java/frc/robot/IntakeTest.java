@@ -21,11 +21,9 @@ public class IntakeTest {
   private IntakePivot _intakePivot;
   private IntakeFeed _intakeFeed;
 
-  private boolean _inBumpZone = false;
-
   @BeforeEach
   public void setup() {
-    _intakePivot = new IntakePivot(() -> _inBumpZone);
+    _intakePivot = new IntakePivot(() -> false, () -> true);
     _intakeFeed = new IntakeFeed(_intakePivot.intakeLowered());
 
     setupTests();

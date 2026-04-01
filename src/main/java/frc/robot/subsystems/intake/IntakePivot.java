@@ -8,6 +8,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -41,16 +42,24 @@ public class IntakePivot extends AdvancedSubsystem {
   private final DynamicMotionMagicVoltage _pivotAngleSetter =
       new DynamicMotionMagicVoltage(0, 0, 0);
 
-  private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
   private final VoltageOut _pivotVoltageSetter = new VoltageOut(0);
 
+  private final StaticBrake _breakSetter = new StaticBrake();
+
+  private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
+
+  // private final Trigger _intakeLowered =
+  //     new Trigger(() -> getAngle().gte(IntakeConstants.pivotTucked)).debounce(0.3);
+
   private final Trigger _intakeLowered =
-      new Trigger(() -> getAngle().gte(IntakeConstants.pivotTucked)).debounce(0.3);
+      new Trigger(() -> getAngle().isNear(IntakeConstants.pivotLowered, Degrees.of(5)))
+          .debounce(0.2);
 
   @Logged(name = "Lower Default")
   private boolean _lowerDefault = true;
 
   private final BooleanSupplier _inBumpZoneSupplier;
+  private final BooleanSupplier _isReadyToShootSupplier;
 
   private DCMotorSim _pivotSim;
 
@@ -69,7 +78,8 @@ public class IntakePivot extends AdvancedSubsystem {
               null,
               this));
 
-  public IntakePivot(BooleanSupplier inBumpZoneSupplier) {
+  public IntakePivot(BooleanSupplier isReadyToShootSupplier, BooleanSupplier inBumpZoneSupplier) {
+    _isReadyToShootSupplier = isReadyToShootSupplier;
     _inBumpZoneSupplier = inBumpZoneSupplier;
 
     var pivotMotorConfigs = new TalonFXConfiguration();
@@ -103,7 +113,7 @@ public class IntakePivot extends AdvancedSubsystem {
         .withAcceleration(IntakeConstants.pivotAcceleration);
 
     CTREUtil.attempt(() -> _pivotMotor.getConfigurator().apply(pivotMotorConfigs), _pivotMotor);
-    CTREUtil.attempt(() -> _pivotMotor.setPosition(Rotations.of(0.22)), _pivotMotor);
+    CTREUtil.attempt(() -> _pivotMotor.setPosition(IntakeConstants.pivotRaised), _pivotMotor);
 
     CTREUtil.attempt(() -> _pivotMotor.optimizeBusUtilization(), _pivotMotor);
 
@@ -223,6 +233,11 @@ public class IntakePivot extends AdvancedSubsystem {
   /** Raises the intake slower while shooting */
   public Command raiseShooting() {
     return run(() -> {
+          if (!_isReadyToShootSupplier.getAsBoolean()) {
+            _pivotMotor.setControl(_breakSetter);
+            return;
+          }
+
           _pivotMotor.setControl(
               _pivotAngleSetter
                   .withPosition(IntakeConstants.pivotRaised)

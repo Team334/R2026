@@ -281,7 +281,7 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
         Volts.per(RotationsPerSecondPerSecond).ofNative(1.7828);
 
-    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(0);
+    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(0.2);
 
     public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(0.5);
     public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(0.5);
@@ -293,7 +293,7 @@ public final class Constants {
     public static final double feedGearRatio = 1;
     public static final double pivotGearRatio = 72;
 
-    public static final Angle pivotRaised = Rotations.of(0.2);
+    public static final Angle pivotRaised = Rotations.of(0.22);
     public static final Angle pivotTucked = Rotations.of(0.4);
     public static final Angle pivotLowered = Rotations.of(0.5);
 
