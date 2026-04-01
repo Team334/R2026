@@ -159,7 +159,7 @@ public final class Constants {
                     Units.inchesToMeters(9.6913),
                     Units.inchesToMeters(20.2395)),
                 new Rotation3d(0, 0, -Units.degreesToRadians(15))),
-            0.1,
+            0.3,
             3,
             7);
 
@@ -172,7 +172,7 @@ public final class Constants {
                     -Units.inchesToMeters(9.6913),
                     Units.inchesToMeters(20.2395)),
                 new Rotation3d(0, 0, Units.degreesToRadians(15))),
-            0.1,
+            0.3,
             3,
             7);
   }

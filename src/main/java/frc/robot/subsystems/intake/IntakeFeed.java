@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
@@ -37,16 +36,12 @@ public class IntakeFeed extends AdvancedSubsystem {
   private final VelocityVoltage _feedVelocitySetter = new VelocityVoltage(0);
   private final StatusSignal<AngularVelocity> _feedVelocityGetter = _feedMotor.getVelocity();
 
-  private final Trigger _intakeLoweredSupplier;
-
   private DCMotorSim _feedSim;
 
   private Notifier _simNotifier;
   private double _lastSimTime;
 
-  public IntakeFeed(Trigger intakeLoweredSupplier) {
-    _intakeLoweredSupplier = intakeLoweredSupplier;
-
+  public IntakeFeed() {
     var feedMotorConfigs = new TalonFXConfiguration();
 
     // feed motor configs
@@ -129,8 +124,6 @@ public class IntakeFeed extends AdvancedSubsystem {
   public Command feedIn() {
     return run(() ->
             _feedMotor.setControl(_feedVelocitySetter.withVelocity(IntakeConstants.feedSpeed)))
-        .onlyIf(_intakeLoweredSupplier)
-        .until(_intakeLoweredSupplier.negate())
         .withName("Feed In");
   }
 
@@ -139,8 +132,6 @@ public class IntakeFeed extends AdvancedSubsystem {
     return run(() ->
             _feedMotor.setControl(
                 _feedVelocitySetter.withVelocity(IntakeConstants.feedSpeed.unaryMinus())))
-        .onlyIf(_intakeLoweredSupplier)
-        .until(_intakeLoweredSupplier.negate())
         .withName("Feed Out");
   }
 

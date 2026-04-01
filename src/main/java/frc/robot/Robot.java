@@ -81,11 +81,10 @@ public class Robot extends TimedRobot {
 
   @Logged(name = "IntakePivot")
   private final IntakePivot _intakePivot =
-      new IntakePivot(
-          _shotParameters::isReadyToShoot, () -> FieldUtil.inBumpZone(_swerve.getPose()));
+      new IntakePivot(() -> FieldUtil.inBumpZone(_swerve.getPose()));
 
   @Logged(name = "IntakeFeed")
-  private final IntakeFeed _intakeFeed = new IntakeFeed(_intakePivot.intakeLowered());
+  private final IntakeFeed _intakeFeed = new IntakeFeed();
 
   @Logged(name = "Climb")
   private final Climb _climb = new Climb();
@@ -145,6 +144,9 @@ public class Robot extends TimedRobot {
 
     _shotParameters =
         new ShotParameters(_shooter::inTolerance, _swerve::getPose, Rotation2d.fromDegrees(5));
+
+    // TERRIBLE temporary solution
+    _intakePivot.setIsReadyToShootSupplier(_shotParameters::isReadyToShoot);
 
     configureDriverBindings();
 

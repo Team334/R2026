@@ -8,7 +8,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
-import com.ctre.phoenix6.controls.StaticBrake;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
@@ -42,24 +41,19 @@ public class IntakePivot extends AdvancedSubsystem {
   private final DynamicMotionMagicVoltage _pivotAngleSetter =
       new DynamicMotionMagicVoltage(0, 0, 0);
 
+  private final VelocityVoltage _pivotVelocitySetter = new VelocityVoltage(0);
   private final VoltageOut _pivotVoltageSetter = new VoltageOut(0);
-
-  private final StaticBrake _breakSetter = new StaticBrake();
 
   private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
 
   // private final Trigger _intakeLowered =
   //     new Trigger(() -> getAngle().gte(IntakeConstants.pivotTucked)).debounce(0.3);
 
-  private final Trigger _intakeLowered =
-      new Trigger(() -> getAngle().isNear(IntakeConstants.pivotLowered, Degrees.of(5)))
-          .debounce(0.2);
-
   @Logged(name = "Lower Default")
   private boolean _lowerDefault = true;
 
   private final BooleanSupplier _inBumpZoneSupplier;
-  private final BooleanSupplier _isReadyToShootSupplier;
+  private BooleanSupplier _isReadyToShootSupplier;
 
   private DCMotorSim _pivotSim;
 
@@ -78,8 +72,7 @@ public class IntakePivot extends AdvancedSubsystem {
               null,
               this));
 
-  public IntakePivot(BooleanSupplier isReadyToShootSupplier, BooleanSupplier inBumpZoneSupplier) {
-    _isReadyToShootSupplier = isReadyToShootSupplier;
+  public IntakePivot(BooleanSupplier inBumpZoneSupplier) {
     _inBumpZoneSupplier = inBumpZoneSupplier;
 
     var pivotMotorConfigs = new TalonFXConfiguration();
@@ -198,10 +191,9 @@ public class IntakePivot extends AdvancedSubsystem {
     _simNotifier.startPeriodic(1 / Constants.simNotifierFrequency.in(Hertz));
   }
 
-  /** Intake is lowered trigger. */
-  @Logged(name = "Intake Lowered")
-  public Trigger intakeLowered() {
-    return _intakeLowered;
+  // TERRIBLE temporary solution
+  public void setIsReadyToShootSupplier(BooleanSupplier isReadyToShootSupplier) {
+    _isReadyToShootSupplier = isReadyToShootSupplier;
   }
 
   @Logged(name = "Angle")
@@ -234,7 +226,7 @@ public class IntakePivot extends AdvancedSubsystem {
   public Command raiseShooting() {
     return run(() -> {
           if (!_isReadyToShootSupplier.getAsBoolean()) {
-            _pivotMotor.setControl(_breakSetter);
+            _pivotMotor.setControl(_pivotVelocitySetter.withVelocity(0));
             return;
           }
 
