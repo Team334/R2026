@@ -300,7 +300,7 @@ public final class Constants {
     public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.1);
     public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.6);
 
-    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(30);
+    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(50);
   }
 
   public static class ClimbConstants {

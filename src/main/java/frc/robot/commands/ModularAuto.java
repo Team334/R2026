@@ -100,7 +100,8 @@ public class ModularAuto {
         "shoot",
         () ->
             sequence(
-                runOnce(() -> _aimAtTarget = true), parallel(hopper.feedShot(), shooter.shoot())));
+                runOnce(() -> _aimAtTarget = true),
+                parallel(hopper.feedShot(), shooter.shoot(), intakePivot.raiseShooting())));
 
     _bindings.put(
         "shoot still",
@@ -108,7 +109,8 @@ public class ModularAuto {
             parallel(
                     _swerve.driveFacing(InputStream.zero, InputStream.zero, shotHeadingSupplier),
                     hopper.feedShot(),
-                    shooter.shoot())
+                    shooter.shoot(),
+                    intakePivot.raiseShooting())
                 .withTimeout(1)
                 .andThen(parallel(hopper.feedStop(), shooter.idle()).withTimeout(0.1)));
 
@@ -175,7 +177,14 @@ public class ModularAuto {
 
     SmartDashboard.putData("Auto Chooser", _layoutChooser);
 
-    generateLayoutAuto(_layoutChooser.getSelected());
+    // generateLayoutAuto(_layoutChooser.getSelected());
+    AutoRoutine routine = _factory.newRoutine("test");
+    AutoTrajectory trajectory = routine.trajectory("test");
+
+    routine.active().onTrue(sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    trajectory.done().onTrue(_bindings.get("shoot still").get());
+
+    _routineCmd = routine.cmd();
   }
 
   /** The auto generated from the specified layout. */

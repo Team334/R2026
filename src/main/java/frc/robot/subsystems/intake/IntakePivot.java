@@ -99,7 +99,7 @@ public class IntakePivot extends AdvancedSubsystem {
     pivotMotorConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     pivotMotorConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 
-    pivotMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    pivotMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     _pivotAngleSetter
         .withVelocity(IntakeConstants.pivotVelocity)
