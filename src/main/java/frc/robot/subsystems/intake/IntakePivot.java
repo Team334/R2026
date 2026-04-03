@@ -27,12 +27,14 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
+import frc.lib.SysId;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Robot;
-import frc.robot.utils.SysId;
+import frc.robot.utils.ShotParameters;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 public class IntakePivot extends AdvancedSubsystem {
   private final TalonFX _pivotMotor =
@@ -52,8 +54,8 @@ public class IntakePivot extends AdvancedSubsystem {
   @Logged(name = "Lower Default")
   private boolean _lowerDefault = true;
 
+  private final Supplier<ShotParameters> _shotParametersSupplier;
   private final BooleanSupplier _inBumpZoneSupplier;
-  private BooleanSupplier _isReadyToShootSupplier;
 
   private DCMotorSim _pivotSim;
 
@@ -72,7 +74,9 @@ public class IntakePivot extends AdvancedSubsystem {
               null,
               this));
 
-  public IntakePivot(BooleanSupplier inBumpZoneSupplier) {
+  public IntakePivot(
+      Supplier<ShotParameters> shotParametersSupplier, BooleanSupplier inBumpZoneSupplier) {
+    _shotParametersSupplier = shotParametersSupplier;
     _inBumpZoneSupplier = inBumpZoneSupplier;
 
     var pivotMotorConfigs = new TalonFXConfiguration();
@@ -191,11 +195,6 @@ public class IntakePivot extends AdvancedSubsystem {
     _simNotifier.startPeriodic(1 / Constants.simNotifierFrequency.in(Hertz));
   }
 
-  // TERRIBLE temporary solution
-  public void setIsReadyToShootSupplier(BooleanSupplier isReadyToShootSupplier) {
-    _isReadyToShootSupplier = isReadyToShootSupplier;
-  }
-
   @Logged(name = "Angle")
   public Angle getAngle() {
     return _pivotAngleGetter.refresh().getValue();
@@ -225,7 +224,7 @@ public class IntakePivot extends AdvancedSubsystem {
   /** Raises the intake slower while shooting */
   public Command raiseShooting() {
     return run(() -> {
-          if (!_isReadyToShootSupplier.getAsBoolean()) {
+          if (!_shotParametersSupplier.get().isReadyToShoot()) {
             _pivotMotor.setControl(_pivotVelocitySetter.withVelocity(0));
             return;
           }

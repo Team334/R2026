@@ -178,10 +178,10 @@ public final class Constants {
   }
 
   public static class ShotConstants {
-    public static final AngularVelocity spitFlywheelSpeed = RotationsPerSecond.of(5);
+    public static final AngularVelocity spitFlywheelSpeed = RotationsPerSecond.of(20);
 
-    public static final AngularVelocity spitRollerSpeed = RotationsPerSecond.of(1);
-    public static final AngularVelocity spitFloorSpeed = RotationsPerSecond.of(1);
+    public static final AngularVelocity spitRollerSpeed = RotationsPerSecond.of(30);
+    public static final AngularVelocity spitFloorSpeed = RotationsPerSecond.of(30);
 
     // distanceMeters : <flywheelRPS, rollerRPS, floorRPS>
     public static InterpolatingMatrixTreeMap<Double, N3, N1> hubPresets =

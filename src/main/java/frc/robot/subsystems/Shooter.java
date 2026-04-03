@@ -28,13 +28,13 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.AdvancedSubsystem;
 import frc.lib.CTREUtil;
 import frc.lib.FaultLogger;
+import frc.lib.SysId;
 import frc.robot.Constants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShotConstants;
 import frc.robot.Robot;
 import frc.robot.utils.ShotParameters;
-import frc.robot.utils.SysId;
 import java.util.function.Supplier;
 
 public class Shooter extends AdvancedSubsystem {
