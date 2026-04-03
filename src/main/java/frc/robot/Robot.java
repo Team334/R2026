@@ -17,7 +17,6 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -38,7 +37,7 @@ import frc.lib.FaultsTable.FaultType;
 import frc.lib.InputStream;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.commands.ModularAuto;
+import frc.robot.commands.Auto;
 import frc.robot.commands.Superstructure;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climb;
@@ -99,14 +98,15 @@ public class Robot extends TimedRobot {
           _swerve,
           () -> _shotParameters.getShotHeading());
 
-  private final ModularAuto _auto =
-      new ModularAuto(
+  private final Auto _auto =
+      new Auto(
           _shooter,
           _hopper,
           _intakePivot,
           _intakeFeed,
           _climb,
           _swerve,
+          _superstructure,
           () -> _shotParameters.getShotHeading(),
           r -> addPeriodic(r, kDefaultPeriod));
 
@@ -160,21 +160,21 @@ public class Robot extends TimedRobot {
                   _driverController.setRumble(RumbleType.kBothRumble, 0);
                 }));
 
-    SmartDashboard.putData(
-        "Reset to Hub",
-        runOnce(
-                () ->
-                    _swerve.resetPose(
-                        new Pose2d(4.343 - 0.6858 - 1, 3.157 + 0.6858, Rotation2d.k180deg)))
-            .ignoringDisable(true));
+    // SmartDashboard.putData("Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)));
+
+    // SmartDashboard.putData(
+    //     "Reset to Hub",
+    //     runOnce(
+    //             () ->
+    //                 _swerve.resetPose(
+    //                     new Pose2d(4.343 - 0.6858 - 1, 3.157 + 0.6858, Rotation2d.k180deg)))
+    //         .ignoringDisable(true));
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
     SmartDashboard.putData("Calculate Wheel COF", _swerve.calculateWheelCOF());
     SmartDashboard.putData("Calculate Chassis MOI", _swerve.calculateMOI());
     SmartDashboard.putData(
         "Calculate Motor Max Speed And Torque", _swerve.calculateMotorMaxSpeedAndTorque());
-
-    SmartDashboard.putData("Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)));
 
     SmartDashboard.putData(
         "Robot Self Check",

@@ -81,7 +81,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   // auton request for choreo / pose controller
   private final ApplyFieldSpeeds _fieldSpeedsRequest = new ApplyFieldSpeeds();
 
-  private final HolonomicController _poseController =
+  private final HolonomicController _holonomicController =
       new HolonomicController(getKinematics().getModules());
 
   // for drive facing
@@ -371,7 +371,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
               _previousRotationGoal = heading.get();
               _lastRotationLoopTime = Timer.getFPGATimestamp();
 
-              return _poseController.calculate(
+              return _holonomicController.calculate(
                           new Pose2d(Translation2d.kZero, heading.get()),
                           new Pose2d(Translation2d.kZero, getHeading()))
                       .omegaRadiansPerSecond
@@ -421,7 +421,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
     Pose2d desiredPose = sample.getPose();
 
-    desiredSpeeds = _poseController.calculate(desiredSpeeds, desiredPose, getPose());
+    desiredSpeeds = _holonomicController.calculate(desiredSpeeds, desiredPose, getPose());
 
     setControl(
         _fieldSpeedsRequest
@@ -453,11 +453,11 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
     desiredPose = new Pose2d(desiredPose.getTranslation(), heading);
 
-    desiredSpeeds = _poseController.calculate(desiredSpeeds, desiredPose, getPose());
+    desiredSpeeds = _holonomicController.calculate(desiredSpeeds, desiredPose, getPose());
 
     // assume shot heading second deriv is low (and choreo accel is low) and set alpha to 0
     Feedforwards sampleLinearForces =
-        _poseController.getWheelForceCalculator().calculate(sample.ax, sample.ay, 0);
+        _holonomicController.getWheelForceCalculator().calculate(sample.ax, sample.ay, 0);
 
     setControl(
         _fieldSpeedsRequest
@@ -474,28 +474,28 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   /** Drives the robot in a straight line to some given goal pose. */
   public Command driveTo(Supplier<Pose2d> goalPose) {
     return run(() -> {
-          _poseController.nextSetpoint(getHeading());
+          _holonomicController.nextSetpoint(getHeading());
 
           ChassisSpeeds desiredSpeeds =
-              _poseController.calculate(
-                  _poseController.getSetpointSpeeds(),
-                  _poseController.getSetpointPose(),
+              _holonomicController.calculate(
+                  _holonomicController.getSetpointSpeeds(),
+                  _holonomicController.getSetpointPose(),
                   getPose());
 
           setControl(
               _fieldSpeedsRequest
                   .withSpeeds(desiredSpeeds)
-                  .withWheelForceFeedforwardsX(_poseController.getWheelForces().x_newtons)
-                  .withWheelForceFeedforwardsY(_poseController.getWheelForces().y_newtons));
+                  .withWheelForceFeedforwardsX(_holonomicController.getWheelForces().x_newtons)
+                  .withWheelForceFeedforwardsY(_holonomicController.getWheelForces().y_newtons));
         })
         .beforeStarting(
             () -> {
-              _poseController.reset(
+              _holonomicController.reset(
                   getPose(),
                   goalPose.get(),
                   ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getHeading()));
             })
-        .until(_poseController::isFinished)
+        .until(_holonomicController::isFinished)
         .withName("Drive To");
   }
 

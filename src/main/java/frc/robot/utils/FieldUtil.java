@@ -16,12 +16,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShotConstants;
+import frc.robot.Constants.SwerveConstants;
 
 public class FieldUtil {
   // newton's method constants
   private static final int maxIter = 15;
   private static final double E_tolerance = 0.1;
-  private static final double couplingTolerance = 20;
+  private static final double couplingDegreesTolerance = 20;
 
   /** Logs FieldUtil methods. */
   public static void log(Pose2d robotPose) {
@@ -178,6 +179,11 @@ public class FieldUtil {
     Translation2d robotVelocity =
         new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
 
+    // treat tiny robot velocity as 0
+    if (robotVelocity.getNorm() < SwerveConstants.translationalDeadband.in(MetersPerSecond)) {
+      robotVelocity = Translation2d.kZero;
+    }
+
     Translation2d robotToVirtualTarget = target.minus(robotPose.getTranslation());
 
     // initial guess for t
@@ -212,7 +218,8 @@ public class FieldUtil {
                     Math.abs(
                         robotToVirtualTarget.dot(robotVelocity)
                             / (robotToVirtualTarget.getNorm() * robotVelocity.getNorm()))));
-        shotParameters.isErrorSensitive = shotParameters.couplingDegrees < couplingTolerance;
+
+        shotParameters.isErrorSensitive = shotParameters.couplingDegrees < couplingDegreesTolerance;
 
         Translation2d virtualTarget = target.minus(robotVelocity.times(t));
 

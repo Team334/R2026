@@ -228,7 +228,6 @@ const makeEventMarker = (name: EventName, target: number, offset: number) : Even
 }
 
 // SOTM
-
 const locationParams: Record<GenericLocation, LocationParams> = {
     start: {
         leftWaypoints: [
@@ -290,7 +289,7 @@ const locationParams: Record<GenericLocation, LocationParams> = {
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),
-            makeEventMarker("pivot raise", 1, 0),
+            makeEventMarker("pivot lower", 1, 0),
             makeEventMarker("feed in", 2, 0),
             makeEventMarker("feed stop", 3, 0.4),
             makeEventMarker("shoot", 5, 0)

@@ -48,9 +48,6 @@ public class IntakePivot extends AdvancedSubsystem {
 
   private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
 
-  // private final Trigger _intakeLowered =
-  //     new Trigger(() -> getAngle().gte(IntakeConstants.pivotTucked)).debounce(0.3);
-
   @Logged(name = "Lower Default")
   private boolean _lowerDefault = true;
 
