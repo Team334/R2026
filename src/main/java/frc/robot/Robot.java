@@ -17,6 +17,7 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -160,15 +161,9 @@ public class Robot extends TimedRobot {
                   _driverController.setRumble(RumbleType.kBothRumble, 0);
                 }));
 
-    // SmartDashboard.putData("Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)));
-
-    // SmartDashboard.putData(
-    //     "Reset to Hub",
-    //     runOnce(
-    //             () ->
-    //                 _swerve.resetPose(
-    //                     new Pose2d(4.343 - 0.6858 - 1, 3.157 + 0.6858, Rotation2d.k180deg)))
-    //         .ignoringDisable(true));
+    // testing tab
+    SmartDashboard.putData(
+        "Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)).ignoringDisable(true));
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
     SmartDashboard.putData("Calculate Wheel COF", _swerve.calculateWheelCOF());
@@ -180,6 +175,11 @@ public class Robot extends TimedRobot {
         "Robot Self Check",
         sequence(
                 runOnce(() -> DataLogManager.log("Robot Self Check Started")),
+                _shooter.fullSelfCheck(),
+                _hopper.fullSelfCheck(),
+                _intakePivot.fullSelfCheck(),
+                _intakeFeed.fullSelfCheck(),
+                _climb.fullSelfCheck(),
                 _swerve.fullSelfCheck(),
                 runOnce(() -> DataLogManager.log("Robot Self Check Finished")))
             .withName("Robot Self Check"));
@@ -301,13 +301,6 @@ public class Robot extends TimedRobot {
 
     // _shotParameters.setPreset(vec3(_flywheelSpeed.get(), _rollerSpeed.get(), _floorSpeed.get()));
 
-    DogLog.log(
-        "Virtual Target Distance",
-        _shotParameters
-            .getVirtualTarget()
-            .getTranslation()
-            .getDistance(_swerve.getPose().getTranslation()));
-
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
@@ -327,6 +320,13 @@ public class Robot extends TimedRobot {
     SignalLogger.writeDouble("Subsystem Bus Utilization", subsystemBusStatus.BusUtilization);
 
     FieldUtil.log(_swerve.getPose());
+
+    DogLog.log(
+        "Virtual Target Distance",
+        _shotParameters
+            .getVirtualTarget()
+            .getTranslation()
+            .getDistance(_swerve.getPose().getTranslation()));
 
     DogLog.timeEnd("Timing/Robot/robotPeriodic()");
 

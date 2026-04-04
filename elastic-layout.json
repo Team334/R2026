@@ -81,19 +81,6 @@
             }
           },
           {
-            "title": "Routine Chooser",
-            "x": 0.0,
-            "y": 180.0,
-            "width": 450.0,
-            "height": 180.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/Routine Chooser",
-              "period": 0.06,
-              "sort_options": false
-            }
-          },
-          {
             "title": "Layout Chooser",
             "x": 0.0,
             "y": 0.0,
@@ -105,6 +92,19 @@
               "period": 0.06,
               "sort_options": false
             }
+          },
+          {
+            "title": "Routine Chooser",
+            "x": 0.0,
+            "y": 180.0,
+            "width": 450.0,
+            "height": 180.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Routine Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
           }
         ]
       }
@@ -113,7 +113,158 @@
       "name": "Testing",
       "grid_layout": {
         "layouts": [],
-        "containers": []
+        "containers": [
+          {
+            "title": "Reset Pose",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 270.0,
+            "height": 360.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Reset Pose",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Wheel Radius Characterization",
+            "x": 0.0,
+            "y": 540.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Wheel Radius Characterization",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Calculate Wheel COF",
+            "x": 0.0,
+            "y": 360.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Calculate Wheel COF",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Calculate Motor Max Speed And Torque",
+            "x": 270.0,
+            "y": 360.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Calculate Motor Max Speed And Torque",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Robot Self Check",
+            "x": 270.0,
+            "y": 540.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Robot Self Check",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Clear Faults",
+            "x": 540.0,
+            "y": 360.0,
+            "width": 270.0,
+            "height": 360.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Clear Faults",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Floor Speed RPS",
+            "x": 270.0,
+            "y": 90.0,
+            "width": 180.0,
+            "height": 90.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunable/Floor Speed RPS",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Flywheel Speed RPS",
+            "x": 270.0,
+            "y": 0.0,
+            "width": 360.0,
+            "height": 90.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunable/Flywheel Speed RPS",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Roller Speed RPS",
+            "x": 450.0,
+            "y": 90.0,
+            "width": 180.0,
+            "height": 90.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunable/Roller Speed RPS",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Active Faults",
+            "x": 810.0,
+            "y": 0.0,
+            "width": 360.0,
+            "height": 720.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/FaultLogger/Active Faults",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Total Faults",
+            "x": 1170.0,
+            "y": 0.0,
+            "width": 360.0,
+            "height": 720.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/FaultLogger/Total Faults",
+              "period": 0.06
+            }
+          }
+        ]
       }
     }
   ]
