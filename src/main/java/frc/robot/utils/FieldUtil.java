@@ -24,6 +24,8 @@ public class FieldUtil {
   private static final double E_tolerance = 0.1;
   private static final double couplingDegreesTolerance = 20;
 
+  private static final double hubActiveLeadTime = 2.0;
+
   /** Logs FieldUtil methods. */
   public static void log(Pose2d robotPose) {
     DogLog.log("FieldUtil/Alliance", getAlliance());
@@ -58,9 +60,7 @@ public class FieldUtil {
 
   /** Checks whether this alliance's hub is active. */
   public static boolean isHubActive() {
-    double time = DriverStation.getMatchTime();
-
-    if (DriverStation.isAutonomous() || time <= 30 || time >= 130) {
+    if (DriverStation.isAutonomous()) {
       return true;
     }
 
@@ -68,22 +68,22 @@ public class FieldUtil {
     if (data.isEmpty()) return true;
 
     boolean active = false;
+    double time = DriverStation.getMatchTime();
+
+    if (time >= 130 || time <= 30) return true;
 
     switch (getAlliance()) {
-      case Blue:
-        active = data.charAt(0) != 'B';
-        break;
-
-      case Red:
-        active = data.charAt(0) != 'R';
-        break;
+      case Blue -> active = data.charAt(0) != 'B';
+      case Red -> active = data.charAt(0) != 'R';
     }
 
     int flips = (int) ((130 - time) / 25.0);
+    int futureFlips = (int) ((130 - (time - hubActiveLeadTime)) / 25.0);
+    int activeParity = active ? 0 : 1;
 
-    if (flips % 2 == 1) {
-      active = !active;
-    }
+    if (flips % 2 == 1) active = !active;
+
+    if (!active && futureFlips % 2 == activeParity) active = !active;
 
     return active;
   }
