@@ -18,7 +18,6 @@ import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
@@ -30,6 +29,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -134,7 +134,16 @@ public class Robot extends TimedRobot {
     FaultLogger.setup(_ntInst);
 
     _shotParameters =
-        new ShotParameters(_shooter::inTolerance, _swerve::getPose, Rotation2d.fromDegrees(5));
+        new ShotParameters(
+            () ->
+                _shooter.inTolerance()
+                    && _shooter
+                        .getFlywheelReference()
+                        .isNear(_shotParameters.getFlywheelSpeed(), 0.02),
+            () ->
+                Math.abs(_shotParameters.getShotHeading().minus(_swerve.getHeading()).getDegrees())
+                    < 5,
+            () -> FieldUtil.isShotValid(_swerve.getPose()));
 
     configureDriverBindings();
 
@@ -227,13 +236,13 @@ public class Robot extends TimedRobot {
   }
 
   private void configureDriverBindings() {
-    InputStream baseVelX =
+    final InputStream baseVelX =
         InputStream.of(_driverController::getLeftY).deadband(0.02, 1).negate().signedPow(2);
 
-    InputStream baseVelY =
+    final InputStream baseVelY =
         InputStream.of(_driverController::getLeftX).deadband(0.02, 1).negate().signedPow(2);
 
-    InputStream baseVelOmega =
+    final InputStream baseVelOmega =
         InputStream.of(_driverController::getRightX).deadband(0.02, 1).negate().signedPow(2);
 
     _swerve.setDefaultCommand(
@@ -252,14 +261,20 @@ public class Robot extends TimedRobot {
                 baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
             .beforeStarting(() -> _swerve.isOpenLoop = true));
 
-    _driverController
-        .rightTrigger()
-        .whileTrue(
-            _superstructure.shoot(
-                baseVelX.scale(
-                    SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
-                baseVelY.scale(
-                    SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond))));
+    final Command shoot =
+        _superstructure.shoot(
+            baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+            baseVelY.scale(
+                SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)));
+
+    final Command shootManually =
+        _superstructure.shootManually(
+            baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+            baseVelY.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+            baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)));
+
+    _driverController.rightTrigger().and(() -> !_shotParameters.isManual).whileTrue(shoot);
+    _driverController.rightTrigger().and(() -> _shotParameters.isManual).whileTrue(shootManually);
 
     _driverController.rightBumper().whileTrue(_superstructure.spit());
 
@@ -269,19 +284,11 @@ public class Robot extends TimedRobot {
 
     _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
 
-    _driverController.x().onTrue(_swerve.toggleFieldOriented());
-    _driverController.y().onTrue(_swerve.resetHeading().ignoringDisable(true));
-
-    // TODO change binding
     _driverController
-        .b()
-        .whileTrue(
-            _superstructure.shootManually(
-                baseVelX.scale(
-                    SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
-                baseVelY.scale(
-                    SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
-                baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond))));
+        .x()
+        .onTrue(runOnce(() -> _shotParameters.isManual = !_shotParameters.isManual));
+
+    _driverController.y().whileTrue(_intakeFeed.feedOut());
   }
 
   /**

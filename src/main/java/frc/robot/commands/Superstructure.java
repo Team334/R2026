@@ -46,7 +46,7 @@ public class Superstructure {
     _shotParametersSupplier = shotParametersSupplier;
   }
 
-  /** Scores / ferries depending on robot pose. */
+  /** Shoots. */
   public Command shoot(InputStream velX, InputStream velY) {
     return parallel(
             _shooter.shoot(),
@@ -56,7 +56,9 @@ public class Superstructure {
         .withName("Shoot");
   }
 
-  /** Shoots using manually set values and driver control. */
+  /**
+   * Shoot to use when {@link ShotParameters#isManual} is true. Gives the driver control over omega.
+   */
   public Command shootManually(InputStream velX, InputStream velY, InputStream velOmega) {
     return parallel(
             _shooter.shoot(),
@@ -65,10 +67,8 @@ public class Superstructure {
             _swerve.drive(velX, velY, velOmega))
         .beforeStarting(
             () -> {
-              _shotParametersSupplier.get().isManual = true;
               _swerve.isOpenLoop = true;
             })
-        .finallyDo(() -> _shotParametersSupplier.get().isManual = false)
         .withName("Shoot Manually");
   }
 
