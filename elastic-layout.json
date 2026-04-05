@@ -6,7 +6,134 @@
       "name": "Dashboard",
       "grid_layout": {
         "layouts": [],
-        "containers": []
+        "containers": [
+          {
+            "title": "left-arducam-processed",
+            "x": 1080.0,
+            "y": 0.0,
+            "width": 450.0,
+            "height": 360.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/left-arducam-processed",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "right-arducam-processed",
+            "x": 1080.0,
+            "y": 360.0,
+            "width": 450.0,
+            "height": 360.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/right-arducam-processed",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "In Bounds",
+            "x": 810.0,
+            "y": 540.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "Robot/Shot Parameters/In Bounds",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Is Manual",
+            "x": 810.0,
+            "y": 0.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "Robot/Shot Parameters/Is Manual",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Is Ready To Shoot",
+            "x": 810.0,
+            "y": 360.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "Robot/Shot Parameters/Is Ready To Shoot",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Is Hub Active",
+            "x": 810.0,
+            "y": 180.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/FieldUtil/Is Hub Active",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Shift Time",
+            "x": 540.0,
+            "y": 180.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/Robot/FieldUtil/Shift Time",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Seconds Only",
+              "red_start_time": 5,
+              "yellow_start_time": 15
+            }
+          },
+          {
+            "title": "Match Time",
+            "x": 540.0,
+            "y": 0.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/Robot/FieldUtil/Match Time",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 15,
+              "yellow_start_time": 35
+            }
+          }
+        ]
       }
     },
     {

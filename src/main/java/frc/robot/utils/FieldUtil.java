@@ -26,6 +26,9 @@ public class FieldUtil {
 
   private static final double hubActiveLeadTime = 2.0;
 
+  private static boolean prevHubActive;
+  private static double prevShiftTime = -1;
+
   /** Logs FieldUtil methods. */
   public static void log(Pose2d robotPose) {
     DogLog.log("FieldUtil/Alliance", getAlliance());
@@ -33,6 +36,8 @@ public class FieldUtil {
     DogLog.log("FieldUtil/Is Shot Valid", isShotValid(robotPose));
     DogLog.log("FieldUtil/In Bump Zone", inBumpZone(robotPose));
     DogLog.log("FieldUtil/In Alliance Zone", inAllianceZone(robotPose));
+    DogLog.log("FieldUtil/Match Time", getMatchTime());
+    DogLog.log("FieldUtil/Shift Time", getShiftTime());
   }
 
   /** Gets the alliance from the DS. If the alliance can't be retreived, blue is used by default. */
@@ -68,9 +73,9 @@ public class FieldUtil {
     if (data.isEmpty()) return true;
 
     boolean active = false;
-    double time = DriverStation.getMatchTime();
+    double time = getMatchTime();
 
-    if (time >= 130 || time <= 30) return true;
+    if (time >= 130 || time <= 30 + hubActiveLeadTime) return true;
 
     switch (getAlliance()) {
       case Blue -> active = data.charAt(0) != 'B';
@@ -86,6 +91,34 @@ public class FieldUtil {
     if (!active && futureFlips % 2 == activeParity) active = !active;
 
     return active;
+  }
+
+  /** Gets approximate match time from Driver Station */
+  public static double getMatchTime() {
+    return DriverStation.getMatchTime();
+  }
+
+  /** Gets the shift time for when each alliance hub is active */
+  public static double getShiftTime() {
+    double time = getMatchTime();
+
+    if (time > 130) return time - 130;
+    if (time <= (30 + hubActiveLeadTime)) return time;
+
+    boolean current = isHubActive();
+
+    if (prevShiftTime == -1) {
+      prevHubActive = current;
+      prevShiftTime = 130 + (prevHubActive ? hubActiveLeadTime : 0);
+    }
+
+    if (current != prevHubActive) {
+      prevShiftTime = time;
+      prevHubActive = current;
+    }
+
+    double elapsed = prevShiftTime - time;
+    return current ? (25 + hubActiveLeadTime) - elapsed : (25 - hubActiveLeadTime) - elapsed;
   }
 
   /**
