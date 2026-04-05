@@ -179,9 +179,12 @@ public final class Constants {
 
   public static class ShotConstants {
     public static final AngularVelocity spitFlywheelSpeed = RotationsPerSecond.of(20);
-
     public static final AngularVelocity spitRollerSpeed = RotationsPerSecond.of(30);
     public static final AngularVelocity spitFloorSpeed = RotationsPerSecond.of(30);
+
+    public static final AngularVelocity towerFlywheelSpeed = RotationsPerSecond.of(56);
+    public static final AngularVelocity towerRollerSpeed = RotationsPerSecond.of(50);
+    public static final AngularVelocity towerFloorSpeed = RotationsPerSecond.of(50);
 
     // distanceMeters : <flywheelRPS, rollerRPS, floorRPS>
     public static InterpolatingMatrixTreeMap<Double, N3, N1> hubPresets =

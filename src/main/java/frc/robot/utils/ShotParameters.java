@@ -3,6 +3,7 @@ package frc.robot.utils;
 import static edu.wpi.first.math.Nat.*;
 import static edu.wpi.first.units.Units.*;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.Matrix;
@@ -11,8 +12,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngularVelocity;
+import frc.robot.Constants.ShotConstants;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -49,6 +52,9 @@ public class ShotParameters {
 
   @NotLogged private final BooleanSupplier _isReadyToShoot;
 
+  @Logged(name = "Is Manual")
+  public boolean isManual = false;
+
   /**
    * The angle in degrees between the robot velocity vector and the vector pointing from the robot
    * to the target.
@@ -62,12 +68,21 @@ public class ShotParameters {
   @Logged(name = "Failed To Converge")
   public boolean failedToConverge = false;
 
+  // tunables for manual control
+  @NotLogged
+  private final DoubleSubscriber _manualFlywheelSpeed =
+      DogLog.tunable("Flywheel Speed RPS", ShotConstants.towerFlywheelSpeed);
+
+  @NotLogged
+  private final DoubleSubscriber _manualFloorSpeed =
+      DogLog.tunable("Floor Speed RPS", ShotConstants.towerFloorSpeed);
+
+  @NotLogged
+  private final DoubleSubscriber _manualRollerSpeed =
+      DogLog.tunable("Roller Speed RPS", ShotConstants.towerRollerSpeed);
+
   public static Matrix<N3, N1> vec3(double a, double b, double c) {
     return new Matrix<N3, N1>(N3(), N1(), new double[] {a, b, c});
-  }
-
-  public ShotParameters() {
-    _isReadyToShoot = () -> true;
   }
 
   public ShotParameters(
@@ -76,6 +91,11 @@ public class ShotParameters {
       Rotation2d headingTolerance) {
     _isReadyToShoot =
         () -> {
+          if (isManual) {
+            // if shooting manually just wait for the shooter
+            return shooterInTolerance.getAsBoolean();
+          }
+
           return shooterInTolerance.getAsBoolean()
               && Math.abs(_shotHeading.minus(robotPoseSupplier.get().getRotation()).getDegrees())
                   < headingTolerance.getDegrees()
@@ -85,15 +105,30 @@ public class ShotParameters {
         };
   }
 
+  @NotLogged
   public AngularVelocity getFlywheelSpeed() {
+    if (isManual) {
+      return _flywheelSpeed.mut_setMagnitude(_manualFlywheelSpeed.get());
+    }
+
     return _flywheelSpeed;
   }
 
+  @NotLogged
   public AngularVelocity getRollerSpeed() {
+    if (isManual) {
+      return _rollerSpeed.mut_setMagnitude(_manualRollerSpeed.get());
+    }
+
     return _rollerSpeed;
   }
 
+  @NotLogged
   public AngularVelocity getFloorSpeed() {
+    if (isManual) {
+      return _floorSpeed.mut_setMagnitude(_manualFloorSpeed.get());
+    }
+
     return _floorSpeed;
   }
 

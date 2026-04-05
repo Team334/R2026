@@ -6,7 +6,6 @@ package frc.robot.commands;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.InputStream;
 import frc.robot.Constants.ClimbConstants;
@@ -17,6 +16,7 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.intake.IntakeFeed;
 import frc.robot.subsystems.intake.IntakePivot;
 import frc.robot.utils.FieldUtil;
+import frc.robot.utils.ShotParameters;
 import java.util.function.Supplier;
 
 /** All superstructure commands. */
@@ -27,7 +27,7 @@ public class Superstructure {
   private final Climb _climb;
   private final Swerve _swerve;
 
-  private final Supplier<Rotation2d> _shotHeadingSupplier;
+  private final Supplier<ShotParameters> _shotParametersSupplier;
 
   public Superstructure(
       Shooter shooter,
@@ -36,14 +36,14 @@ public class Superstructure {
       IntakeFeed intakeFeed,
       Climb climb,
       Swerve swerve,
-      Supplier<Rotation2d> shotHeadingSupplier) {
+      Supplier<ShotParameters> shotParametersSupplier) {
     _shooter = shooter;
     _hopper = hopper;
     _intakePivot = intakePivot;
     _climb = climb;
     _swerve = swerve;
 
-    _shotHeadingSupplier = shotHeadingSupplier;
+    _shotParametersSupplier = shotParametersSupplier;
   }
 
   /** Scores / ferries depending on robot pose. */
@@ -52,8 +52,24 @@ public class Superstructure {
             _shooter.shoot(),
             _hopper.feedShot(),
             _intakePivot.raiseShooting(),
-            _swerve.driveFacing(velX, velY, () -> _shotHeadingSupplier.get()))
+            _swerve.driveFacing(velX, velY, () -> _shotParametersSupplier.get().getShotHeading()))
         .withName("Shoot");
+  }
+
+  /** Shoots using manually set values and driver control. */
+  public Command shootManually(InputStream velX, InputStream velY, InputStream velOmega) {
+    return parallel(
+            _shooter.shoot(),
+            _hopper.feedShot(),
+            _intakePivot.raiseShooting(),
+            _swerve.drive(velX, velY, velOmega))
+        .beforeStarting(
+            () -> {
+              _shotParametersSupplier.get().isManual = true;
+              _swerve.isOpenLoop = true;
+            })
+        .finallyDo(() -> _shotParametersSupplier.get().isManual = false)
+        .withName("Shoot Manually");
   }
 
   /** Spits fuel at a short range without aiming. */

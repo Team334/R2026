@@ -10,7 +10,6 @@ import choreo.trajectory.SwerveSample;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.doglog.DogLog;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -30,6 +29,7 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.intake.IntakeFeed;
 import frc.robot.subsystems.intake.IntakePivot;
 import frc.robot.utils.FieldUtil;
+import frc.robot.utils.ShotParameters;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +76,7 @@ public class Auto {
       Climb climb,
       Swerve swerve,
       Superstructure superstructure,
-      Supplier<Rotation2d> shotHeadingSupplier,
+      Supplier<ShotParameters> shotParametersSupplier,
       Consumer<Runnable> addPeriodic) {
     // -- CHOREO --
     _factory =
@@ -85,7 +85,8 @@ public class Auto {
             swerve::resetPose,
             sample -> {
               if (_aimAtTarget) {
-                swerve.followTrajectoryFacing((SwerveSample) sample, shotHeadingSupplier.get());
+                swerve.followTrajectoryFacing(
+                    (SwerveSample) sample, shotParametersSupplier.get().getShotHeading());
                 return;
               }
 

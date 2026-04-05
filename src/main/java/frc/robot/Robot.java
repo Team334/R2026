@@ -91,13 +91,7 @@ public class Robot extends TimedRobot {
 
   private final Superstructure _superstructure =
       new Superstructure(
-          _shooter,
-          _hopper,
-          _intakePivot,
-          _intakeFeed,
-          _climb,
-          _swerve,
-          () -> _shotParameters.getShotHeading());
+          _shooter, _hopper, _intakePivot, _intakeFeed, _climb, _swerve, () -> _shotParameters);
 
   private final Auto _auto =
       new Auto(
@@ -108,12 +102,8 @@ public class Robot extends TimedRobot {
           _climb,
           _swerve,
           _superstructure,
-          () -> _shotParameters.getShotHeading(),
+          () -> _shotParameters,
           r -> addPeriodic(r, kDefaultPeriod));
-
-  // private final DoubleSubscriber _flywheelSpeed = DogLog.tunable("Flywheel Speed RPS", 0.0);
-  // private final DoubleSubscriber _floorSpeed = DogLog.tunable("Floor Speed RPS", 0.0);
-  // private final DoubleSubscriber _rollerSpeed = DogLog.tunable("Roller Speed RPS", 0.0);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -281,6 +271,17 @@ public class Robot extends TimedRobot {
 
     _driverController.x().onTrue(_swerve.toggleFieldOriented());
     _driverController.y().onTrue(_swerve.resetHeading().ignoringDisable(true));
+
+    // TODO change binding
+    _driverController
+        .b()
+        .whileTrue(
+            _superstructure.shootManually(
+                baseVelX.scale(
+                    SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+                baseVelY.scale(
+                    SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+                baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond))));
   }
 
   /**
@@ -298,8 +299,6 @@ public class Robot extends TimedRobot {
         _swerve.getPose(),
         ChassisSpeeds.fromRobotRelativeSpeeds(_swerve.getChassisSpeeds(), _swerve.getHeading()),
         _shotParameters);
-
-    // _shotParameters.setPreset(vec3(_flywheelSpeed.get(), _rollerSpeed.get(), _floorSpeed.get()));
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
