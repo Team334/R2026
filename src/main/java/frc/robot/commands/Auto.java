@@ -124,7 +124,7 @@ public class Auto {
             superstructure
                 .shoot(InputStream.zero, InputStream.zero)
                 .withTimeout(1)
-                .andThen(parallel(hopper.feedStop(), shooter.idle(), intakePivot.lower())));
+                .andThen(parallel(hopper.feedStop()).withTimeout(0.1)));
 
     _bindings.put("pivot lower", intakePivot::lower);
 
@@ -245,7 +245,7 @@ public class Auto {
     AutoRoutine routine = _factory.newRoutine(layoutName);
     AutoTrajectory trajectory = routine.trajectory(layoutName, 0);
 
-    List<Integer> splits = routine.trajectory(layoutName).getRawTrajectory().splits();
+    int splits = routine.trajectory(layoutName).getRawTrajectory().splits().size();
 
     @SuppressWarnings("unchecked")
     Map<String, List<String>> splitCommands =
@@ -253,15 +253,15 @@ public class Auto {
 
     routine.active().onTrue(sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
-    for (int i = 0; i < splits.size(); i++) {
+    for (int i = 0; i < splits; i++) {
       SequentialCommandGroup splitCommand = new SequentialCommandGroup();
 
       for (String command : splitCommands.get(Integer.toString(i))) {
         splitCommand.addCommands(getBinding(command));
       }
 
-      if (i + 1 < splits.size()) {
-        AutoTrajectory nextTrajectory = routine.trajectory(layoutName, splits.get(i + 1));
+      if (i + 1 < splits) {
+        AutoTrajectory nextTrajectory = routine.trajectory(layoutName, i + 1);
         splitCommand.addCommands(nextTrajectory.cmd());
 
         trajectory.done().onTrue(splitCommand);
