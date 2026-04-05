@@ -334,6 +334,8 @@ public class Robot extends TimedRobot {
             .getTranslation()
             .getDistance(_swerve.getPose().getTranslation()));
 
+    SmartDashboard.putBoolean("Is Manual", _shotParameters.isManual);
+
     DogLog.timeEnd("Timing/Robot/robotPeriodic()");
 
     DogLog.timeEnd("Timing/Robot/Full Loop");
