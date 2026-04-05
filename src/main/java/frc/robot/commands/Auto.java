@@ -124,7 +124,9 @@ public class Auto {
             superstructure
                 .shoot(InputStream.zero, InputStream.zero)
                 .withTimeout(1)
-                .andThen(parallel(hopper.feedStop()).withTimeout(0.1)));
+                .andThen(
+                    parallel(hopper.feedStop(), shooter.idle(), intakePivot.lower())
+                        .withTimeout(0.1)));
 
     _bindings.put("pivot lower", intakePivot::lower);
 
