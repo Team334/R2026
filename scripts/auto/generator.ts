@@ -305,6 +305,7 @@ const locationParams: Record<GenericLocation, LocationParams> = {
             makeWaypoint(1.5006606578826904, 5.137444972991943, 0.0, true, false),
             makeWaypoint(0.43300509452819824, 4.9178547859191895, 1.5708),
             makeWaypoint(0.44392159581184387, 6.838572978973389, 1.5708, true, false),
+            makeWaypoint(0.7331758141517639, 6.146159648895264, 1.5708, true, false),
             makeWaypoint(0.99637770652771, 5.633697986602783, -1.5707963267948966, true, false)
         ],
         constraints: [
