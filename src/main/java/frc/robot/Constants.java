@@ -195,8 +195,8 @@ public final class Constants {
     public static final Distance hubMinDistance = Meters.of(1.89);
     public static final Distance hubMaxDistance = Meters.of(5.252);
 
-    public static final Distance ferryMinDistance = Meters.of(2.767);
-    public static final Distance ferryMaxDistance = Meters.of(4.0);
+    public static final Distance ferryMinDistance = Meters.of(0); // PLACEHOLDER
+    public static final Distance ferryMaxDistance = Meters.of(20); // PLACEHOLDER
 
     public static final LinearVelocity hubProjectileHorizontalVelocity = MetersPerSecond.of(2.722);
     public static final LinearVelocity ferryProjectileHorizontalVelocity = MetersPerSecond.of(2);
@@ -213,7 +213,7 @@ public final class Constants {
       hubPresets.put(5.012, vec3(61, 50, 50));
 
       // ferry presets
-      ferryPresets.put(0.0, vec3(0, 0, 0));
+      ferryPresets.put(20.0, vec3(61, 50, 50)); // PLACEHOLDER
 
       // hub TOFs
       hubTOFs.put(2.0, 0.885);
@@ -222,7 +222,7 @@ public final class Constants {
       hubTOFs.put(5.012, 1.41);
 
       // ferry TOFs
-      ferryTOFs.put(0.0, 0.00000001);
+      ferryTOFs.put(20.0, 2.0); // PLACEHOLDER
     }
   }
 

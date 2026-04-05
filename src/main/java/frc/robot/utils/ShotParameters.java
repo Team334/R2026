@@ -2,6 +2,7 @@ package frc.robot.utils;
 
 import static edu.wpi.first.math.Nat.*;
 import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
@@ -15,9 +16,9 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ShotConstants;
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 @Logged
 public class ShotParameters {
@@ -31,7 +32,7 @@ public class ShotParameters {
   private final MutAngularVelocity _floorSpeed = RotationsPerSecond.mutable(0);
 
   @Logged(name = "Shot Heading")
-  private Rotation2d _shotHeading = new Rotation2d();
+  private Rotation2d _shotHeading = Rotation2d.kZero;
 
   @Logged(name = "Target")
   private Pose2d _target = Pose2d.kZero;
@@ -85,10 +86,39 @@ public class ShotParameters {
     return new Matrix<N3, N1>(N3(), N1(), new double[] {a, b, c});
   }
 
+  /**
+   * Creates a new ShotParameters.
+   *
+   * @param shooterInTolerance Shooter flywheel is in tolerance of the shot parameters.
+   * @param headingInTolerance Heading is in tolerance of the shoot parameters.
+   * @param isShotValid Shot is valid depending on the hub status.
+   */
   public ShotParameters(
       BooleanSupplier shooterInTolerance,
-      Supplier<Pose2d> robotPoseSupplier,
-      Rotation2d headingTolerance) {
+      BooleanSupplier headingInTolerance,
+      BooleanSupplier isShotValid) {
+    new Trigger(() -> isManual)
+        .onTrue(
+            runOnce(
+                () -> {
+                  // switch to manually set shot parameters
+                  _flywheelSpeed.mut_setMagnitude(_manualFlywheelSpeed.get());
+                  _rollerSpeed.mut_setMagnitude(_manualRollerSpeed.get());
+                  _floorSpeed.mut_setMagnitude(_manualFloorSpeed.get());
+                  _shotHeading = Rotation2d.kZero;
+
+                  _target = Pose2d.kZero;
+                  _virtualTarget = Pose2d.kZero;
+
+                  inBounds = false;
+
+                  isErrorSensitive = false;
+                  couplingDegrees = 0;
+
+                  newtonIterations = 0;
+                  failedToConverge = false;
+                }));
+
     _isReadyToShoot =
         () -> {
           if (isManual) {
@@ -97,9 +127,8 @@ public class ShotParameters {
           }
 
           return shooterInTolerance.getAsBoolean()
-              && Math.abs(_shotHeading.minus(robotPoseSupplier.get().getRotation()).getDegrees())
-                  < headingTolerance.getDegrees()
-              && FieldUtil.isShotValid(robotPoseSupplier.get())
+              && headingInTolerance.getAsBoolean()
+              && isShotValid.getAsBoolean()
               && inBounds
               && !failedToConverge;
         };

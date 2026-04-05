@@ -328,9 +328,9 @@
           {
             "title": "Floor Speed RPS",
             "x": 270.0,
-            "y": 90.0,
-            "width": 180.0,
-            "height": 90.0,
+            "y": 180.0,
+            "width": 270.0,
+            "height": 180.0,
             "type": "Text Display",
             "properties": {
               "topic": "/Tunable/Floor Speed RPS",
@@ -343,8 +343,8 @@
             "title": "Flywheel Speed RPS",
             "x": 270.0,
             "y": 0.0,
-            "width": 360.0,
-            "height": 90.0,
+            "width": 540.0,
+            "height": 180.0,
             "type": "Text Display",
             "properties": {
               "topic": "/Tunable/Flywheel Speed RPS",
@@ -355,10 +355,10 @@
           },
           {
             "title": "Roller Speed RPS",
-            "x": 450.0,
-            "y": 90.0,
-            "width": 180.0,
-            "height": 90.0,
+            "x": 540.0,
+            "y": 180.0,
+            "width": 270.0,
+            "height": 180.0,
             "type": "Text Display",
             "properties": {
               "topic": "/Tunable/Roller Speed RPS",

@@ -19,6 +19,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
@@ -50,6 +51,10 @@ public class Shooter extends AdvancedSubsystem {
 
   private final StatusSignal<AngularVelocity> _flywheelVelocityGetter =
       _flywheelMotor.getVelocity();
+
+  private final StatusSignal<Double> _flywheelReferenceGetter =
+      _flywheelMotor.getClosedLoopReference();
+  private final MutAngularVelocity _flywheelReference = RotationsPerSecond.mutable(0);
 
   @Logged(name = "Idle Velocity Percentage")
   private final double idleVelocityPercentage = 0.5;
@@ -250,7 +255,7 @@ public class Shooter extends AdvancedSubsystem {
         .withName("Spit");
   }
 
-  /** Whether the shooter flywheel is in velocity tolerance for shooting. */
+  /** Whether the flywheel velocity is in tolerance of its reference. */
   @Logged(name = "In Tolerance")
   public boolean inTolerance() {
     return _inTolerance;
@@ -259,6 +264,11 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Flywheel Speed")
   public AngularVelocity getFlywheelSpeed() {
     return _flywheelVelocityGetter.refresh().getValue();
+  }
+
+  @Logged(name = "Flywheel Reference")
+  public AngularVelocity getFlywheelReference() {
+    return _flywheelReference.mut_setMagnitude(_flywheelReferenceGetter.refresh().getValue());
   }
 
   @Override
