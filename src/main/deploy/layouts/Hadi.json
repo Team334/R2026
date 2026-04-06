@@ -1,0 +1,10 @@
+{
+    "name": "Hadi",
+    "layout": [
+        "l_start",
+        "l_neutralmiddle"
+    ],
+    "splitCommands": {
+        "0": ["shoot still"]
+    }
+}
