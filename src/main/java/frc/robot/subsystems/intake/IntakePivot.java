@@ -7,11 +7,9 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
@@ -19,6 +17,7 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
@@ -40,13 +39,12 @@ public class IntakePivot extends AdvancedSubsystem {
   private final TalonFX _pivotMotor =
       new TalonFX(IntakeConstants.pivotMotorID, Constants.subsystemBus);
 
-  private final DynamicMotionMagicVoltage _pivotAngleSetter =
-      new DynamicMotionMagicVoltage(0, 0, 0);
-
-  private final VelocityVoltage _pivotVelocitySetter = new VelocityVoltage(0);
   private final VoltageOut _pivotVoltageSetter = new VoltageOut(0);
-
+  private final VelocityVoltage _pivotVelocitySetter = new VelocityVoltage(0);
   private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
+
+  private final DigitalInput _raisedSwitch = new DigitalInput(IntakeConstants.raisedSwitch);
+  private final DigitalInput _loweredSwitch = new DigitalInput(IntakeConstants.loweredSwitch);
 
   @Logged(name = "Lower Default")
   private boolean _lowerDefault = true;
@@ -80,13 +78,7 @@ public class IntakePivot extends AdvancedSubsystem {
 
     // pivot motor configs
     pivotMotorConfigs.Slot0.kS = IntakeConstants.pivotkS.in(Volts);
-    pivotMotorConfigs.Slot0.kG = IntakeConstants.pivotkG.in(Volts);
     pivotMotorConfigs.Slot0.kV = IntakeConstants.pivotkV.in(Volts.per(RotationsPerSecond));
-    pivotMotorConfigs.Slot0.kA = IntakeConstants.pivotkA.in(Volts.per(RotationsPerSecondPerSecond));
-
-    pivotMotorConfigs.Slot0.kP = IntakeConstants.pivotkP.in(Volts.per(Rotations));
-
-    pivotMotorConfigs.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
     pivotMotorConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
@@ -101,10 +93,6 @@ public class IntakePivot extends AdvancedSubsystem {
     pivotMotorConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 
     pivotMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-
-    _pivotAngleSetter
-        .withVelocity(IntakeConstants.pivotVelocity)
-        .withAcceleration(IntakeConstants.pivotAcceleration);
 
     CTREUtil.attempt(() -> _pivotMotor.getConfigurator().apply(pivotMotorConfigs), _pivotMotor);
     CTREUtil.attempt(() -> _pivotMotor.setPosition(IntakeConstants.pivotRaised), _pivotMotor);
@@ -153,7 +141,6 @@ public class IntakePivot extends AdvancedSubsystem {
 
       _pivotSim.setAngle(IntakeConstants.pivotRaised.in(Radians));
 
-      _pivotAngleSetter.withUpdateFreqHz(Hertz.of(1000));
       _pivotAngleGetter.setUpdateFrequency(Hertz.of(1000));
 
       startSimThread();
@@ -210,10 +197,10 @@ public class IntakePivot extends AdvancedSubsystem {
   public Command raise() {
     return run(() -> {
           _pivotMotor.setControl(
-              _pivotAngleSetter
-                  .withPosition(IntakeConstants.pivotRaised)
-                  .withVelocity(IntakeConstants.pivotVelocity)
-                  .withAcceleration(IntakeConstants.pivotAcceleration));
+              _pivotVoltageSetter
+                  .withOutput(IntakeConstants.pivotVoltage.unaryMinus())
+                  .withLimitForwardMotion(_loweredSwitch.get())
+                  .withLimitReverseMotion(_raisedSwitch.get()));
         })
         .withName("Raise");
   }
@@ -227,10 +214,10 @@ public class IntakePivot extends AdvancedSubsystem {
           }
 
           _pivotMotor.setControl(
-              _pivotAngleSetter
-                  .withPosition(IntakeConstants.pivotRaised)
-                  .withVelocity(IntakeConstants.shootingPivotVelocity)
-                  .withAcceleration(IntakeConstants.shootingPivotAcceleration));
+              _pivotVoltageSetter
+                  .withOutput(IntakeConstants.pivotShootingVoltage.unaryMinus())
+                  .withLimitForwardMotion(_loweredSwitch.get())
+                  .withLimitReverseMotion(_raisedSwitch.get()));
         })
         .withName("Raise Shooting");
   }
@@ -248,10 +235,10 @@ public class IntakePivot extends AdvancedSubsystem {
           // }
 
           _pivotMotor.setControl(
-              _pivotAngleSetter
-                  .withPosition(IntakeConstants.pivotLowered)
-                  .withVelocity(IntakeConstants.pivotVelocity)
-                  .withAcceleration(IntakeConstants.pivotAcceleration));
+              _pivotVoltageSetter
+                  .withOutput(IntakeConstants.pivotShootingVoltage)
+                  .withLimitForwardMotion(_loweredSwitch.get())
+                  .withLimitReverseMotion(_raisedSwitch.get()));
         })
         .withName("Lower");
   }
