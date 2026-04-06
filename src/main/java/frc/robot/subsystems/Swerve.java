@@ -339,16 +339,18 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   /** Resets the heading to face away from the alliance wall. */
   public Command resetHeading() {
     return runOnce(
-        () -> {
-          Rotation2d rotation =
-              DriverStation.getAlliance()
-                  .map(
-                      allianceColor ->
-                          allianceColor == Alliance.Red ? Rotation2d.k180deg : Rotation2d.kZero)
-                  .orElse(Rotation2d.kZero);
+            () -> {
+              Rotation2d rotation =
+                  DriverStation.getAlliance()
+                      .map(
+                          allianceColor ->
+                              allianceColor == Alliance.Red ? Rotation2d.k180deg : Rotation2d.kZero)
+                      .orElse(Rotation2d.kZero);
 
-          resetPose(new Pose2d(getPose().getTranslation(), rotation));
-        });
+              resetPose(new Pose2d(getPose().getTranslation(), rotation));
+            })
+        .ignoringDisable(true)
+        .withName("Reset Heading");
   }
 
   /**

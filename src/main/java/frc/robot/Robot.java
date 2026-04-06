@@ -163,6 +163,9 @@ public class Robot extends TimedRobot {
     // testing tab
     SmartDashboard.putData(
         "Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)).ignoringDisable(true));
+    SmartDashboard.putData("Reset Heading", _swerve.resetHeading());
+
+    SmartDashboard.putData("Toggle Field Oriented", _swerve.toggleFieldOriented());
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
     SmartDashboard.putData("Calculate Wheel COF", _swerve.calculateWheelCOF());
@@ -335,6 +338,7 @@ public class Robot extends TimedRobot {
             .getDistance(_swerve.getPose().getTranslation()));
 
     SmartDashboard.putBoolean("Is Manual", _shotParameters.isManual);
+    SmartDashboard.putBoolean("Is Field Oriented", _swerve.isFieldOriented);
 
     DogLog.timeEnd("Timing/Robot/robotPeriodic()");
 

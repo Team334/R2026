@@ -212,8 +212,7 @@ public class Shooter extends AdvancedSubsystem {
             ? ShooterConstants.shootingVelocityTolerance.in(RotationsPerSecond)
             : ShooterConstants.windupVelocityTolerance.in(RotationsPerSecond);
 
-    // in tolerance for shooting
-    if (errorRPS > toleranceRPS) {
+    if (Math.abs(errorRPS) > toleranceRPS) {
       _inTolerance = false;
     } else {
       _inTolerance = true;
