@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.FaultLogger;
 import frc.lib.FaultsTable.FaultType;
@@ -121,13 +122,7 @@ public class Auto {
 
     _bindings.put(
         "shoot still",
-        () ->
-            superstructure
-                .shoot(InputStream.zero, InputStream.zero)
-                .withTimeout(1)
-                .andThen(
-                    parallel(hopper.feedStop(), shooter.idle(), intakePivot.lower())
-                        .withTimeout(0.1)));
+        () -> superstructure.shoot(InputStream.zero, InputStream.zero).withTimeout(1));
 
     _bindings.put("pivot lower", intakePivot::lower);
 
@@ -265,7 +260,7 @@ public class Auto {
 
       if (i + 1 < splits) {
         AutoTrajectory nextTrajectory = routine.trajectory(layoutName, i + 1);
-        splitCommand.addCommands(nextTrajectory.cmd());
+        splitCommand.addCommands(new ScheduleCommand(nextTrajectory.cmd()));
 
         trajectory.done().onTrue(splitCommand);
         trajectory = nextTrajectory;

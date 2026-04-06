@@ -93,12 +93,12 @@ public class FieldUtil {
     return active;
   }
 
-  /** Gets approximate match time from Driver Station */
+  /** Gets approximate match time from Driver Station. */
   public static double getMatchTime() {
     return DriverStation.getMatchTime();
   }
 
-  /** Gets the shift time for when each alliance hub is active */
+  /** Gets the shift time for when each alliance hub is active. */
   public static double getShiftTime() {
     double time = getMatchTime();
 
