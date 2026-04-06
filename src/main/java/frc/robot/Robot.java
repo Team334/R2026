@@ -277,10 +277,10 @@ public class Robot extends TimedRobot {
 
     _driverController.leftBumper().onTrue(_intakePivot.toggleLowerDefault());
 
-    _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
+    // _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
 
     _driverController
-        .x()
+        .b()
         .onTrue(runOnce(() -> _shotParameters.isManual = !_shotParameters.isManual));
 
     _driverController.y().whileTrue(_intakeFeed.feedOut());

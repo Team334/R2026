@@ -144,27 +144,27 @@
             }
           },
           {
-            "title": "left-arducam-processed",
+            "title": "orangepi_Port_1182_Output_MJPEG_Server",
             "x": 270.0,
             "y": 180.0,
             "width": 360.0,
             "height": 360.0,
             "type": "Camera Stream",
             "properties": {
-              "topic": "/CameraPublisher/left-arducam-processed",
+              "topic": "/CameraPublisher/orangepi_Port_1182_Output_MJPEG_Server",
               "period": 0.06,
               "rotation_turns": 0
             }
           },
           {
-            "title": "right-arducam-processed",
+            "title": "orangepi_Port_1184_Output_MJPEG_Server",
             "x": 630.0,
             "y": 180.0,
             "width": 360.0,
             "height": 360.0,
             "type": "Camera Stream",
             "properties": {
-              "topic": "/CameraPublisher/right-arducam-processed",
+              "topic": "/CameraPublisher/orangepi_Port_1184_Output_MJPEG_Server",
               "period": 0.06,
               "rotation_turns": 0
             }
@@ -470,6 +470,98 @@
             "properties": {
               "topic": "/FaultLogger/Active Faults",
               "period": 0.06
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tab 4",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Swerve Rotation Forward Dynamic",
+            "x": 360.0,
+            "y": 270.0,
+            "width": 360.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve Rotation Forward Dynamic",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Swerve Rotation Forward Quasistatic",
+            "x": 360.0,
+            "y": 90.0,
+            "width": 360.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve Rotation Forward Quasistatic",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Swerve Rotation Reverse Dynamic",
+            "x": 720.0,
+            "y": 270.0,
+            "width": 360.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve Rotation Reverse Dynamic",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Swerve Rotation Reverse Quasistatic",
+            "x": 720.0,
+            "y": 90.0,
+            "width": 360.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve Rotation Reverse Quasistatic",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Angular kA",
+            "x": 450.0,
+            "y": 450.0,
+            "width": 180.0,
+            "height": 180.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunable/Angular kA",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Calculate Chassis MOI",
+            "x": 630.0,
+            "y": 450.0,
+            "width": 360.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Calculate Chassis MOI",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
             }
           }
         ]

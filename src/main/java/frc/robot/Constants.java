@@ -338,8 +338,8 @@ public final class Constants {
   public static class SwerveConstants {
     public static final Frequency odometryFrequency = Hertz.of(250);
 
-    public static final Mass mass = Pounds.of(132);
-    public static final MomentOfInertia moi = KilogramSquareMeters.of(8.83);
+    public static final Mass mass = Pounds.of(136);
+    public static final MomentOfInertia moi = KilogramSquareMeters.of(8.79);
 
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
     public static final LinearVelocity driverTranslationalVelocityBump = MetersPerSecond.of(1.5);
