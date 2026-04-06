@@ -331,6 +331,8 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putBoolean("Is Manual", _shotParameters.isManual);
     SmartDashboard.putBoolean("Is Field Oriented", _swerve.isFieldOriented);
+    SmartDashboard.putNumber("Shift Time", FieldUtil.getShiftTime());
+    SmartDashboard.putNumber("Match Time", FieldUtil.getMatchTime());
 
     DogLog.timeEnd("Timing/Robot/robotPeriodic()");
 
