@@ -11,7 +11,7 @@
             "title": "Is Manual",
             "x": 0.0,
             "y": 0.0,
-            "width": 540.0,
+            "width": 450.0,
             "height": 720.0,
             "type": "Boolean Box",
             "properties": {
@@ -22,6 +22,51 @@
               "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
+            }
+          },
+          {
+            "title": "Is Field Oriented",
+            "x": 450.0,
+            "y": 0.0,
+            "width": 270.0,
+            "height": 720.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Is Field Oriented",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Toggle Field Oriented",
+            "x": 720.0,
+            "y": 0.0,
+            "width": 360.0,
+            "height": 360.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Toggle Field Oriented",
+              "period": 0.06,
+              "show_type": false,
+              "maximize_button_space": true
+            }
+          },
+          {
+            "title": "Reset Heading",
+            "x": 720.0,
+            "y": 360.0,
+            "width": 360.0,
+            "height": 360.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Reset Heading",
+              "period": 0.06,
+              "show_type": false,
+              "maximize_button_space": true
             }
           }
         ]
@@ -99,19 +144,6 @@
             }
           },
           {
-            "title": "Layout Chooser",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 450.0,
-            "height": 180.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/Layout Chooser",
-              "period": 0.06,
-              "sort_options": false
-            }
-          },
-          {
             "title": "Routine Chooser",
             "x": 0.0,
             "y": 180.0,
@@ -120,6 +152,19 @@
             "type": "ComboBox Chooser",
             "properties": {
               "topic": "/SmartDashboard/Routine Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "Layout Chooser",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 450.0,
+            "height": 180.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Layout Chooser",
               "period": 0.06,
               "sort_options": false
             }
@@ -137,12 +182,12 @@
             "x": 0.0,
             "y": 0.0,
             "width": 270.0,
-            "height": 360.0,
+            "height": 180.0,
             "type": "Command",
             "properties": {
               "topic": "/SmartDashboard/Reset Pose",
               "period": 0.06,
-              "show_type": true,
+              "show_type": false,
               "maximize_button_space": false
             }
           },
@@ -156,7 +201,7 @@
             "properties": {
               "topic": "/SmartDashboard/Wheel Radius Characterization",
               "period": 0.06,
-              "show_type": true,
+              "show_type": false,
               "maximize_button_space": false
             }
           },
@@ -170,7 +215,7 @@
             "properties": {
               "topic": "/SmartDashboard/Calculate Wheel COF",
               "period": 0.06,
-              "show_type": true,
+              "show_type": false,
               "maximize_button_space": false
             }
           },
@@ -184,7 +229,7 @@
             "properties": {
               "topic": "/SmartDashboard/Calculate Motor Max Speed And Torque",
               "period": 0.06,
-              "show_type": true,
+              "show_type": false,
               "maximize_button_space": false
             }
           },
@@ -198,7 +243,7 @@
             "properties": {
               "topic": "/SmartDashboard/Robot Self Check",
               "period": 0.06,
-              "show_type": true,
+              "show_type": false,
               "maximize_button_space": false
             }
           },
@@ -206,7 +251,7 @@
             "title": "Clear Faults",
             "x": 540.0,
             "y": 360.0,
-            "width": 270.0,
+            "width": 360.0,
             "height": 360.0,
             "type": "Command",
             "properties": {
@@ -218,9 +263,9 @@
           },
           {
             "title": "Floor Speed RPS",
-            "x": 270.0,
+            "x": 540.0,
             "y": 180.0,
-            "width": 270.0,
+            "width": 180.0,
             "height": 180.0,
             "type": "Text Display",
             "properties": {
@@ -232,9 +277,9 @@
           },
           {
             "title": "Flywheel Speed RPS",
-            "x": 270.0,
+            "x": 540.0,
             "y": 0.0,
-            "width": 540.0,
+            "width": 360.0,
             "height": 180.0,
             "type": "Text Display",
             "properties": {
@@ -246,9 +291,9 @@
           },
           {
             "title": "Roller Speed RPS",
-            "x": 540.0,
+            "x": 720.0,
             "y": 180.0,
-            "width": 270.0,
+            "width": 180.0,
             "height": 180.0,
             "type": "Text Display",
             "properties": {
@@ -260,9 +305,9 @@
           },
           {
             "title": "Active Faults",
-            "x": 810.0,
+            "x": 900.0,
             "y": 0.0,
-            "width": 360.0,
+            "width": 270.0,
             "height": 720.0,
             "type": "Alerts",
             "properties": {
@@ -280,6 +325,51 @@
             "properties": {
               "topic": "/FaultLogger/Total Faults",
               "period": 0.06
+            }
+          },
+          {
+            "title": "Toggle Field Oriented",
+            "x": 0.0,
+            "y": 180.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Toggle Field Oriented",
+              "period": 0.06,
+              "show_type": false,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Reset Heading",
+            "x": 270.0,
+            "y": 0.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Reset Heading",
+              "period": 0.06,
+              "show_type": false,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Is Field Oriented",
+            "x": 270.0,
+            "y": 180.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Is Field Oriented",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           }
         ]

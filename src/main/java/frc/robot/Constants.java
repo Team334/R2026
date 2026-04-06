@@ -182,7 +182,7 @@ public final class Constants {
     public static final AngularVelocity spitRollerSpeed = RotationsPerSecond.of(30);
     public static final AngularVelocity spitFloorSpeed = RotationsPerSecond.of(30);
 
-    public static final AngularVelocity towerFlywheelSpeed = RotationsPerSecond.of(56);
+    public static final AngularVelocity towerFlywheelSpeed = RotationsPerSecond.of(53);
     public static final AngularVelocity towerRollerSpeed = RotationsPerSecond.of(50);
     public static final AngularVelocity towerFloorSpeed = RotationsPerSecond.of(50);
 
@@ -199,7 +199,8 @@ public final class Constants {
     public static final Distance ferryMaxDistance = Meters.of(20); // PLACEHOLDER
 
     public static final LinearVelocity hubProjectileHorizontalVelocity = MetersPerSecond.of(2.722);
-    public static final LinearVelocity ferryProjectileHorizontalVelocity = MetersPerSecond.of(2);
+    public static final LinearVelocity ferryProjectileHorizontalVelocity =
+        MetersPerSecond.of(2.722); // PLACEHOLDER
 
     // distanceMeters : TOFSecs
     public static InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
