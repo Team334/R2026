@@ -285,7 +285,7 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
         Volts.per(RotationsPerSecondPerSecond).ofNative(1.7828);
 
-    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(0.2);
+    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(2);
 
     public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(0.5);
     public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(0.5);
