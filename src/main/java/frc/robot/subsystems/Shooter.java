@@ -59,6 +59,8 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Idle Velocity Percentage")
   private final double idleVelocityPercentage = 0.75;
 
+  private final AngularVelocity idleVelocity = RotationsPerSecond.of(30);
+
   private boolean _inTolerance = false;
 
   private final Supplier<ShotParameters> _shotParametersSupplier;
@@ -91,6 +93,8 @@ public class Shooter extends AdvancedSubsystem {
     flywheelMotorConfigs.CurrentLimits.StatorCurrentLimit = 100;
     flywheelMotorConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 
+    flywheelMotorConfigs.CurrentLimits.SupplyCurrentLowerTime = 0;
+
     flywheelMotorConfigs.CurrentLimits.SupplyCurrentLimit = 50;
     flywheelMotorConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
 
@@ -107,6 +111,8 @@ public class Shooter extends AdvancedSubsystem {
     // flywheel follower motor configs
     flywheelFollowerMotorConfigs.CurrentLimits.StatorCurrentLimit = 100;
     flywheelFollowerMotorConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+
+    flywheelFollowerMotorConfigs.CurrentLimits.SupplyCurrentLowerTime = 0;
 
     flywheelFollowerMotorConfigs.CurrentLimits.SupplyCurrentLimit = 50;
     flywheelFollowerMotorConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -229,9 +235,10 @@ public class Shooter extends AdvancedSubsystem {
   /** Set flywheel to {@link #idleVelocityPercentage} of shooting speed. */
   public Command idle() {
     return run(() -> {
-          ShotParameters parameters = _shotParametersSupplier.get();
+          // ShotParameters parameters = _shotParametersSupplier.get();
 
-          setFlywheelSpeed(parameters.getFlywheelSpeed().times(idleVelocityPercentage));
+          // setFlywheelSpeed(parameters.getFlywheelSpeed().times(idleVelocityPercentage));
+          setFlywheelSpeed(idleVelocity);
         })
         .withName("Idle");
   }

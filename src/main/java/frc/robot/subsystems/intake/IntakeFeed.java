@@ -50,6 +50,9 @@ public class IntakeFeed extends AdvancedSubsystem {
 
     feedMotorConfigs.Slot0.kP = IntakeConstants.feedkP.in(Volts.per(RotationsPerSecond));
 
+    feedMotorConfigs.CurrentLimits.SupplyCurrentLimit = IntakeConstants.feedSupplyLimit.in(Amps);
+    feedMotorConfigs.CurrentLimits.SupplyCurrentLowerTime = 0;
+
     feedMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     feedMotorConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;

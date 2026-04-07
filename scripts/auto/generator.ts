@@ -380,11 +380,12 @@ const locationParams: Record<GenericLocation, LocationParams> = {
         ),
         constraints: [
             makeConstraint(5, undefined, {type: "StopPoint", props: {}}),
+            makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}})
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),
             makeEventMarker("feed in", 1, 0),
-            makeEventMarker("feed stop", 4, 0.4),
+            makeEventMarker("feed stop", 2, 0.4),
         ]
     },
     neutralmiddle: {

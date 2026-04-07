@@ -32,6 +32,7 @@ import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearAcceleration;
@@ -276,6 +277,8 @@ public final class Constants {
 
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
         Volts.per(RotationsPerSecond).ofNative(0.35);
+
+    public static final Current feedSupplyLimit = Amps.of(50);
 
     public static final Voltage pivotkG = Volts.of(0.25062);
     public static final Voltage pivotkS = Volts.of(0.27011);
