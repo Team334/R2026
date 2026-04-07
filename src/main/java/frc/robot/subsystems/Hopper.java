@@ -58,6 +58,7 @@ public class Hopper extends AdvancedSubsystem {
 
     rollerMotorConfig.Feedback.SensorToMechanismRatio = HopperConstants.rollerGearRatio;
 
+    rollerMotorConfig.CurrentLimits.SupplyCurrentLimit = 50;
     rollerMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0;
 
     // floor motor configs
@@ -70,6 +71,7 @@ public class Hopper extends AdvancedSubsystem {
 
     floorMotorConfig.Feedback.SensorToMechanismRatio = HopperConstants.floorGearRatio;
 
+    rollerMotorConfig.CurrentLimits.SupplyCurrentLimit = 50;
     floorMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0;
 
     CTREUtil.attempt(() -> _rollerMotor.getConfigurator().apply(rollerMotorConfig), _rollerMotor);
