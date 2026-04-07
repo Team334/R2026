@@ -165,6 +165,8 @@ public class Robot extends TimedRobot {
         "Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)).ignoringDisable(true));
     SmartDashboard.putData("Reset Heading", _swerve.resetHeading());
 
+    SmartDashboard.putData("Reset Intake Pivot", _intakePivot.reset());
+
     SmartDashboard.putData("Toggle Field Oriented", _swerve.toggleFieldOriented());
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
