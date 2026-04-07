@@ -1,8 +1,8 @@
 {
     "name": "Jerry",
     "layout": [
-        "r_start",
-        "r_neutralmiddle"
+        "l_start",
+        "l_neutralmiddle"
     ],
     "splitCommands": {
         "0": ["shoot still"]

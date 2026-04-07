@@ -365,16 +365,14 @@ const locationParams: Record<GenericLocation, LocationParams> = {
     },
     neutralbump: {
         leftWaypoints: [
-            makeWaypoint(2.9307680130004883, 7.31110954284668, 0, true, false),
-            makeWaypoint(5.697521209716797, 7.402477741241455, -0.006293),
+            makeWaypoint(5.576541423797607, 7.480874061584473, 0, true, true),
             makeWaypoint(5.955106735229492, 5.9437713623046875, -1.5707963267948966),
             makeWaypoint(5.955106735229492, 4.313876152038574, -1.5707963267948966),
             makeWaypoint(5.693442344665527, 7.406031608581543, 3.131788918491988),
             makeWaypoint(2.770551919937134, 7.13850736618042, -1.0286093969667478, true, true, true)
         ],
         rightWaypoints: reflectWaypoints(
-            makeWaypoint(2.9307680130004883, 7.31110954284668, 0, true, false),
-            makeWaypoint(5.697521209716797, 7.402477741241455, -0.006293),
+            makeWaypoint(5.576541423797607, 7.480874061584473, 0, true, true),
             makeWaypoint(5.955106735229492, 5.9437713623046875, -1.5707963267948966),
             makeWaypoint(5.955106735229492, 4.313876152038574, -1.5707963267948966),
             makeWaypoint(5.693442344665527, 7.406031608581543, 3.131788918491988),
@@ -476,8 +474,8 @@ var baseTraj: Trajectory = {
         constraints: [
             {from: "first", data: {type: "StopPoint", props: {}}, enabled: true},
             {from: "last", data: {type: "StopPoint", props: {}}, enabled: true},
-            {from: "first", to: "last", data: {type: "MaxVelocity", props: {max: toExpr(3, "m/s")}}, enabled: true},
-            {from: "first", to: "last", data: {type: "MaxAcceleration", props: {max: toExpr(4, "m/s^2")}}, enabled: true},
+            {from: "first", to: "last", data: {type: "MaxVelocity", props: {max: toExpr(2.5, "m/s")}}, enabled: true},
+            {from: "first", to: "last", data: {type: "MaxAcceleration", props: {max: toExpr(3, "m/s^2")}}, enabled: true},
             {from: "first", to: "last", data: {type: "KeepOutCircle", props: {x: toExpr(4.625668669119477, "m"), y: toExpr(6.208901214599609, "m"), r: toExpr(0.826396949005302, "m")}}, enabled: true},
             {from: "first", to: "last", data: {type: "KeepOutCircle", props: {x: toExpr(4.625668669119477, "m"), y: toExpr(1.8539987854, "m"), r: toExpr(0.826396949005302, "m")}}, enabled: true},
             {from: "first", to: "last", data: {type: "KeepInRectangle", props: {x: toExpr(0, "m"), y: toExpr(0.0692, "m"), w: toExpr(16.541, "m"), h: toExpr(7.95, "m")}}, enabled: true}

@@ -57,7 +57,7 @@ public class Shooter extends AdvancedSubsystem {
   private final MutAngularVelocity _flywheelReference = RotationsPerSecond.mutable(0);
 
   @Logged(name = "Idle Velocity Percentage")
-  private final double idleVelocityPercentage = 0.5;
+  private final double idleVelocityPercentage = 0.75;
 
   private boolean _inTolerance = false;
 
