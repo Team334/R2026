@@ -199,7 +199,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData(
         runOnce(FaultLogger::clear).ignoringDisable(true).withName("Clear Faults"));
 
-    addPeriodic(FaultLogger::update, 1);
+    // addPeriodic(FaultLogger::update, 1);
 
     autonomous().whileTrue(_auto.getAutoScheduler());
 
