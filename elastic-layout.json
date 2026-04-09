@@ -11,8 +11,8 @@
             "title": "Is Manual",
             "x": 0.0,
             "y": 0.0,
-            "width": 540.0,
-            "height": 720.0,
+            "width": 180.0,
+            "height": 180.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Is Manual",
@@ -22,6 +22,172 @@
               "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
+            }
+          },
+          {
+            "title": "Is Field Oriented",
+            "x": 180.0,
+            "y": 0.0,
+            "width": 180.0,
+            "height": 180.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Is Field Oriented",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Reset Heading",
+            "x": 990.0,
+            "y": 0.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Reset Heading",
+              "period": 0.06,
+              "show_type": false,
+              "maximize_button_space": true
+            }
+          },
+          {
+            "title": "Flywheel Speed RPS",
+            "x": 0.0,
+            "y": 540.0,
+            "width": 540.0,
+            "height": 90.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunable/Flywheel Speed RPS",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Floor Speed RPS",
+            "x": 540.0,
+            "y": 540.0,
+            "width": 360.0,
+            "height": 90.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunable/Floor Speed RPS",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Roller Speed RPS",
+            "x": 900.0,
+            "y": 540.0,
+            "width": 360.0,
+            "height": 90.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunable/Roller Speed RPS",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Shift Time",
+            "x": 540.0,
+            "y": 0.0,
+            "width": 180.0,
+            "height": 180.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/SmartDashboard/Shift Time",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 5,
+              "yellow_start_time": 15
+            }
+          },
+          {
+            "title": "Match Time",
+            "x": 360.0,
+            "y": 0.0,
+            "width": 180.0,
+            "height": 180.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/SmartDashboard/Match Time",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 15,
+              "yellow_start_time": 30
+            }
+          },
+          {
+            "title": "left arducam",
+            "x": 0.0,
+            "y": 180.0,
+            "width": 360.0,
+            "height": 360.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/orangepi_Port_1182_Output_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "right arducam",
+            "x": 900.0,
+            "y": 180.0,
+            "width": 360.0,
+            "height": 360.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/orangepi_Port_1184_Output_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "Reset Intake Pivot",
+            "x": 720.0,
+            "y": 0.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Reset Intake Pivot",
+              "period": 0.06,
+              "show_type": false,
+              "maximize_button_space": true
+            }
+          },
+          {
+            "title": "Field",
+            "x": 360.0,
+            "y": 180.0,
+            "width": 540.0,
+            "height": 360.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.06,
+              "field_game": "Rebuilt",
+              "robot_width": 0.85,
+              "robot_length": 0.85,
+              "show_other_objects": true,
+              "show_trajectories": true,
+              "field_rotation": 0.0,
+              "robot_color": 4294198070,
+              "trajectory_color": 4294967295,
+              "show_robot_outside_widget": false
             }
           }
         ]
@@ -34,10 +200,10 @@
         "containers": [
           {
             "title": "Total Faults",
-            "x": 630.0,
-            "y": 270.0,
+            "x": 720.0,
+            "y": 0.0,
             "width": 270.0,
-            "height": 270.0,
+            "height": 450.0,
             "type": "Alerts",
             "properties": {
               "topic": "/FaultLogger/Total Faults",
@@ -46,10 +212,10 @@
           },
           {
             "title": "Is Auto Generated",
-            "x": 450.0,
+            "x": 270.0,
             "y": 0.0,
             "width": 180.0,
-            "height": 540.0,
+            "height": 450.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/Robot/Auto/Is Auto Generated",
@@ -63,10 +229,10 @@
           },
           {
             "title": "Active Faults",
-            "x": 630.0,
+            "x": 450.0,
             "y": 0.0,
             "width": 270.0,
-            "height": 270.0,
+            "height": 450.0,
             "type": "Alerts",
             "properties": {
               "topic": "/FaultLogger/Active Faults",
@@ -75,10 +241,10 @@
           },
           {
             "title": "Choreo Alerts",
-            "x": 900.0,
+            "x": 990.0,
             "y": 0.0,
             "width": 270.0,
-            "height": 540.0,
+            "height": 450.0,
             "type": "Alerts",
             "properties": {
               "topic": "/SmartDashboard/Choreo Alerts",
@@ -89,8 +255,8 @@
             "title": "Use Layout Auto",
             "x": 0.0,
             "y": 360.0,
-            "width": 450.0,
-            "height": 180.0,
+            "width": 270.0,
+            "height": 90.0,
             "type": "Toggle Switch",
             "properties": {
               "topic": "/Tunable/Use Layout Auto",
@@ -99,27 +265,27 @@
             }
           },
           {
-            "title": "Layout Chooser",
+            "title": "Routine Chooser",
             "x": 0.0,
-            "y": 0.0,
-            "width": 450.0,
+            "y": 180.0,
+            "width": 270.0,
             "height": 180.0,
             "type": "ComboBox Chooser",
             "properties": {
-              "topic": "/SmartDashboard/Layout Chooser",
+              "topic": "/SmartDashboard/Routine Chooser",
               "period": 0.06,
               "sort_options": false
             }
           },
           {
-            "title": "Routine Chooser",
+            "title": "Layout Chooser",
             "x": 0.0,
-            "y": 180.0,
-            "width": 450.0,
+            "y": 0.0,
+            "width": 270.0,
             "height": 180.0,
             "type": "ComboBox Chooser",
             "properties": {
-              "topic": "/SmartDashboard/Routine Chooser",
+              "topic": "/SmartDashboard/Layout Chooser",
               "period": 0.06,
               "sort_options": false
             }
@@ -137,26 +303,26 @@
             "x": 0.0,
             "y": 0.0,
             "width": 270.0,
-            "height": 360.0,
+            "height": 180.0,
             "type": "Command",
             "properties": {
               "topic": "/SmartDashboard/Reset Pose",
               "period": 0.06,
-              "show_type": true,
+              "show_type": false,
               "maximize_button_space": false
             }
           },
           {
             "title": "Wheel Radius Characterization",
-            "x": 0.0,
-            "y": 540.0,
-            "width": 270.0,
+            "x": 540.0,
+            "y": 360.0,
+            "width": 360.0,
             "height": 180.0,
             "type": "Command",
             "properties": {
               "topic": "/SmartDashboard/Wheel Radius Characterization",
               "period": 0.06,
-              "show_type": true,
+              "show_type": false,
               "maximize_button_space": false
             }
           },
@@ -170,44 +336,44 @@
             "properties": {
               "topic": "/SmartDashboard/Calculate Wheel COF",
               "period": 0.06,
-              "show_type": true,
+              "show_type": false,
               "maximize_button_space": false
             }
           },
           {
             "title": "Calculate Motor Max Speed And Torque",
             "x": 270.0,
-            "y": 360.0,
+            "y": 180.0,
             "width": 270.0,
             "height": 180.0,
             "type": "Command",
             "properties": {
               "topic": "/SmartDashboard/Calculate Motor Max Speed And Torque",
               "period": 0.06,
-              "show_type": true,
+              "show_type": false,
               "maximize_button_space": false
             }
           },
           {
             "title": "Robot Self Check",
             "x": 270.0,
-            "y": 540.0,
+            "y": 360.0,
             "width": 270.0,
             "height": 180.0,
             "type": "Command",
             "properties": {
               "topic": "/SmartDashboard/Robot Self Check",
               "period": 0.06,
-              "show_type": true,
+              "show_type": false,
               "maximize_button_space": false
             }
           },
           {
             "title": "Clear Faults",
             "x": 540.0,
-            "y": 360.0,
-            "width": 270.0,
-            "height": 360.0,
+            "y": 180.0,
+            "width": 360.0,
+            "height": 180.0,
             "type": "Command",
             "properties": {
               "topic": "/SmartDashboard/Clear Faults",
@@ -218,10 +384,10 @@
           },
           {
             "title": "Floor Speed RPS",
-            "x": 270.0,
-            "y": 180.0,
-            "width": 270.0,
-            "height": 180.0,
+            "x": 540.0,
+            "y": 90.0,
+            "width": 180.0,
+            "height": 90.0,
             "type": "Text Display",
             "properties": {
               "topic": "/Tunable/Floor Speed RPS",
@@ -232,10 +398,10 @@
           },
           {
             "title": "Flywheel Speed RPS",
-            "x": 270.0,
+            "x": 540.0,
             "y": 0.0,
-            "width": 540.0,
-            "height": 180.0,
+            "width": 360.0,
+            "height": 90.0,
             "type": "Text Display",
             "properties": {
               "topic": "/Tunable/Flywheel Speed RPS",
@@ -246,10 +412,10 @@
           },
           {
             "title": "Roller Speed RPS",
-            "x": 540.0,
-            "y": 180.0,
-            "width": 270.0,
-            "height": 180.0,
+            "x": 720.0,
+            "y": 90.0,
+            "width": 180.0,
+            "height": 90.0,
             "type": "Text Display",
             "properties": {
               "topic": "/Tunable/Roller Speed RPS",
@@ -259,26 +425,71 @@
             }
           },
           {
-            "title": "Active Faults",
-            "x": 810.0,
+            "title": "Total Faults",
+            "x": 900.0,
             "y": 0.0,
             "width": 360.0,
-            "height": 720.0,
+            "height": 270.0,
             "type": "Alerts",
             "properties": {
-              "topic": "/FaultLogger/Active Faults",
+              "topic": "/FaultLogger/Total Faults",
               "period": 0.06
             }
           },
           {
-            "title": "Total Faults",
-            "x": 1170.0,
+            "title": "Toggle Field Oriented",
+            "x": 0.0,
+            "y": 180.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Toggle Field Oriented",
+              "period": 0.06,
+              "show_type": false,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Reset Heading",
+            "x": 270.0,
             "y": 0.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Reset Heading",
+              "period": 0.06,
+              "show_type": false,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "Is Field Oriented",
+            "x": 0.0,
+            "y": 540.0,
+            "width": 1260.0,
+            "height": 90.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Is Field Oriented",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Active Faults",
+            "x": 900.0,
+            "y": 270.0,
             "width": 360.0,
-            "height": 720.0,
+            "height": 270.0,
             "type": "Alerts",
             "properties": {
-              "topic": "/FaultLogger/Total Faults",
+              "topic": "/FaultLogger/Active Faults",
               "period": 0.06
             }
           }

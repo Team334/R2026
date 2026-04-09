@@ -1,0 +1,13 @@
+{
+    "name": "Jerry",
+    "layout": [
+        "r_start",
+        "r_neutralmiddle",
+        "r_neutralbump"
+    ],
+    "splitCommands": {
+        "0": ["shoot still"],
+        "1": ["shoot still"]
+
+    }
+}

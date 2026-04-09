@@ -4,12 +4,16 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.wpilibj2.command.Commands.*;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.wpilibj2.command.Commands.run;
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 
 import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.StatusCode;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
@@ -28,6 +32,7 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Watchdog;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -105,6 +110,8 @@ public class Robot extends TimedRobot {
           () -> _shotParameters,
           r -> addPeriodic(r, kDefaultPeriod));
 
+  private final Field2d _field2d = new Field2d();
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -165,6 +172,8 @@ public class Robot extends TimedRobot {
         "Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)).ignoringDisable(true));
     SmartDashboard.putData("Reset Heading", _swerve.resetHeading());
 
+    SmartDashboard.putData("Reset Intake Pivot", _intakePivot.reset());
+
     SmartDashboard.putData("Toggle Field Oriented", _swerve.toggleFieldOriented());
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
@@ -189,7 +198,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData(
         runOnce(FaultLogger::clear).ignoringDisable(true).withName("Clear Faults"));
 
-    addPeriodic(FaultLogger::update, 1);
+    // addPeriodic(FaultLogger::update, 1);
 
     autonomous().whileTrue(_auto.getAutoScheduler());
 
@@ -251,16 +260,8 @@ public class Robot extends TimedRobot {
     _swerve.setDefaultCommand(
         _swerve
             .drive(
-                baseVelX.scale(
-                    () ->
-                        FieldUtil.inBumpZone(_swerve.getPose())
-                            ? SwerveConstants.driverTranslationalVelocityBump.in(MetersPerSecond)
-                            : SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
-                baseVelY.scale(
-                    () ->
-                        FieldUtil.inBumpZone(_swerve.getPose())
-                            ? SwerveConstants.driverTranslationalVelocityBump.in(MetersPerSecond)
-                            : SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+                baseVelX.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+                baseVelY.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
                 baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
             .beforeStarting(() -> _swerve.isOpenLoop = true));
 
@@ -285,10 +286,10 @@ public class Robot extends TimedRobot {
 
     _driverController.leftBumper().onTrue(_intakePivot.toggleLowerDefault());
 
-    _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
+    // _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
 
     _driverController
-        .x()
+        .b()
         .onTrue(runOnce(() -> _shotParameters.isManual = !_shotParameters.isManual));
 
     _driverController.y().whileTrue(_intakeFeed.feedOut());
@@ -325,6 +326,42 @@ public class Robot extends TimedRobot {
     CANBusStatus swerveBusStatus = TunerConstants.kCANBus.getStatus();
     CANBusStatus subsystemBusStatus = Constants.subsystemBus.getStatus();
 
+    if (swerveBusStatus.Status != StatusCode.OK) {
+      String name = "CANBus " + TunerConstants.kCANBus.getName();
+
+      try {
+        Process p =
+            Runtime.getRuntime()
+                .exec(
+                    new String[] {
+                      "sh", "-c", "dmesg | grep -iE 'usb|can0|canivore|emi' | tail -30"
+                    });
+
+        String output = new String(p.getInputStream().readAllBytes());
+        FaultLogger.report(name + "- dmesg output: " + output, FaultType.WARNING);
+      } catch (Exception e) {
+        FaultLogger.report(name + "- failed to read dmesg output", FaultType.ERROR);
+      }
+    }
+
+    if (subsystemBusStatus.Status != StatusCode.OK) {
+      String name = "CANBus " + Constants.subsystemBus.getName();
+
+      try {
+        Process p =
+            Runtime.getRuntime()
+                .exec(
+                    new String[] {
+                      "sh", "-c", "dmesg | grep -iE 'usb|can0|canivore|emi' | tail -30"
+                    });
+
+        String output = new String(p.getInputStream().readAllBytes());
+        FaultLogger.report(name + "- dmesg output: " + output, FaultType.WARNING);
+      } catch (Exception e) {
+        FaultLogger.report(name + "- failed to read dmesg output", FaultType.ERROR);
+      }
+    }
+
     SignalLogger.writeDouble("Swerve Bus Utilization", swerveBusStatus.BusUtilization);
     SignalLogger.writeDouble("Subsystem Bus Utilization", subsystemBusStatus.BusUtilization);
 
@@ -339,6 +376,11 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putBoolean("Is Manual", _shotParameters.isManual);
     SmartDashboard.putBoolean("Is Field Oriented", _swerve.isFieldOriented);
+    SmartDashboard.putNumber("Shift Time", FieldUtil.getShiftTime());
+    SmartDashboard.putNumber("Match Time", FieldUtil.getMatchTime());
+
+    _field2d.setRobotPose(_swerve.getPose());
+    SmartDashboard.putData("Field", _field2d);
 
     DogLog.timeEnd("Timing/Robot/robotPeriodic()");
 

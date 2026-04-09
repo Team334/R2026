@@ -2,9 +2,12 @@
     "name": "Hadi",
     "layout": [
         "l_start",
-        "l_neutralmiddle"
+        "l_neutralmiddle",
+        "l_neutralbump"
     ],
     "splitCommands": {
-        "0": ["shoot still"]
+        "0": ["shoot still"],
+        "1": ["shoot still"]
+
     }
 }

@@ -24,7 +24,7 @@ public class FieldUtil {
   private static final double E_tolerance = 0.1;
   private static final double couplingDegreesTolerance = 20;
 
-  private static final double hubActiveLeadTime = 2.0;
+  private static final double hubActiveLeadTime = 1.0;
 
   private static boolean prevHubActive;
   private static double prevShiftTime = -1;

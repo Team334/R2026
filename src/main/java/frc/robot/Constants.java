@@ -32,6 +32,7 @@ import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearAcceleration;
@@ -182,9 +183,11 @@ public final class Constants {
     public static final AngularVelocity spitRollerSpeed = RotationsPerSecond.of(30);
     public static final AngularVelocity spitFloorSpeed = RotationsPerSecond.of(30);
 
-    public static final AngularVelocity towerFlywheelSpeed = RotationsPerSecond.of(56);
+    public static final AngularVelocity towerFlywheelSpeed = RotationsPerSecond.of(53);
     public static final AngularVelocity towerRollerSpeed = RotationsPerSecond.of(50);
     public static final AngularVelocity towerFloorSpeed = RotationsPerSecond.of(50);
+
+    public static final AngularVelocity idleSpeed = RotationsPerSecond.of(30);
 
     // distanceMeters : <flywheelRPS, rollerRPS, floorRPS>
     public static InterpolatingMatrixTreeMap<Double, N3, N1> hubPresets =
@@ -199,7 +202,8 @@ public final class Constants {
     public static final Distance ferryMaxDistance = Meters.of(20); // PLACEHOLDER
 
     public static final LinearVelocity hubProjectileHorizontalVelocity = MetersPerSecond.of(2.722);
-    public static final LinearVelocity ferryProjectileHorizontalVelocity = MetersPerSecond.of(2);
+    public static final LinearVelocity ferryProjectileHorizontalVelocity =
+        MetersPerSecond.of(2.722); // PLACEHOLDER
 
     // distanceMeters : TOFSecs
     public static InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
@@ -236,6 +240,8 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkP =
         Volts.per(RotationsPerSecond).ofNative(0.3);
 
+    public static final Current flywheelSupplyLimit = Amps.of(50);
+
     public static final AngularVelocity bangBangVelocityTolerance = RotationsPerSecond.of(3);
 
     public static final AngularVelocity windupVelocityTolerance = RotationsPerSecond.of(1);
@@ -254,11 +260,15 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkP =
         Volts.per(RotationsPerSecond).ofNative(0.4);
 
+    public static final Current rollerSupplyLimit = Amps.of(45);
+
     public static final Voltage floorkS = Volts.of(0.3);
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkV =
         Volts.per(RotationsPerSecond).ofNative(0.23);
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkP =
         Volts.per(RotationsPerSecond).ofNative(0.6);
+
+    public static final Current floorSupplyLimit = Amps.of(45);
 
     public static final double rollerGearRatio = 1;
     public static final double floorGearRatio = 2;
@@ -276,6 +286,8 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
         Volts.per(RotationsPerSecond).ofNative(0.35);
 
+    public static final Current feedSupplyLimit = Amps.of(45);
+
     public static final Voltage pivotkG = Volts.of(0.25062);
     public static final Voltage pivotkS = Volts.of(0.27011);
 
@@ -284,7 +296,7 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
         Volts.per(RotationsPerSecondPerSecond).ofNative(1.7828);
 
-    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(0.2);
+    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(4);
 
     public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(0.5);
     public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(0.5);
@@ -298,12 +310,12 @@ public final class Constants {
 
     public static final Angle pivotRaised = Rotations.of(0.22);
     public static final Angle pivotTucked = Rotations.of(0.4);
-    public static final Angle pivotLowered = Rotations.of(0.5);
+    public static final Angle pivotLowered = Rotations.of(0.6);
 
     public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.1);
-    public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.6);
+    public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.72);
 
-    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(50);
+    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(80);
   }
 
   public static class ClimbConstants {
@@ -337,12 +349,12 @@ public final class Constants {
   public static class SwerveConstants {
     public static final Frequency odometryFrequency = Hertz.of(250);
 
-    public static final Mass mass = Pounds.of(132);
-    public static final MomentOfInertia moi = KilogramSquareMeters.of(8.83);
+    public static final Mass mass = Pounds.of(136);
+    public static final MomentOfInertia moi = KilogramSquareMeters.of(8.79);
 
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
     public static final LinearVelocity driverTranslationalVelocityBump = MetersPerSecond.of(1.5);
-    public static final AngularVelocity driverAngularVelocity = RadiansPerSecond.of(Math.PI);
+    public static final AngularVelocity driverAngularVelocity = RadiansPerSecond.of(Math.PI * 2);
 
     public static final LinearVelocity driverTranslationalShootingVelocity =
         MetersPerSecond.of(1.5);

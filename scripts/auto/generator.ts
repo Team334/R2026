@@ -354,10 +354,10 @@ const makeEventMarker = (name: EventName, target: number, offset: number) : Even
 const locationParams: Record<GenericLocation, LocationParams> = {
     start: {
         leftWaypoints: [
-            makeWaypoint(3.419274091720581, 7.474021911621094, 0.0)
+            makeWaypoint(3.5480897426605225, 7.474021911621094, 0.0)
         ],
         rightWaypoints: reflectWaypoints(
-            makeWaypoint(3.419274091720581, 7.474021911621094, 0.0)
+            makeWaypoint(3.5480897426605225, 7.474021911621094, 0.0)
         ),
         eventMarkers: [
             makeEventMarker("pivot lower", 0, 0.3)
@@ -365,16 +365,14 @@ const locationParams: Record<GenericLocation, LocationParams> = {
     },
     neutralbump: {
         leftWaypoints: [
-            makeWaypoint(2.9307680130004883, 7.31110954284668, 0, true, false),
-            makeWaypoint(5.697521209716797, 7.402477741241455, -0.006293),
+            makeWaypoint(5.576541423797607, 7.480874061584473, 0, true, true),
             makeWaypoint(5.955106735229492, 5.9437713623046875, -1.5707963267948966),
             makeWaypoint(5.955106735229492, 4.313876152038574, -1.5707963267948966),
             makeWaypoint(5.693442344665527, 7.406031608581543, 3.131788918491988),
             makeWaypoint(2.770551919937134, 7.13850736618042, -1.0286093969667478, true, true, true)
         ],
         rightWaypoints: reflectWaypoints(
-            makeWaypoint(2.9307680130004883, 7.31110954284668, 0, true, false),
-            makeWaypoint(5.697521209716797, 7.402477741241455, -0.006293),
+            makeWaypoint(5.576541423797607, 7.480874061584473, 0, true, true),
             makeWaypoint(5.955106735229492, 5.9437713623046875, -1.5707963267948966),
             makeWaypoint(5.955106735229492, 4.313876152038574, -1.5707963267948966),
             makeWaypoint(5.693442344665527, 7.406031608581543, 3.131788918491988),
@@ -382,27 +380,28 @@ const locationParams: Record<GenericLocation, LocationParams> = {
         ),
         constraints: [
             makeConstraint(5, undefined, {type: "StopPoint", props: {}}),
+            makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}})
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),
             makeEventMarker("feed in", 1, 0),
-            makeEventMarker("feed stop", 4, 0.4),
+            makeEventMarker("feed stop", 2, 0.4),
         ]
     },
     neutralmiddle: {
         leftWaypoints: [
             makeWaypoint(3.7149038314819336, 7.477536201477051, 0.0, true, false),
-            makeWaypoint(4.809019565582275, 7.465332508087158, 0.0),
+            makeWaypoint(4.809019565582275, 7.520789623260498, 0.0),
             makeWaypoint(7.484222412109375, 6.948218822479248, -1.4711286226200226),
-            makeWaypoint(7.468718528747559, 4.425135612487793, -2.0576957311828057),
+            makeWaypoint(7.4373555183410645, 5.014767646789551, -2.0576957311828057),
             makeWaypoint(5.6979265213012695, 7.4296064376831055, 3.141592653589793),
             makeWaypoint(3.2754716873168945, 7.364711284637451, -1.1729889971693404, true, true, true)
         ],
         rightWaypoints: reflectWaypoints(
             makeWaypoint(3.7149038314819336, 7.477536201477051, 0.0, true, false),
-            makeWaypoint(4.809019565582275, 7.465332508087158, 0.0),
+            makeWaypoint(4.809019565582275, 7.520789623260498, 0.0),
             makeWaypoint(7.484222412109375, 6.948218822479248, -1.4711286226200226),
-            makeWaypoint(7.468718528747559, 4.425135612487793, -2.0576957311828057),
+            makeWaypoint(7.4373555183410645, 5.014767646789551, -2.0576957311828057),
             makeWaypoint(5.6979265213012695, 7.4296064376831055, 3.141592653589793),
             makeWaypoint(3.2754716873168945, 7.364711284637451, -1.1729889971693404, true, true, true)
         ),
@@ -476,9 +475,11 @@ var baseTraj: Trajectory = {
         constraints: [
             {from: "first", data: {type: "StopPoint", props: {}}, enabled: true},
             {from: "last", data: {type: "StopPoint", props: {}}, enabled: true},
+            {from: "first", to: "last", data: {type: "MaxVelocity", props: {max: toExpr(2.5, "m/s")}}, enabled: true},
+            {from: "first", to: "last", data: {type: "MaxAcceleration", props: {max: toExpr(3, "m/s^2")}}, enabled: true},
             {from: "first", to: "last", data: {type: "KeepOutCircle", props: {x: toExpr(4.625668669119477, "m"), y: toExpr(6.208901214599609, "m"), r: toExpr(0.826396949005302, "m")}}, enabled: true},
             {from: "first", to: "last", data: {type: "KeepOutCircle", props: {x: toExpr(4.625668669119477, "m"), y: toExpr(1.8539987854, "m"), r: toExpr(0.826396949005302, "m")}}, enabled: true},
-            {from: "first", to: "last", data: {type: "KeepInRectangle", props: {x: toExpr(0, "m"), y: toExpr(0.1629, "m"), w: toExpr(16.541, "m"), h: toExpr(7.7371, "m")}}, enabled: true}
+            {from: "first", to: "last", data: {type: "KeepInRectangle", props: {x: toExpr(0, "m"), y: toExpr(0.0692, "m"), w: toExpr(16.541, "m"), h: toExpr(7.95, "m")}}, enabled: true}
         ],
         targetDt: toExpr(0.05, "s")
     },
