@@ -54,7 +54,6 @@ import frc.robot.subsystems.intake.IntakeFeed;
 import frc.robot.subsystems.intake.IntakePivot;
 import frc.robot.utils.FieldUtil;
 import frc.robot.utils.ShotParameters;
-import java.io.IOException;
 import java.lang.reflect.Field;
 
 /**
@@ -327,7 +326,9 @@ public class Robot extends TimedRobot {
     CANBusStatus swerveBusStatus = TunerConstants.kCANBus.getStatus();
     CANBusStatus subsystemBusStatus = Constants.subsystemBus.getStatus();
 
-    if (swerveBusStatus.Status != StatusCode.OK || subsystemBusStatus.Status != StatusCode.OK) {
+    if (swerveBusStatus.Status != StatusCode.OK) {
+      String name = "CANBus " + TunerConstants.kCANBus.getName();
+
       try {
         Process p =
             Runtime.getRuntime()
@@ -337,11 +338,27 @@ public class Robot extends TimedRobot {
                     });
 
         String output = new String(p.getInputStream().readAllBytes());
-        System.out.println("[CANIVORE]: dmesg output:\n" + output);
+        FaultLogger.report(name + "- dmesg output: " + output, FaultType.WARNING);
+      } catch (Exception e) {
+        FaultLogger.report(name + "- failed to read dmesg output", FaultType.ERROR);
+      }
+    }
 
-      } catch (IOException e) {
-        e.printStackTrace();
-        System.out.println("[CANIVORE]: Failed to read dmesg output");
+    if (subsystemBusStatus.Status != StatusCode.OK) {
+      String name = "CANBus " + Constants.subsystemBus.getName();
+
+      try {
+        Process p =
+            Runtime.getRuntime()
+                .exec(
+                    new String[] {
+                      "sh", "-c", "dmesg | grep -iE 'usb|can0|canivore|emi' | tail -30"
+                    });
+
+        String output = new String(p.getInputStream().readAllBytes());
+        FaultLogger.report(name + "- dmesg output: " + output, FaultType.WARNING);
+      } catch (Exception e) {
+        FaultLogger.report(name + "- failed to read dmesg output", FaultType.ERROR);
       }
     }
 

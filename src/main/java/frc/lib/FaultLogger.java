@@ -286,7 +286,7 @@ public final class FaultLogger {
   public static void register(PhotonCamera photonCamera) {
     register(
         () -> !photonCamera.isConnected(),
-        photonCamera.getName() + ": Disconnected.",
+        "PhotonCamera " + photonCamera.getName() + "- Disconnected.",
         FaultType.ERROR);
   }
 }

@@ -62,7 +62,7 @@ public class TunerConstants {
   private static final TalonFXConfiguration driveInitialConfigs =
       new TalonFXConfiguration()
           .withCurrentLimits(
-              new CurrentLimitsConfigs().withSupplyCurrentLimit(45).withSupplyCurrentLowerLimit(0));
+              new CurrentLimitsConfigs().withSupplyCurrentLimit(45).withSupplyCurrentLowerTime(0));
   private static final TalonFXConfiguration steerInitialConfigs =
       new TalonFXConfiguration()
           .withCurrentLimits(

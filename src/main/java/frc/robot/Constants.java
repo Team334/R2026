@@ -187,6 +187,8 @@ public final class Constants {
     public static final AngularVelocity towerRollerSpeed = RotationsPerSecond.of(50);
     public static final AngularVelocity towerFloorSpeed = RotationsPerSecond.of(50);
 
+    public static final AngularVelocity idleSpeed = RotationsPerSecond.of(30);
+
     // distanceMeters : <flywheelRPS, rollerRPS, floorRPS>
     public static InterpolatingMatrixTreeMap<Double, N3, N1> hubPresets =
         new InterpolatingMatrixTreeMap<>();
@@ -238,6 +240,8 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> flywheelkP =
         Volts.per(RotationsPerSecond).ofNative(0.3);
 
+    public static final Current flywheelSupplyLimit = Amps.of(50);
+
     public static final AngularVelocity bangBangVelocityTolerance = RotationsPerSecond.of(3);
 
     public static final AngularVelocity windupVelocityTolerance = RotationsPerSecond.of(1);
@@ -256,11 +260,15 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> rollerkP =
         Volts.per(RotationsPerSecond).ofNative(0.4);
 
+    public static final Current rollerSupplyLimit = Amps.of(45);
+
     public static final Voltage floorkS = Volts.of(0.3);
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkV =
         Volts.per(RotationsPerSecond).ofNative(0.23);
     public static final Per<VoltageUnit, AngularVelocityUnit> floorkP =
         Volts.per(RotationsPerSecond).ofNative(0.6);
+
+    public static final Current floorSupplyLimit = Amps.of(45);
 
     public static final double rollerGearRatio = 1;
     public static final double floorGearRatio = 2;

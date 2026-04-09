@@ -58,8 +58,10 @@ public class Hopper extends AdvancedSubsystem {
 
     rollerMotorConfig.Feedback.SensorToMechanismRatio = HopperConstants.rollerGearRatio;
 
-    rollerMotorConfig.CurrentLimits.SupplyCurrentLimit = 45;
+    rollerMotorConfig.CurrentLimits.SupplyCurrentLimit = HopperConstants.rollerSupplyLimit.in(Amps);
     rollerMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0;
+
+    rollerMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     // floor motor configs
     floorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -71,8 +73,10 @@ public class Hopper extends AdvancedSubsystem {
 
     floorMotorConfig.Feedback.SensorToMechanismRatio = HopperConstants.floorGearRatio;
 
-    rollerMotorConfig.CurrentLimits.SupplyCurrentLimit = 45;
+    floorMotorConfig.CurrentLimits.SupplyCurrentLimit = HopperConstants.floorSupplyLimit.in(Amps);
     floorMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0;
+
+    floorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     CTREUtil.attempt(() -> _rollerMotor.getConfigurator().apply(rollerMotorConfig), _rollerMotor);
     CTREUtil.attempt(() -> _floorMotor.getConfigurator().apply(floorMotorConfig), _floorMotor);
