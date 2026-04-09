@@ -6,14 +6,10 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.wpilibj2.command.Commands.run;
-import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
-import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 
-import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.StatusCode;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
@@ -22,7 +18,6 @@ import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -40,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.FaultLogger;
 import frc.lib.FaultsTable.FaultType;
+import frc.lib.GcStatsCollector;
 import frc.lib.InputStream;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
@@ -111,6 +107,8 @@ public class Robot extends TimedRobot {
           r -> addPeriodic(r, kDefaultPeriod));
 
   private final Field2d _field2d = new Field2d();
+
+  private final GcStatsCollector _gcStatsCollector = new GcStatsCollector();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -306,10 +304,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     DogLog.time("Timing/Robot/robotPeriodic()");
 
-    FieldUtil.getShotParameters(
-        _swerve.getPose(),
-        ChassisSpeeds.fromRobotRelativeSpeeds(_swerve.getChassisSpeeds(), _swerve.getHeading()),
-        _shotParameters);
+    FieldUtil.getShotParameters(_swerve.getPose(), _shotParameters);
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
@@ -323,54 +318,55 @@ public class Robot extends TimedRobot {
       _fileOnlySet = true;
     }
 
-    CANBusStatus swerveBusStatus = TunerConstants.kCANBus.getStatus();
-    CANBusStatus subsystemBusStatus = Constants.subsystemBus.getStatus();
+    // 2ms block
+    // CANBusStatus swerveBusStatus = TunerConstants.kCANBus.getStatus();
+    // CANBusStatus subsystemBusStatus = Constants.subsystemBus.getStatus();
 
-    if (swerveBusStatus.Status != StatusCode.OK) {
-      String name = "CANBus " + TunerConstants.kCANBus.getName();
+    // if (swerveBusStatus.Status != StatusCode.OK) {
+    //   String name = "CANBus " + TunerConstants.kCANBus.getName();
 
-      try {
-        Process p =
-            Runtime.getRuntime()
-                .exec(
-                    new String[] {
-                      "sh", "-c", "dmesg | grep -iE 'usb|can0|canivore|emi' | tail -30"
-                    });
+    //   try {
+    //     Process p =
+    //         Runtime.getRuntime()
+    //             .exec(
+    //                 new String[] {
+    //                   "sh", "-c", "dmesg | grep -iE 'usb|can0|canivore|emi' | tail -30"
+    //                 });
 
-        String output = new String(p.getInputStream().readAllBytes());
-        FaultLogger.report(name + "- dmesg output: " + output, FaultType.WARNING);
-      } catch (Exception e) {
-        FaultLogger.report(name + "- failed to read dmesg output", FaultType.ERROR);
-      }
-    }
+    //     String output = new String(p.getInputStream().readAllBytes());
+    //     FaultLogger.report(name + "- dmesg output: " + output, FaultType.WARNING);
+    //   } catch (Exception e) {
+    //     FaultLogger.report(name + "- failed to read dmesg output", FaultType.ERROR);
+    //   }
+    // }
 
-    if (subsystemBusStatus.Status != StatusCode.OK) {
-      String name = "CANBus " + Constants.subsystemBus.getName();
+    // if (subsystemBusStatus.Status != StatusCode.OK) {
+    //   String name = "CANBus " + Constants.subsystemBus.getName();
 
-      try {
-        Process p =
-            Runtime.getRuntime()
-                .exec(
-                    new String[] {
-                      "sh", "-c", "dmesg | grep -iE 'usb|can0|canivore|emi' | tail -30"
-                    });
+    //   try {
+    //     Process p =
+    //         Runtime.getRuntime()
+    //             .exec(
+    //                 new String[] {
+    //                   "sh", "-c", "dmesg | grep -iE 'usb|can0|canivore|emi' | tail -30"
+    //                 });
 
-        String output = new String(p.getInputStream().readAllBytes());
-        FaultLogger.report(name + "- dmesg output: " + output, FaultType.WARNING);
-      } catch (Exception e) {
-        FaultLogger.report(name + "- failed to read dmesg output", FaultType.ERROR);
-      }
-    }
+    //     String output = new String(p.getInputStream().readAllBytes());
+    //     FaultLogger.report(name + "- dmesg output: " + output, FaultType.WARNING);
+    //   } catch (Exception e) {
+    //     FaultLogger.report(name + "- failed to read dmesg output", FaultType.ERROR);
+    //   }
+    // }
 
-    SignalLogger.writeDouble("Swerve Bus Utilization", swerveBusStatus.BusUtilization);
-    SignalLogger.writeDouble("Subsystem Bus Utilization", subsystemBusStatus.BusUtilization);
+    // SignalLogger.writeDouble("Swerve Bus Utilization", swerveBusStatus.BusUtilization);
+    // SignalLogger.writeDouble("Subsystem Bus Utilization", subsystemBusStatus.BusUtilization);
 
     FieldUtil.log(_swerve.getPose());
 
     DogLog.log(
-        "Virtual Target Distance",
+        "Target Distance",
         _shotParameters
-            .getVirtualTarget()
+            .getTarget()
             .getTranslation()
             .getDistance(_swerve.getPose().getTranslation()));
 
@@ -381,6 +377,8 @@ public class Robot extends TimedRobot {
 
     _field2d.setRobotPose(_swerve.getPose());
     SmartDashboard.putData("Field", _field2d);
+
+    _gcStatsCollector.update();
 
     DogLog.timeEnd("Timing/Robot/robotPeriodic()");
 

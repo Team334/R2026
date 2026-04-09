@@ -1,22 +1,17 @@
 package frc.robot.utils;
 
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShotConstants;
-import frc.robot.Constants.SwerveConstants;
 
 public class FieldUtil {
   // newton's method constants
@@ -180,12 +175,8 @@ public class FieldUtil {
     return inAllianceZone(robotPose) ? getHubTarget() : getFerryTarget(robotPose);
   }
 
-  /**
-   * Finds the shot target at the current robot pose, then uses newton's method to update the
-   * supplied shot parameters.
-   */
-  public static void getShotParameters(
-      Pose2d robotPose, ChassisSpeeds robotSpeeds, ShotParameters shotParameters) {
+  /** Finds the shot parameters at the robot's current pose. */
+  public static void getShotParameters(Pose2d robotPose, ShotParameters shotParameters) {
     if (shotParameters.isManual) {
       // unnecessary call if shot parameters are manually set
       return;
@@ -194,9 +185,6 @@ public class FieldUtil {
     InterpolatingMatrixTreeMap<Double, N3, N1> presets =
         inAllianceZone(robotPose) ? ShotConstants.hubPresets : ShotConstants.ferryPresets;
 
-    InterpolatingDoubleTreeMap TOFs =
-        inAllianceZone(robotPose) ? ShotConstants.hubTOFs : ShotConstants.ferryTOFs;
-
     double minDistance =
         (inAllianceZone(robotPose) ? ShotConstants.hubMinDistance : ShotConstants.ferryMinDistance)
             .in(Meters);
@@ -204,83 +192,95 @@ public class FieldUtil {
         (inAllianceZone(robotPose) ? ShotConstants.hubMaxDistance : ShotConstants.ferryMaxDistance)
             .in(Meters);
 
-    double projectileHorizontalVelocity =
-        (inAllianceZone(robotPose)
-                ? ShotConstants.hubProjectileHorizontalVelocity
-                : ShotConstants.ferryProjectileHorizontalVelocity)
-            .in(MetersPerSecond);
-
     Translation2d target = getShotTarget(robotPose);
-
     shotParameters.setTarget(target);
 
-    Translation2d robotVelocity =
-        new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
+    double distanceToTarget = robotPose.getTranslation().getDistance(target);
+    shotParameters.setPreset(presets.get(distanceToTarget));
 
-    // treat tiny robot velocity as 0
-    if (robotVelocity.getNorm() < SwerveConstants.translationalDeadband.in(MetersPerSecond)) {
-      robotVelocity = Translation2d.kZero;
-    }
+    shotParameters.setShotHeading(target.minus(robotPose.getTranslation()).getAngle());
 
-    Translation2d robotToVirtualTarget = target.minus(robotPose.getTranslation());
-
-    // initial guess for t
-    double t =
-        robotToVirtualTarget.getNorm()
-            / (robotToVirtualTarget.dot(robotVelocity) / robotToVirtualTarget.getNorm()
-                + projectileHorizontalVelocity);
-
-    for (int i = 0; i < maxIter; i++) {
-      robotToVirtualTarget = target.minus(robotPose.getTranslation()).minus(robotVelocity.times(t));
-
-      double T = TOFs.get(robotToVirtualTarget.getNorm());
-      double dT_dt = 0;
-
-      // if D is within LUT
-      if (robotToVirtualTarget.getNorm()
-          == MathUtil.clamp(robotToVirtualTarget.getNorm(), minDistance, maxDistance)) {
-        dT_dt =
-            -robotToVirtualTarget.dot(robotVelocity)
-                / (projectileHorizontalVelocity * robotToVirtualTarget.getNorm());
-      }
-
-      double E = t - T;
-      double dE_dt = 1 - dT_dt;
-
-      // finish and update shot parameters once converged to E(t) = 0
-      if (Math.abs(E) < E_tolerance) {
-        // check if robot velocity vector and projectile velocity vector are strongly aligned
-        shotParameters.couplingDegrees =
-            Math.toDegrees(
-                Math.acos(
-                    Math.abs(
-                        robotToVirtualTarget.dot(robotVelocity)
-                            / (robotToVirtualTarget.getNorm() * robotVelocity.getNorm()))));
-
-        shotParameters.isErrorSensitive = shotParameters.couplingDegrees < couplingDegreesTolerance;
-
-        Translation2d virtualTarget = target.minus(robotVelocity.times(t));
-
-        double distanceToVirtualTarget = virtualTarget.getDistance(robotPose.getTranslation());
-
-        shotParameters.setPreset(presets.get(distanceToVirtualTarget));
-
-        shotParameters.setShotHeading(virtualTarget.minus(robotPose.getTranslation()).getAngle());
-        shotParameters.setVirtualTarget(virtualTarget);
-
-        shotParameters.newtonIterations = i + 1;
-        shotParameters.failedToConverge = false;
-
-        // check if shot is in bounds
-        shotParameters.inBounds =
-            minDistance <= distanceToVirtualTarget && distanceToVirtualTarget <= maxDistance;
-
-        return;
-      }
-
-      t = t - (E / dE_dt);
-    }
-
-    shotParameters.failedToConverge = true;
+    shotParameters.inBounds = minDistance <= distanceToTarget && distanceToTarget <= maxDistance;
   }
+
+  /**
+   * Finds the shot target at the current robot pose, then uses newton's method to update the
+   * supplied shot parameters.
+   */
+  /**
+   * public static void getShotParameters( Pose2d robotPose, ChassisSpeeds robotSpeeds,
+   * ShotParameters shotParameters) { if (shotParameters.isManual) { // unnecessary call if shot
+   * parameters are manually set return; }
+   *
+   * <p>InterpolatingMatrixTreeMap<Double, N3, N1> presets = inAllianceZone(robotPose) ?
+   * ShotConstants.hubPresets : ShotConstants.ferryPresets;
+   *
+   * <p>InterpolatingDoubleTreeMap TOFs = inAllianceZone(robotPose) ? ShotConstants.hubTOFs :
+   * ShotConstants.ferryTOFs;
+   *
+   * <p>double minDistance = (inAllianceZone(robotPose) ? ShotConstants.hubMinDistance :
+   * ShotConstants.ferryMinDistance) .in(Meters); double maxDistance = (inAllianceZone(robotPose) ?
+   * ShotConstants.hubMaxDistance : ShotConstants.ferryMaxDistance) .in(Meters);
+   *
+   * <p>double projectileHorizontalVelocity = (inAllianceZone(robotPose) ?
+   * ShotConstants.hubProjectileHorizontalVelocity :
+   * ShotConstants.ferryProjectileHorizontalVelocity) .in(MetersPerSecond);
+   *
+   * <p>Translation2d target = getShotTarget(robotPose);
+   *
+   * <p>shotParameters.setTarget(target);
+   *
+   * <p>Translation2d robotVelocity = new Translation2d(robotSpeeds.vxMetersPerSecond,
+   * robotSpeeds.vyMetersPerSecond);
+   *
+   * <p>// treat tiny robot velocity as 0 if (robotVelocity.getNorm() <
+   * SwerveConstants.translationalDeadband.in(MetersPerSecond)) { robotVelocity =
+   * Translation2d.kZero; }
+   *
+   * <p>Translation2d robotToVirtualTarget = target.minus(robotPose.getTranslation());
+   *
+   * <p>// initial guess for t double t = robotToVirtualTarget.getNorm() /
+   * (robotToVirtualTarget.dot(robotVelocity) / robotToVirtualTarget.getNorm() +
+   * projectileHorizontalVelocity);
+   *
+   * <p>for (int i = 0; i < maxIter; i++) { robotToVirtualTarget =
+   * target.minus(robotPose.getTranslation()).minus(robotVelocity.times(t));
+   *
+   * <p>double T = TOFs.get(robotToVirtualTarget.getNorm()); double dT_dt = 0;
+   *
+   * <p>// if D is within LUT if (robotToVirtualTarget.getNorm() ==
+   * MathUtil.clamp(robotToVirtualTarget.getNorm(), minDistance, maxDistance)) { dT_dt =
+   * -robotToVirtualTarget.dot(robotVelocity) / (projectileHorizontalVelocity *
+   * robotToVirtualTarget.getNorm()); }
+   *
+   * <p>double E = t - T; double dE_dt = 1 - dT_dt;
+   *
+   * <p>// finish and update shot parameters once converged to E(t) = 0 if (Math.abs(E) <
+   * E_tolerance) { // check if robot velocity vector and projectile velocity vector are strongly
+   * aligned shotParameters.couplingDegrees = Math.toDegrees( Math.acos( Math.abs(
+   * robotToVirtualTarget.dot(robotVelocity) / (robotToVirtualTarget.getNorm() *
+   * robotVelocity.getNorm()))));
+   *
+   * <p>shotParameters.isErrorSensitive = shotParameters.couplingDegrees < couplingDegreesTolerance;
+   *
+   * <p>Translation2d virtualTarget = target.minus(robotVelocity.times(t));
+   *
+   * <p>double distanceToVirtualTarget = virtualTarget.getDistance(robotPose.getTranslation());
+   *
+   * <p>shotParameters.setPreset(presets.get(distanceToVirtualTarget));
+   *
+   * <p>shotParameters.setShotHeading(virtualTarget.minus(robotPose.getTranslation()).getAngle());
+   * shotParameters.setVirtualTarget(virtualTarget);
+   *
+   * <p>shotParameters.newtonIterations = i + 1; shotParameters.failedToConverge = false;
+   *
+   * <p>// check if shot is in bounds shotParameters.inBounds = minDistance <=
+   * distanceToVirtualTarget && distanceToVirtualTarget <= maxDistance;
+   *
+   * <p>return; }
+   *
+   * <p>t = t - (E / dE_dt); }
+   *
+   * <p>shotParameters.failedToConverge = true; }
+   */
 }
