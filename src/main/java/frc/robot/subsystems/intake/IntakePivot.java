@@ -209,7 +209,7 @@ public class IntakePivot extends AdvancedSubsystem {
   /** Drives pivot with voltage, finally resetting the angle. */
   public Command reset() {
     return run(() -> {
-          _pivotMotor.setControl(_pivotVoltageSetter.withOutput(Volts.of(1).unaryMinus()));
+          _pivotMotor.setControl(_pivotVoltageSetter.withOutput(-1));
         })
         .finallyDo(() -> _pivotMotor.setPosition(IntakeConstants.pivotRaised));
   }
