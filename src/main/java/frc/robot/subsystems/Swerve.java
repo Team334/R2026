@@ -21,7 +21,8 @@ import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -29,6 +30,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleSubscriber;
@@ -169,6 +172,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   private final List<VisionPoseEstimate> _acceptedEstimates = new ArrayList<>();
   private final List<VisionPoseEstimate> _rejectedEstimates = new ArrayList<>();
+
+  private Matrix<N3, N1> _visionStdDevs = new Matrix<>(Nat.N3(), Nat.N1());
 
   private final Set<Pose3d> _detectedTags = new HashSet<>();
 
@@ -585,10 +590,12 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
       _acceptedEstimates.forEach(
           (e) -> {
             var stdDevs = e.stdDevs();
+            _visionStdDevs.set(0, 0, stdDevs[0]);
+            _visionStdDevs.set(1, 0, stdDevs[1]);
+            _visionStdDevs.set(2, 0, stdDevs[2]);
+
             addVisionMeasurement(
-                e.pose().toPose2d(),
-                Utils.fpgaToCurrentTime(e.timestamp()),
-                VecBuilder.fill(stdDevs[0], stdDevs[1], stdDevs[2]));
+                e.pose().toPose2d(), Utils.fpgaToCurrentTime(e.timestamp()), _visionStdDevs);
           });
     }
 

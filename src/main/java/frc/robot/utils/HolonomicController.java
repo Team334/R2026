@@ -58,6 +58,8 @@ public class HolonomicController {
           0,
           SwerveConstants.poseRotationkD.in(RadiansPerSecond.per(RadiansPerSecond)));
 
+  private ChassisSpeeds _pidSpeeds = new ChassisSpeeds();
+
   private final WheelForceCalculator _wheelForceCalculator;
   private Feedforwards _wheelForces = new Feedforwards(4);
 
@@ -197,11 +199,9 @@ public class HolonomicController {
             _startPose.getY() + setpointPosition.get(1),
             new Rotation2d(_headingProfile.getSetpoint().position));
 
-    _setpointSpeeds =
-        new ChassisSpeeds(
-            setpointVelocity.get(0),
-            setpointVelocity.get(1),
-            _headingProfile.getSetpoint().velocity);
+    _setpointSpeeds.vxMetersPerSecond = setpointVelocity.get(0);
+    _setpointSpeeds.vyMetersPerSecond = setpointVelocity.get(1);
+    _setpointSpeeds.omegaRadiansPerSecond = _headingProfile.getSetpoint().velocity;
 
     _wheelForces =
         _wheelForceCalculator.calculate(Robot.kDefaultPeriod, _prevSetpointSpeeds, _setpointSpeeds);
@@ -254,14 +254,17 @@ public class HolonomicController {
               : _headingController.calculate(
                   currentPose.getRotation().getRadians(), desiredPose.getRotation().getRadians());
 
-      return baseSpeeds.plus(new ChassisSpeeds(velX, velY, velOmega));
+      _pidSpeeds.vxMetersPerSecond = velX;
+      _pidSpeeds.vyMetersPerSecond = velY;
+      _pidSpeeds.omegaRadiansPerSecond = velOmega;
+    } else {
+      _pidSpeeds.vxMetersPerSecond = _xController.calculate(currentPose.getX(), desiredPose.getX());
+      _pidSpeeds.vyMetersPerSecond = _yController.calculate(currentPose.getY(), desiredPose.getY());
+      _pidSpeeds.omegaRadiansPerSecond =
+          _headingController.calculate(
+              currentPose.getRotation().getRadians(), desiredPose.getRotation().getRadians());
     }
 
-    return baseSpeeds.plus(
-        new ChassisSpeeds(
-            _xController.calculate(currentPose.getX(), desiredPose.getX()),
-            _yController.calculate(currentPose.getY(), desiredPose.getY()),
-            _headingController.calculate(
-                currentPose.getRotation().getRadians(), desiredPose.getRotation().getRadians())));
+    return baseSpeeds.plus(_pidSpeeds);
   }
 }
