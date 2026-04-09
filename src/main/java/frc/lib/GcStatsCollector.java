@@ -23,7 +23,7 @@ public class GcStatsCollector {
       lastCounts[i] = gcCount;
     }
 
-    DogLog.log("GC/GCTimeMS", (double) accumTime);
+    DogLog.log("GC/GCTime", accumTime / 1000.0);
     DogLog.log("GC/GCCounts", (double) accumCounts);
   }
 }
