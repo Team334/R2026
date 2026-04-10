@@ -479,7 +479,7 @@ var baseTraj: Trajectory = {
             {from: "first", to: "last", data: {type: "MaxAcceleration", props: {max: toExpr(3, "m/s^2")}}, enabled: true},
             {from: "first", to: "last", data: {type: "KeepOutCircle", props: {x: toExpr(4.625668669119477, "m"), y: toExpr(6.208901214599609, "m"), r: toExpr(0.826396949005302, "m")}}, enabled: true},
             {from: "first", to: "last", data: {type: "KeepOutCircle", props: {x: toExpr(4.625668669119477, "m"), y: toExpr(1.8539987854, "m"), r: toExpr(0.826396949005302, "m")}}, enabled: true},
-            {from: "first", to: "last", data: {type: "KeepInRectangle", props: {x: toExpr(0, "m"), y: toExpr(0.0692, "m"), w: toExpr(16.541, "m"), h: toExpr(7.95, "m")}}, enabled: true}
+            {from: "first", to: "last", data: {type: "KeepInRectangle", props: {x: toExpr(0, "m"), y: toExpr(0.0392, "m"), w: toExpr(16.541, "m"), h: toExpr(7.9908, "m")}}, enabled: true}
         ],
         targetDt: toExpr(0.05, "s")
     },
