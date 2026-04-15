@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -92,7 +93,8 @@ public class Auto {
             sample -> {
               if (_aimAtTarget) {
                 swerve.followTrajectoryFacing(
-                    (SwerveSample) sample, shotParametersSupplier.get().getShotHeading());
+                    (SwerveSample) sample,
+                    Rotation2d.fromRadians(shotParametersSupplier.get().getShotHeading()));
                 return;
               }
 

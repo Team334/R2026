@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 
@@ -146,8 +147,8 @@ public class Robot extends TimedRobot {
                         .getFlywheelReference()
                         .isNear(_shotParameters.getFlywheelSpeed(), 0.02),
             () ->
-                Math.abs(_shotParameters.getShotHeading().minus(_swerve.getHeading()).getDegrees())
-                    < 5,
+                Math.abs(_shotParameters.getShotHeading() - _swerve.getHeading().getRadians())
+                    < 0.08,
             () -> FieldUtil.isShotValid(_swerve.getPose()));
 
     configureDriverBindings();
@@ -291,6 +292,8 @@ public class Robot extends TimedRobot {
         .onTrue(runOnce(() -> _shotParameters.isManual = !_shotParameters.isManual));
 
     _driverController.y().whileTrue(_intakeFeed.feedOut());
+
+    _driverController.x().whileTrue(_superstructure.unjam());
   }
 
   /**
@@ -310,7 +313,9 @@ public class Robot extends TimedRobot {
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
+    DogLog.time("Timing/Robot/CommandScheduler.getInstance().run()");
     CommandScheduler.getInstance().run();
+    DogLog.timeEnd("Timing/Robot/CommandScheduler.getInstance().run()");
 
     if (DriverStation.isFMSAttached() && !_fileOnlySet) {
       setFileOnly(true);
@@ -364,16 +369,14 @@ public class Robot extends TimedRobot {
     FieldUtil.log(_swerve.getPose());
 
     DogLog.log(
-        "Target Distance",
-        _shotParameters
-            .getTarget()
-            .getTranslation()
-            .getDistance(_swerve.getPose().getTranslation()));
+        "Virtual Target Distance", _shotParameters.getDistanceToVirtualTarget(_swerve.getPose()));
 
     SmartDashboard.putBoolean("Is Manual", _shotParameters.isManual);
     SmartDashboard.putBoolean("Is Field Oriented", _swerve.isFieldOriented);
     SmartDashboard.putNumber("Shift Time", FieldUtil.getShiftTime());
     SmartDashboard.putNumber("Match Time", FieldUtil.getMatchTime());
+
+    SmartDashboard.putNumber("Shooter Speed", _shooter.getFlywheelSpeed().in(RotationsPerSecond));
 
     _field2d.setRobotPose(_swerve.getPose());
     SmartDashboard.putData("Field", _field2d);

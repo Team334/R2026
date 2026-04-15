@@ -202,7 +202,7 @@ public class Shooter extends AdvancedSubsystem {
     _simNotifier.startPeriodic(1 / Constants.simNotifierFrequency.in(Hertz));
   }
 
-  private void setFlywheelSpeed(AngularVelocity speed) {
+  private void setShootingSpeed(AngularVelocity speed) {
     double errorRPS = speed.minus(getFlywheelSpeed()).in(RotationsPerSecond);
     double toleranceRPS =
         _inTolerance
@@ -226,7 +226,7 @@ public class Shooter extends AdvancedSubsystem {
   /** Idle at a constant speed. */
   public Command idle() {
     return run(() -> {
-          setFlywheelSpeed(ShotConstants.idleSpeed);
+          setShootingSpeed(ShotConstants.idleSpeed);
         })
         .withName("Idle");
   }
@@ -236,7 +236,7 @@ public class Shooter extends AdvancedSubsystem {
     return run(() -> {
           ShotParameters parameters = _shotParametersSupplier.get();
 
-          setFlywheelSpeed(parameters.getFlywheelSpeed());
+          setShootingSpeed(parameters.getFlywheelSpeed());
         })
         .withName("Shoot");
   }
@@ -244,12 +244,21 @@ public class Shooter extends AdvancedSubsystem {
   /** Spits the fuel in front of the robot at a fixed angle and speed. */
   public Command spit() {
     return run(() -> {
-          setFlywheelSpeed(ShotConstants.spitFlywheelSpeed);
+          _flywheelMotor.setControl(
+              _flywheelVelocitySetter.withVelocity(ShotConstants.spitFlywheelSpeed));
         })
         .withName("Spit");
   }
 
-  /** Whether the flywheel velocity is in tolerance of its reference. */
+  /** Unjams fuel by maximing reverse stator current. */
+  public Command unjam() {
+    return run(() -> {
+          _flywheelMotor.setControl(_flywheelDutyCycleSetter.withOutput(-1));
+        })
+        .withName("Unjam");
+  }
+
+  /** Whether the flywheel velocity is in tolerance of its reference for shooting. */
   @Logged(name = "In Tolerance")
   public boolean inTolerance() {
     return _inTolerance;

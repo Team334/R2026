@@ -133,6 +133,15 @@ public class Hopper extends AdvancedSubsystem {
         .withName("Feed Spit");
   }
 
+  /** Unjams the hopper with fuel. */
+  public Command unjam() {
+    return run(() -> {
+          setRollerSpeed(ShotConstants.unjamRollerSpeed);
+          setFloorSpeed(ShotConstants.unjamFloorSpeed);
+        })
+        .withName("Unjam");
+  }
+
   @Logged(name = "Roller Speed")
   public AngularVelocity getRollerSpeed() {
     return _rollerVelocityGetter.refresh().getValue();

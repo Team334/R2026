@@ -206,22 +206,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     // closed loop vel always in auto
     _fieldSpeedsRequest.withDriveRequestType(DriveRequestType.Velocity);
 
-    registerTelemetry(
-        state -> {
-          DogLog.log("Swerve/Pose", state.Pose);
-          DogLog.log("Swerve/Raw Heading", state.RawHeading);
-          DogLog.log("Swerve/Speeds", state.Speeds);
-          DogLog.log("Swerve/Desired Speeds", getKinematics().toChassisSpeeds(state.ModuleTargets));
-          DogLog.log("Swerve/Module States", state.ModuleStates);
-          DogLog.log("Swerve/Desired Module States", state.ModuleTargets);
-
-          double totalDaqs = state.SuccessfulDaqs + state.FailedDaqs;
-          totalDaqs = totalDaqs == 0 ? 1 : totalDaqs;
-
-          DogLog.log("Swerve/Odometry Success %", state.SuccessfulDaqs / totalDaqs * 100);
-          DogLog.log("Swerve/Odometry Period", state.OdometryPeriod);
-        });
-
     SysId.displayRoutine("Swerve Translation", _translationRoutine);
     SysId.displayRoutine("Swerve Steer", _steerRoutine);
     SysId.displayRoutine("Swerve Rotation", _rotationRoutine);
@@ -575,15 +559,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
               });
     }
 
-    DogLog.log(
-        "Swerve/Accepted Estimates",
-        _acceptedEstimates.stream().map(VisionPoseEstimate::pose).toArray(Pose3d[]::new));
-    DogLog.log(
-        "Swerve/Rejected Estimates",
-        _rejectedEstimates.stream().map(VisionPoseEstimate::pose).toArray(Pose3d[]::new));
-
-    DogLog.log("Swerve/Detected Tags", _detectedTags.toArray(Pose3d[]::new));
-
     if (!_ignoreVisionEstimates) {
       _acceptedEstimates.sort(VisionPoseEstimate.sorter);
 
@@ -598,6 +573,30 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
                 e.pose().toPose2d(), Utils.fpgaToCurrentTime(e.timestamp()), _visionStdDevs);
           });
     }
+
+    SwerveDriveState state = getState();
+
+    DogLog.log("Swerve/Pose", state.Pose);
+    DogLog.log("Swerve/Raw Heading", state.RawHeading);
+    DogLog.log("Swerve/Speeds", state.Speeds);
+    DogLog.log("Swerve/Desired Speeds", getKinematics().toChassisSpeeds(state.ModuleTargets));
+    DogLog.log("Swerve/Module States", state.ModuleStates);
+    DogLog.log("Swerve/Desired Module States", state.ModuleTargets);
+
+    double totalDaqs = state.SuccessfulDaqs + state.FailedDaqs;
+    totalDaqs = totalDaqs == 0 ? 1 : totalDaqs;
+
+    DogLog.log("Swerve/Odometry Success %", state.SuccessfulDaqs / totalDaqs * 100);
+    DogLog.log("Swerve/Odometry Period", state.OdometryPeriod);
+
+    DogLog.log(
+        "Swerve/Accepted Estimates",
+        _acceptedEstimates.stream().map(VisionPoseEstimate::pose).toArray(Pose3d[]::new));
+    DogLog.log(
+        "Swerve/Rejected Estimates",
+        _rejectedEstimates.stream().map(VisionPoseEstimate::pose).toArray(Pose3d[]::new));
+
+    DogLog.log("Swerve/Detected Tags", _detectedTags.toArray(Pose3d[]::new));
 
     DogLog.log(getName() + "/Current Command", currentCommandName());
     DogLog.log(getName() + "/Has Error", _hasError);

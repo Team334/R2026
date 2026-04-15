@@ -160,7 +160,7 @@ public final class Constants {
                     Units.inchesToMeters(9.6913),
                     Units.inchesToMeters(20.2395)),
                 new Rotation3d(0, 0, -Units.degreesToRadians(15))),
-            0.3,
+            0.1,
             3,
             7);
 
@@ -173,7 +173,7 @@ public final class Constants {
                     -Units.inchesToMeters(9.6913),
                     Units.inchesToMeters(20.2395)),
                 new Rotation3d(0, 0, Units.degreesToRadians(15))),
-            0.3,
+            0.1,
             3,
             7);
   }
@@ -188,6 +188,11 @@ public final class Constants {
     public static final AngularVelocity towerFloorSpeed = RotationsPerSecond.of(50);
 
     public static final AngularVelocity idleSpeed = RotationsPerSecond.of(30);
+
+    public static final AngularVelocity unjamRollerSpeed = RotationsPerSecond.of(-20);
+    public static final AngularVelocity unjamFloorSpeed = RotationsPerSecond.of(-20);
+
+    public static final Distance distanceToTargetFudge = Meters.of(-0.2);
 
     // distanceMeters : <flywheelRPS, rollerRPS, floorRPS>
     public static InterpolatingMatrixTreeMap<Double, N3, N1> hubPresets =
@@ -217,16 +222,18 @@ public final class Constants {
       hubPresets.put(5.012, vec3(61, 50, 50));
 
       // ferry presets
-      ferryPresets.put(20.0, vec3(61, 50, 50)); // PLACEHOLDER
+      ferryPresets.put(8.2705, vec3(61, 50, 50)); // PLACEHOLDER
+      ferryPresets.put(16.541, vec3(90, 50, 50)); // PLACEHOLDER
 
-      // hub TOFs
+      // hub TOFS
       hubTOFs.put(2.0, 0.885);
       hubTOFs.put(2.97, 1.05);
       hubTOFs.put(4.26, 1.275);
       hubTOFs.put(5.012, 1.41);
 
-      // ferry TOFs
-      ferryTOFs.put(20.0, 2.0); // PLACEHOLDER
+      // ferry TOFS
+      ferryTOFs.put(8.2705, 2.0); // PLACEHOLDER
+      ferryTOFs.put(16.541, 4.0); // PLACEHOLDER
     }
   }
 
@@ -286,15 +293,15 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
         Volts.per(RotationsPerSecond).ofNative(0.35);
 
-    public static final Current feedSupplyLimit = Amps.of(45);
+    public static final Current feedSupplyLimit = Amps.of(40);
 
-    public static final Voltage pivotkG = Volts.of(0.25062);
-    public static final Voltage pivotkS = Volts.of(0.27011);
+    public static final Voltage pivotkG = Volts.of(0.23323);
+    public static final Voltage pivotkS = Volts.of(0.48903);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> pivotkV =
-        Volts.per(RotationsPerSecond).ofNative(7.8768);
+        Volts.per(RotationsPerSecond).ofNative(7.5034);
     public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
-        Volts.per(RotationsPerSecondPerSecond).ofNative(1.7828);
+        Volts.per(RotationsPerSecondPerSecond).ofNative(0.50228);
 
     public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(4);
 
@@ -310,12 +317,12 @@ public final class Constants {
 
     public static final Angle pivotRaised = Rotations.of(0.22);
     public static final Angle pivotTucked = Rotations.of(0.4);
-    public static final Angle pivotLowered = Rotations.of(0.6);
+    public static final Angle pivotLowered = Rotations.of(0.56);
 
-    public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.1);
-    public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.72);
+    public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.2);
+    public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.62);
 
-    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(80);
+    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(90);
   }
 
   public static class ClimbConstants {

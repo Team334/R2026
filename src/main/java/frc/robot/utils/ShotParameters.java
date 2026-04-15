@@ -9,8 +9,6 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.DoubleSubscriber;
@@ -32,13 +30,13 @@ public class ShotParameters {
   private final MutAngularVelocity _floorSpeed = RotationsPerSecond.mutable(0);
 
   @Logged(name = "Shot Heading")
-  private Rotation2d _shotHeading = Rotation2d.kZero;
+  private double _shotHeading = 0;
 
   @Logged(name = "Target")
-  private Pose2d _target = Pose2d.kZero;
+  private double[] _target = new double[3];
 
   @Logged(name = "Virtual Target")
-  private Pose2d _virtualTarget = Pose2d.kZero;
+  private double[] _virtualTarget = new double[3];
 
   @Logged(name = "In Bounds")
   public boolean inBounds = false;
@@ -105,10 +103,10 @@ public class ShotParameters {
                   _flywheelSpeed.mut_setMagnitude(_manualFlywheelSpeed.get());
                   _rollerSpeed.mut_setMagnitude(_manualRollerSpeed.get());
                   _floorSpeed.mut_setMagnitude(_manualFloorSpeed.get());
-                  _shotHeading = Rotation2d.kZero;
+                  _shotHeading = 0;
 
-                  _target = Pose2d.kZero;
-                  _virtualTarget = Pose2d.kZero;
+                  _target = new double[3];
+                  _virtualTarget = new double[3];
 
                   inBounds = false;
 
@@ -161,16 +159,14 @@ public class ShotParameters {
     return _floorSpeed;
   }
 
-  public Rotation2d getShotHeading() {
+  public double getShotHeading() {
     return _shotHeading;
   }
 
-  public Pose2d getTarget() {
-    return _target;
-  }
-
-  public Pose2d getVirtualTarget() {
-    return _virtualTarget;
+  public double getDistanceToVirtualTarget(Pose2d robotPose) {
+    return Math.sqrt(
+        Math.pow(_virtualTarget[0] - robotPose.getTranslation().getX(), 2)
+            + Math.pow(_virtualTarget[1] - robotPose.getTranslation().getY(), 2));
   }
 
   /**
@@ -187,15 +183,15 @@ public class ShotParameters {
     _floorSpeed.mut_setMagnitude(preset.get(2, 0));
   }
 
-  public void setShotHeading(Rotation2d shotHeading) {
+  public void setShotHeading(double shotHeading) {
     _shotHeading = shotHeading;
   }
 
-  public void setTarget(Translation2d target) {
-    _target = new Pose2d(target, Rotation2d.kZero);
+  public void setTarget(double[] target) {
+    _target = target;
   }
 
-  public void setVirtualTarget(Translation2d virtualTarget) {
-    _virtualTarget = new Pose2d(virtualTarget, Rotation2d.kZero);
+  public void setVirtualTarget(double[] virtualTarget) {
+    _virtualTarget = virtualTarget;
   }
 }

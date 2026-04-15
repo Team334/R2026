@@ -25,23 +25,6 @@
             }
           },
           {
-            "title": "Is Field Oriented",
-            "x": 180.0,
-            "y": 0.0,
-            "width": 180.0,
-            "height": 180.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Is Field Oriented",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
             "title": "Reset Heading",
             "x": 990.0,
             "y": 0.0,
@@ -99,9 +82,9 @@
           },
           {
             "title": "Shift Time",
-            "x": 540.0,
+            "x": 360.0,
             "y": 0.0,
-            "width": 180.0,
+            "width": 270.0,
             "height": 180.0,
             "type": "Match Time",
             "properties": {
@@ -115,7 +98,7 @@
           },
           {
             "title": "Match Time",
-            "x": 360.0,
+            "x": 180.0,
             "y": 0.0,
             "width": 180.0,
             "height": 180.0,
@@ -156,20 +139,6 @@
             }
           },
           {
-            "title": "Reset Intake Pivot",
-            "x": 720.0,
-            "y": 0.0,
-            "width": 270.0,
-            "height": 180.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/Reset Intake Pivot",
-              "period": 0.06,
-              "show_type": false,
-              "maximize_button_space": true
-            }
-          },
-          {
             "title": "Field",
             "x": 360.0,
             "y": 180.0,
@@ -188,6 +157,32 @@
               "robot_color": 4294198070,
               "trajectory_color": 4294967295,
               "show_robot_outside_widget": false
+            }
+          },
+          {
+            "title": "Shooter Speed",
+            "x": 630.0,
+            "y": 0.0,
+            "width": 180.0,
+            "height": 180.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter Speed",
+              "period": 0.06,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "Use Fudge",
+            "x": 810.0,
+            "y": 0.0,
+            "width": 180.0,
+            "height": 180.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tunable/Use Fudge",
+              "period": 0.06,
+              "data_type": "boolean"
             }
           }
         ]
@@ -212,10 +207,10 @@
           },
           {
             "title": "Is Auto Generated",
-            "x": 270.0,
-            "y": 0.0,
-            "width": 180.0,
-            "height": 450.0,
+            "x": 180.0,
+            "y": 180.0,
+            "width": 270.0,
+            "height": 270.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/Robot/Auto/Is Auto Generated",
@@ -252,23 +247,10 @@
             }
           },
           {
-            "title": "Use Layout Auto",
-            "x": 0.0,
-            "y": 360.0,
-            "width": 270.0,
-            "height": 90.0,
-            "type": "Toggle Switch",
-            "properties": {
-              "topic": "/Tunable/Use Layout Auto",
-              "period": 0.06,
-              "data_type": "boolean"
-            }
-          },
-          {
             "title": "Routine Chooser",
             "x": 0.0,
             "y": 180.0,
-            "width": 270.0,
+            "width": 180.0,
             "height": 180.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -281,13 +263,39 @@
             "title": "Layout Chooser",
             "x": 0.0,
             "y": 0.0,
-            "width": 270.0,
+            "width": 180.0,
             "height": 180.0,
             "type": "ComboBox Chooser",
             "properties": {
               "topic": "/SmartDashboard/Layout Chooser",
               "period": 0.06,
               "sort_options": false
+            }
+          },
+          {
+            "title": "Generated Auto",
+            "x": 180.0,
+            "y": 0.0,
+            "width": 270.0,
+            "height": 180.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/Robot/Auto/Generated Auto",
+              "period": 0.06,
+              "data_type": "string"
+            }
+          },
+          {
+            "title": "Use Layout Auto",
+            "x": 0.0,
+            "y": 360.0,
+            "width": 180.0,
+            "height": 90.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tunable/Use Layout Auto",
+              "period": 0.06,
+              "data_type": "boolean"
             }
           }
         ]

@@ -48,41 +48,6 @@ def dTOF_dt(v: np.ndarray, g: np.ndarray, t: float) -> float:
 
     return -np.dot(v, virtual_goal) / (distance * projectile_velocity)
 
-# TODO fix later to account for out of bounds TOF inputs, and add the new visualizations
-
-# def FPI(max_iter: int):
-#     print("\nFPI")
-
-#     prev_t = 0
-#     t = 0
-
-#     for i in range(max_iter):
-#         new_t = TOF(v, g, t)
-#         dT_dt = dTOF_dt(v, g, t)
-
-#         print("fpi iteration {}: t = {}, dT/dt = {}".format(i + 1, t, abs(dT_dt)))
-
-#         prev_t = t
-#         t = new_t
-
-#         if abs(t - prev_t) < 0.01:
-#             print("t has been found - converged after {} iterations.".format(i + 1))
-#             break
-
-#     axs = plt.subplots(1, 1, figsize=(6, 4))[1]
-
-#     axs.plot(t_values, tof_values, label='TOF(t)')
-#     axs.plot(t_values, t_values, label='y = t')
-#     axs.plot(t_values, dE_dt_values, label="TOF'(t)", linewidth=2, linestyle='dashed')
-#     axs.plot(t, TOF(v, g, t), 'ro', markersize=8, label='Fixed-Point Solution')
-#     axs.set_xlabel('t')
-#     axs.set_ylabel('TOF / TOF\'')
-#     axs.set_title('Fixed-Point Method ({} iterations)'.format(i + 1))
-#     plt.gcf().canvas.manager.set_window_title('Fixed-Point Method')
-#     axs.grid(True)
-#     axs.legend()
-
-
 def Newton(max_iter: int):
     print("\nNewton")
 
@@ -161,7 +126,7 @@ projectile_tof_lookup = LookupTable({
     2.665: 1.08,
     3.768: 1.38,
     4.574: 1.53,
-    5.252: 1.51 # this point is ass
+    5.252: 1.51
 })
 
 min_shot_distance = 1.89

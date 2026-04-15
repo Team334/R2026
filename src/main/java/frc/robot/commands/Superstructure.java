@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.InputStream;
 import frc.robot.Constants.ClimbConstants;
@@ -52,7 +53,10 @@ public class Superstructure {
             _shooter.shoot(),
             _hopper.feedShot(),
             _intakePivot.raiseShooting(),
-            _swerve.driveFacing(velX, velY, () -> _shotParametersSupplier.get().getShotHeading()))
+            _swerve.driveFacing(
+                velX,
+                velY,
+                () -> Rotation2d.fromRadians(_shotParametersSupplier.get().getShotHeading())))
         .withName("Shoot");
   }
 
@@ -75,6 +79,11 @@ public class Superstructure {
   /** Spits fuel at a short range without aiming. */
   public Command spit() {
     return parallel(_shooter.spit(), _hopper.feedSpit()).withName("Spit");
+  }
+
+  /** Unjam the shooter and hopper. */
+  public Command unjam() {
+    return parallel(_shooter.unjam(), _hopper.unjam()).withName("Unjam");
   }
 
   /**

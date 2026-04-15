@@ -62,7 +62,7 @@ public class IntakePivot extends AdvancedSubsystem {
   private final SysIdRoutine _pivotRoutine =
       new SysIdRoutine(
           new SysIdRoutine.Config(
-              Volts.of(0.5).per(Seconds),
+              Volts.of(1).per(Seconds),
               Volts.of(2),
               null,
               state -> SignalLogger.writeString("state", state.toString())),
@@ -125,8 +125,8 @@ public class IntakePivot extends AdvancedSubsystem {
     SysId.displayRoutine(
         "Intake Pivot",
         _pivotRoutine,
-        () -> _pivotAngleGetter.isNear(Rotations.of(0.47), Degrees.of(5)),
-        () -> _pivotAngleGetter.isNear(Rotations.of(0.2), Degrees.of(5)));
+        () -> _pivotAngleGetter.refresh().getValue().gte(Rotations.of(0.49)),
+        () -> _pivotAngleGetter.refresh().getValue().lte(Rotations.of(0.23)));
 
     if (Robot.isSimulation()) {
       // rely on sim to control the position
