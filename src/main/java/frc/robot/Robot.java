@@ -176,6 +176,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Toggle Field Oriented", _swerve.toggleFieldOriented());
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
+
+    SmartDashboard.putData(
+        "Calculate Max Omega At Linear Velocity", _swerve.calculateMaxOmegaAtLinearVelocity());
     SmartDashboard.putData("Calculate Wheel COF", _swerve.calculateWheelCOF());
     SmartDashboard.putData("Calculate Chassis MOI", _swerve.calculateMOI());
     SmartDashboard.putData(

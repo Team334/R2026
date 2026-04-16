@@ -179,6 +179,7 @@ public class FieldUtil {
     return inAllianceZone(robotPose) ? getHubTarget() : getFerryTarget(robotPose);
   }
 
+  /** Finds the shot parameters at the robot's current pose. */
   public static void getShotParameters(Pose2d robotPose, ShotParameters shotParameters) {
     // TODO
   }

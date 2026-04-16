@@ -389,7 +389,7 @@ public final class Constants {
     public static final Translation2d poseTranslationTolerance = new Translation2d(0.03, 0.03);
     public static final Rotation2d poseRotationTolerance = Rotation2d.fromDegrees(1);
 
-    public static LinearVelocity translationalDeadband = MetersPerSecond.of(0.01);
-    public static AngularVelocity rotationalDeadband = RadiansPerSecond.of(0.01);
+    public static final LinearVelocity translationalDeadband = MetersPerSecond.of(0.01);
+    public static final AngularVelocity rotationalDeadband = RadiansPerSecond.of(0.01);
   }
 }

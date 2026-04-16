@@ -28,7 +28,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -601,6 +603,25 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   @Override
   public void simulationPeriodic() {
     _visionSystemSim.update(getPose()); // TODO: odom only?
+  }
+
+  public Command calculateMaxOmegaAtLinearVelocity() {
+    final SwerveDriveKinematics kinematics = getKinematics();
+
+    return Commands.runOnce(
+            () -> {
+              ChassisSpeeds desiredSpeeds = new ChassisSpeeds(1, 0, 100);
+
+              SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(desiredSpeeds);
+              SwerveDriveKinematics.desaturateWheelSpeeds(
+                  moduleStates, TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
+
+              ChassisSpeeds speeds = kinematics.toChassisSpeeds(moduleStates);
+
+              System.out.println(speeds);
+            })
+        .ignoringDisable(true)
+        .withName("Calculate Max Omega At Linear Velocity");
   }
 
   /** Calculates the chassis MOI given angular chassis kA in volts/rad/s^2. */
