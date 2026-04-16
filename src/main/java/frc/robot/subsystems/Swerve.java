@@ -27,7 +27,6 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
@@ -363,8 +362,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
               _lastRotationLoopTime = Timer.getFPGATimestamp();
 
               return _holonomicController.calculate(
-                          new Pose2d(Translation2d.kZero, heading.get()),
-                          new Pose2d(Translation2d.kZero, getHeading()))
+                          new Pose2d(getPose().getTranslation(), heading.get()), getPose())
                       .omegaRadiansPerSecond
                   + omegaFeedforward;
             })
@@ -430,21 +428,17 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    */
   public void followTrajectoryFacing(SwerveSample sample, Rotation2d heading) {
     ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
-    Pose2d desiredPose = sample.getPose();
 
-    desiredSpeeds =
-        new ChassisSpeeds(
-            desiredSpeeds.vxMetersPerSecond,
-            desiredSpeeds.vyMetersPerSecond,
-            (heading.minus(_previousRotationGoal).getRadians())
-                / (Timer.getFPGATimestamp() - _lastRotationLoopTime));
+    desiredSpeeds.omegaRadiansPerSecond =
+        (heading.minus(_previousRotationGoal).getRadians())
+            / (Timer.getFPGATimestamp() - _lastRotationLoopTime);
 
     _previousRotationGoal = heading;
     _lastRotationLoopTime = Timer.getFPGATimestamp();
 
-    desiredPose = new Pose2d(desiredPose.getTranslation(), heading);
-
-    desiredSpeeds = _holonomicController.calculate(desiredSpeeds, desiredPose, getPose());
+    desiredSpeeds =
+        _holonomicController.calculate(
+            desiredSpeeds, new Pose2d(sample.x, sample.y, heading), getPose());
 
     // assume shot heading second deriv is low (and choreo accel is low) and set alpha to 0
     Feedforwards sampleLinearForces =

@@ -228,7 +228,7 @@ public class HolonomicController {
    * @param baseSpeeds The field-relative speed the chassis is already traveling at.
    * @param desiredPose The desired pose.
    * @param currentPose The current pose.
-   * @return New modified field-relative speeds.
+   * @return New field-relative speeds.
    */
   public ChassisSpeeds calculate(ChassisSpeeds baseSpeeds, Pose2d desiredPose, Pose2d currentPose) {
     DogLog.log("Auto/Controller Desired Pose", desiredPose);
