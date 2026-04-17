@@ -195,9 +195,9 @@ public final class Constants {
     public static final Distance distanceToTargetFudge = Meters.of(-0.2);
 
     // distanceMeters : <flywheelRPS, rollerRPS, floorRPS>
-    public static InterpolatingMatrixTreeMap<Double, N3, N1> hubPresets =
+    public static final InterpolatingMatrixTreeMap<Double, N3, N1> hubPresets =
         new InterpolatingMatrixTreeMap<>();
-    public static InterpolatingMatrixTreeMap<Double, N3, N1> ferryPresets =
+    public static final InterpolatingMatrixTreeMap<Double, N3, N1> ferryPresets =
         new InterpolatingMatrixTreeMap<>();
 
     public static final Distance hubMinDistance = Meters.of(1.89);
@@ -211,8 +211,8 @@ public final class Constants {
         MetersPerSecond.of(2.722); // PLACEHOLDER
 
     // distanceMeters : TOFSecs
-    public static InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
-    public static InterpolatingDoubleTreeMap ferryTOFs = new InterpolatingDoubleTreeMap();
+    public static final InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
+    public static final InterpolatingDoubleTreeMap ferryTOFs = new InterpolatingDoubleTreeMap();
 
     static {
       // hub presets

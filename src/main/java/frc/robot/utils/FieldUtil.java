@@ -233,8 +233,10 @@ public class FieldUtil {
 
     double robotVelocityNorm = Math.hypot(robotVelocityX, robotVelocityY);
 
-    // If acceleration is small, use previous robot velocity to not drastically change virtual
-    // target. Sometimes when
+    // Sometimes rotating to the shot heading alters the direction of the robot's linear velocity,
+    // causing a jump in the virtual target / shot heading. To prevent this, this scenario is
+    // detected as a
+    // small acceleration and treated as an acceleration = 0.
     if (Math.hypot(robotVelocityX - _prevRobotVelocityX, robotVelocityY - _prevRobotVelocityY)
         < accelerationTolerance) {
       robotVelocityX = _prevRobotVelocityX;
