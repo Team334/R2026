@@ -19,6 +19,7 @@ import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -177,8 +178,6 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
 
-    SmartDashboard.putData(
-        "Calculate Max Omega At Linear Velocity", _swerve.calculateMaxOmegaAtLinearVelocity());
     SmartDashboard.putData("Calculate Wheel COF", _swerve.calculateWheelCOF());
     SmartDashboard.putData("Calculate Chassis MOI", _swerve.calculateMOI());
     SmartDashboard.putData(
@@ -310,7 +309,10 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     DogLog.time("Timing/Robot/robotPeriodic()");
 
-    FieldUtil.getShotParameters(_swerve.getPose(), _shotParameters);
+    FieldUtil.getShotParameters(
+        _swerve.getPose(),
+        ChassisSpeeds.fromRobotRelativeSpeeds(_swerve.getChassisSpeeds(), _swerve.getHeading()),
+        _shotParameters);
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,

@@ -118,14 +118,14 @@ def Newton(max_iter: int):
     return t
 
 
-ang = 20
-s = 1
+ang = 5
+s = 1.5
 
 G = np.array([1.5, 0])
 V = np.array([np.cos(np.deg2rad(ang)), np.sin(np.deg2rad(ang))]) * s
 
-v = V
 g = G
+v = V
 
 projectile_velocity = 2.722
 
@@ -177,18 +177,18 @@ for x in np.linspace(-1, 1, 100):
     dshot_heading_dx_values.append(dshot_heading_dx)
 
     # really bad simulation of SwerveDriveKinematics desaturateWheelSpeeds
-    # if abs(dshot_heading_dx) > 180:
-    #     v = 2 / 3 * V
+    if abs(dshot_heading_dx) > 180:
+        v = 2 / 3 * V
     
-    # else:
-    #     v = V
+    else:
+        v = V
 
     x_values.append(x)
     shot_heading_values.append(shot_heading)
 
     robot_poses.append(v * x)
 
-print(max([abs(v) for v in dshot_heading_dx_values]))
+dshot_heading_dx_values[0] = dshot_heading_dx_values[1]
 
 _, axs_vec = plt.subplots(figsize=(6, 6))
 
@@ -212,5 +212,6 @@ for robot_pose in robot_poses:
 axs = plt.subplots(1, 1, figsize=(6, 4))[1]
 
 axs.plot(x_values, shot_heading_values)
+axs.plot(x_values, dshot_heading_dx_values)
 
 plt.show()

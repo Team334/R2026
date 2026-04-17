@@ -187,11 +187,13 @@ public class ShotParameters {
     _shotHeading = shotHeading;
   }
 
-  public void setTarget(double[] target) {
-    _target = target;
+  public void setTarget(double targetX, double targetY) {
+    _target[0] = targetX;
+    _target[1] = targetY;
   }
 
-  public void setVirtualTarget(double[] virtualTarget) {
-    _virtualTarget = virtualTarget;
+  public void setVirtualTarget(double virtualTargetX, double virtualTargetY) {
+    _virtualTarget[0] = virtualTargetX;
+    _virtualTarget[1] = virtualTargetY;
   }
 }

@@ -21,6 +21,7 @@ import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -28,9 +29,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -89,7 +88,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
       new HolonomicController(getKinematics().getModules());
 
   // for drive facing
-  private Rotation2d _previousRotationGoal = Rotation2d.kZero;
+  private Rotation2d _previousRotationSetpoint = Rotation2d.kZero;
   private double _lastRotationLoopTime = 0;
 
   private double _lastSimTime = 0;
@@ -357,16 +356,22 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
             velY,
             () -> {
               double omegaFeedforward =
-                  (heading.get().minus(_previousRotationGoal).getRadians())
+                  MathUtil.inputModulus(
+                          heading.get().getRadians() - _previousRotationSetpoint.getRadians(),
+                          -Math.PI,
+                          Math.PI)
                       / (Timer.getFPGATimestamp() - _lastRotationLoopTime);
 
-              _previousRotationGoal = heading.get();
+              _previousRotationSetpoint = heading.get();
               _lastRotationLoopTime = Timer.getFPGATimestamp();
 
-              return _holonomicController.calculate(
-                          new Pose2d(getPose().getTranslation(), heading.get()), getPose())
-                      .omegaRadiansPerSecond
-                  + omegaFeedforward;
+              double omega =
+                  _holonomicController.calculate(
+                              new Pose2d(getPose().getTranslation(), heading.get()), getPose())
+                          .omegaRadiansPerSecond
+                      + omegaFeedforward;
+
+              return omega;
             })
         .beforeStarting(runOnce(() -> isOpenLoop = false))
         .withName("Drive Facing");
@@ -423,7 +428,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   /**
    * Sets the chassis state to the given {@link SwerveSample} for trajectory following. Omega is
-   * overriden by the omega generated from the heading profile to follow the supplied heading.
+   * overriden by the omega generated from the holonomic controller to follow the supplied heading.
    *
    * @param sample The SwerveSample.
    * @param heading Heading to follow.
@@ -432,10 +437,11 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
 
     desiredSpeeds.omegaRadiansPerSecond =
-        (heading.minus(_previousRotationGoal).getRadians())
+        MathUtil.inputModulus(
+                heading.getRadians() - _previousRotationSetpoint.getRadians(), -Math.PI, Math.PI)
             / (Timer.getFPGATimestamp() - _lastRotationLoopTime);
 
-    _previousRotationGoal = heading;
+    _previousRotationSetpoint = heading;
     _lastRotationLoopTime = Timer.getFPGATimestamp();
 
     desiredSpeeds =
@@ -605,25 +611,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     _visionSystemSim.update(getPose()); // TODO: odom only?
   }
 
-  public Command calculateMaxOmegaAtLinearVelocity() {
-    final SwerveDriveKinematics kinematics = getKinematics();
-
-    return Commands.runOnce(
-            () -> {
-              ChassisSpeeds desiredSpeeds = new ChassisSpeeds(1, 0, 100);
-
-              SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(desiredSpeeds);
-              SwerveDriveKinematics.desaturateWheelSpeeds(
-                  moduleStates, TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
-
-              ChassisSpeeds speeds = kinematics.toChassisSpeeds(moduleStates);
-
-              System.out.println(speeds);
-            })
-        .ignoringDisable(true)
-        .withName("Calculate Max Omega At Linear Velocity");
-  }
-
   /** Calculates the chassis MOI given angular chassis kA in volts/rad/s^2. */
   public Command calculateMOI() {
     final Distance driveRadius =
@@ -632,7 +619,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
                 Math.pow(TunerConstants.FrontLeft.LocationX, 2)
                     + Math.pow(TunerConstants.FrontLeft.LocationY, 2)));
 
-    final DoubleSubscriber angularkA = DogLog.tunable("Angular kA", 1.0);
+    final DoubleSubscriber angularkA = DogLog.tunable("Calculator/Angular kA", 1.0);
 
     return Commands.runOnce(
             () -> {
@@ -666,7 +653,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
               double cof = totalFrictionForce / (SwerveConstants.mass.in(Kilograms) * 9.81);
 
-              FaultLogger.report("Drive Wheel COF: " + cof, FaultType.INFO);
+              FaultLogger.report("Calculator/Drive Wheel COF: " + cof, FaultType.INFO);
             })
         .ignoringDisable(true)
         .withName("Calculate Wheel COF");
@@ -678,7 +665,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    */
   public Command calculateMotorMaxSpeedAndTorque() {
     // percentage of max achievable speed and torque, leaving headroom for pose PID
-    final double headroom = 0.80;
+    final DoubleSubscriber headroom = DogLog.tunable("Calculator/Headroom", .8);
 
     return Commands.runOnce(
             () -> {
@@ -686,9 +673,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
               double maxSpeed =
                   Units.radiansPerSecondToRotationsPerMinute(
-                      driveMotor.freeSpeedRadPerSec * headroom);
+                      driveMotor.freeSpeedRadPerSec * headroom.get());
               double maxTorque =
-                  driveMotor.getTorque(TunerConstants.FrontLeft.SlipCurrent) * headroom;
+                  driveMotor.getTorque(TunerConstants.FrontLeft.SlipCurrent) * headroom.get();
 
               FaultLogger.report(
                   "Motor Max Speed (rpm): " + maxSpeed + ", Motor Max Torque: " + maxTorque,

@@ -1,15 +1,25 @@
 package frc.robot.utils;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.teleop;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.InterpolatingMatrixTreeMap;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.ShotConstants;
+import frc.robot.Constants.SwerveConstants;
 
 public class FieldUtil {
   // newton's method constants
@@ -17,10 +27,15 @@ public class FieldUtil {
   private static final double E_tolerance = 0.1;
   private static final double couplingDegreesTolerance = 20;
 
+  private static final double accelerationTolerance = 0.2;
+
+  private static double _prevRobotVelocityX = 0;
+  private static double _prevRobotVelocityY = 0;
+
   private static final double hubActiveLeadTime = 1.0;
 
-  private static boolean prevHubActive;
-  private static double prevShiftTime = -1;
+  private static boolean _prevHubActive;
+  private static double _prevShiftTime = -1;
 
   private static final BooleanSubscriber _useFudge = DogLog.tunable("Use Fudge", false);
 
@@ -106,17 +121,17 @@ public class FieldUtil {
 
     boolean current = isHubActive();
 
-    if (prevShiftTime == -1) {
-      prevHubActive = current;
-      prevShiftTime = 130 + (prevHubActive ? hubActiveLeadTime : 0);
+    if (_prevShiftTime == -1) {
+      _prevHubActive = current;
+      _prevShiftTime = 130 + (_prevHubActive ? hubActiveLeadTime : 0);
     }
 
-    if (current != prevHubActive) {
-      prevShiftTime = time;
-      prevHubActive = current;
+    if (current != _prevHubActive) {
+      _prevShiftTime = time;
+      _prevHubActive = current;
     }
 
-    double elapsed = prevShiftTime - time;
+    double elapsed = _prevShiftTime - time;
     return current ? (25 + hubActiveLeadTime) - elapsed : (25 - hubActiveLeadTime) - elapsed;
   }
 
@@ -179,40 +194,130 @@ public class FieldUtil {
     return inAllianceZone(robotPose) ? getHubTarget() : getFerryTarget(robotPose);
   }
 
-  /** Finds the shot parameters at the robot's current pose. */
-  public static void getShotParameters(Pose2d robotPose, ShotParameters shotParameters) {
-    // TODO
+  /**
+   * Finds the shot target at the current robot pose, then uses newton's method to update the
+   * supplied shot parameters.
+   */
+  public static void getShotParameters(
+      Pose2d robotPose, ChassisSpeeds robotSpeeds, ShotParameters shotParameters) {
+    if (shotParameters.isManual) {
+      // unnecessary call if shot parameters are manually set
+      return;
+    }
+
+    InterpolatingMatrixTreeMap<Double, N3, N1> presets =
+        inAllianceZone(robotPose) ? ShotConstants.hubPresets : ShotConstants.ferryPresets;
+
+    InterpolatingDoubleTreeMap TOFs =
+        inAllianceZone(robotPose) ? ShotConstants.hubTOFs : ShotConstants.ferryTOFs;
+
+    double minDistance =
+        (inAllianceZone(robotPose) ? ShotConstants.hubMinDistance : ShotConstants.ferryMinDistance)
+            .in(Meters);
+    double maxDistance =
+        (inAllianceZone(robotPose) ? ShotConstants.hubMaxDistance : ShotConstants.ferryMaxDistance)
+            .in(Meters);
+
+    double projectileHorizontalVelocity =
+        (inAllianceZone(robotPose)
+                ? ShotConstants.hubProjectileHorizontalVelocity
+                : ShotConstants.ferryProjectileHorizontalVelocity)
+            .in(MetersPerSecond);
+
+    Translation2d target = getShotTarget(robotPose);
+
+    shotParameters.setTarget(target.getX(), target.getY());
+
+    double robotVelocityX = robotSpeeds.vxMetersPerSecond;
+    double robotVelocityY = robotSpeeds.vyMetersPerSecond;
+
+    double robotVelocityNorm = Math.hypot(robotVelocityX, robotVelocityY);
+
+    // If acceleration is small, use previous robot velocity to not drastically change virtual
+    // target. Sometimes when
+    if (Math.hypot(robotVelocityX - _prevRobotVelocityX, robotVelocityY - _prevRobotVelocityY)
+        < accelerationTolerance) {
+      robotVelocityX = _prevRobotVelocityX;
+      robotVelocityY = _prevRobotVelocityY;
+    }
+
+    // treat tiny robot velocity as 0
+    if (robotVelocityNorm < SwerveConstants.translationalDeadband.in(MetersPerSecond)) {
+      robotVelocityX = 0;
+      robotVelocityY = 0;
+    }
+
+    _prevRobotVelocityX = robotVelocityX;
+    _prevRobotVelocityY = robotVelocityY;
+
+    double robotToVirtualTargetX = target.getX() - robotPose.getX();
+    double robotToVirtualTargetY = target.getY() - robotPose.getY();
+
+    double robotToVirtualTargetNorm = Math.hypot(robotToVirtualTargetX, robotToVirtualTargetY);
+
+    double robotToVirtualTarget_dot_robotVelocity =
+        robotToVirtualTargetX * robotVelocityX + robotToVirtualTargetY * robotVelocityY;
+
+    // initial guess for t
+    double t =
+        robotToVirtualTargetNorm
+            / (robotToVirtualTarget_dot_robotVelocity / robotToVirtualTargetNorm
+                + projectileHorizontalVelocity);
+
+    for (int i = 0; i < maxIter; i++) {
+      robotToVirtualTargetX = target.getX() - robotPose.getX() - robotVelocityX * t;
+      robotToVirtualTargetY = target.getY() - robotPose.getY() - robotVelocityY * t;
+
+      robotToVirtualTarget_dot_robotVelocity =
+          robotToVirtualTargetX * robotVelocityX + robotToVirtualTargetY * robotVelocityY;
+
+      double T = TOFs.get(robotToVirtualTargetNorm);
+      double dT_dt = 0;
+
+      // if D is within LUT
+      if (robotToVirtualTargetNorm
+          == MathUtil.clamp(robotToVirtualTargetNorm, minDistance, maxDistance)) {
+        dT_dt =
+            -robotToVirtualTarget_dot_robotVelocity
+                / (projectileHorizontalVelocity * robotToVirtualTargetNorm);
+      }
+
+      double E = t - T;
+      double dE_dt = 1 - dT_dt;
+
+      // finish and update shot parameters once converged to E(t) = 0
+      if (Math.abs(E) < E_tolerance) {
+        // check if robot velocity vector and projectile velocity vector are strongly aligned
+        shotParameters.couplingDegrees =
+            Math.toDegrees(
+                Math.acos(
+                    Math.abs(
+                        robotToVirtualTarget_dot_robotVelocity
+                            / (robotToVirtualTargetNorm * robotVelocityNorm))));
+
+        shotParameters.isErrorSensitive = shotParameters.couplingDegrees < couplingDegreesTolerance;
+
+        shotParameters.setPreset(presets.get(robotToVirtualTargetNorm));
+        shotParameters.setShotHeading(Math.atan2(robotToVirtualTargetY, robotToVirtualTargetX));
+
+        double virtualTargetX = target.getX() - robotVelocityX * t;
+        double virtualTargetY = target.getY() - robotVelocityY * t;
+
+        shotParameters.setVirtualTarget(virtualTargetX, virtualTargetY);
+
+        shotParameters.newtonIterations = i + 1;
+        shotParameters.failedToConverge = false;
+
+        // check if shot is in bounds
+        shotParameters.inBounds =
+            minDistance <= robotToVirtualTargetNorm && robotToVirtualTargetNorm <= maxDistance;
+
+        return;
+      }
+
+      t = t - (E / dE_dt);
+    }
+
+    shotParameters.failedToConverge = true;
   }
-
-  /** Finds the shot parameters at the robot's current pose. */
-  // public static void getShotParameters(Pose2d robotPose, ShotParameters shotParameters) {
-  //   if (shotParameters.isManual) {
-  //     // unnecessary call if shot parameters are manually set
-  //     return;
-  //   }
-
-  //   InterpolatingMatrixTreeMap<Double, N3, N1> presets =
-  //       inAllianceZone(robotPose) ? ShotConstants.hubPresets : ShotConstants.ferryPresets;
-
-  //   double minDistance =
-  //       (inAllianceZone(robotPose) ? ShotConstants.hubMinDistance :
-  // ShotConstants.ferryMinDistance)
-  //           .in(Meters);
-  //   double maxDistance =
-  //       (inAllianceZone(robotPose) ? ShotConstants.hubMaxDistance :
-  // ShotConstants.ferryMaxDistance)
-  //           .in(Meters);
-
-  //   Translation2d target = getShotTarget(robotPose);
-  //   shotParameters.setTarget(target);
-
-  //   double distanceToTarget = robotPose.getTranslation().getDistance(target);
-  //   double distanceToTargetFudge =
-  //       _useFudge.get() ? ShotConstants.distanceToTargetFudge.in(Meters) : 0;
-
-  //   shotParameters.setPreset(presets.get(distanceToTarget + distanceToTargetFudge));
-  //   shotParameters.setShotHeading(target.minus(robotPose.getTranslation()).getAngle());
-
-  //   shotParameters.inBounds = minDistance <= distanceToTarget && distanceToTarget <= maxDistance;
-  // }
 }
