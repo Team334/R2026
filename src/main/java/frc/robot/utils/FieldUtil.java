@@ -2,8 +2,6 @@ package frc.robot.utils;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.teleop;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
@@ -14,7 +12,6 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.FieldConstants;
@@ -27,20 +24,16 @@ public class FieldUtil {
   private static final double E_tolerance = 0.1;
   private static final double couplingDegreesTolerance = 20;
 
-  private static final double accelerationTolerance = 0.2;
-
-  private static double _prevRobotVelocityX = 0;
-  private static double _prevRobotVelocityY = 0;
-
   private static final double hubActiveLeadTime = 1.0;
 
   private static boolean _prevHubActive;
   private static double _prevShiftTime = -1;
 
-  private static final BooleanSubscriber _useFudge = DogLog.tunable("Use Fudge", false);
+  // private static final BooleanSubscriber _useFudge = DogLog.tunable("Use Fudge", false); // TODO:
+  // unused rn
 
   static {
-    teleop().onTrue(runOnce(() -> _useFudge.getTopic().publish().set(true)));
+    // teleop().onTrue(runOnce(() -> _useFudge.getTopic().publish().set(true)));
   }
 
   /** Logs FieldUtil methods. */
@@ -233,24 +226,13 @@ public class FieldUtil {
 
     double robotVelocityNorm = Math.hypot(robotVelocityX, robotVelocityY);
 
-    // Sometimes rotating to the shot heading alters the direction of the robot's linear velocity,
-    // causing a jump in the virtual target / shot heading. To prevent this, this scenario is
-    // detected as a
-    // small acceleration and treated as an acceleration = 0.
-    if (Math.hypot(robotVelocityX - _prevRobotVelocityX, robotVelocityY - _prevRobotVelocityY)
-        < accelerationTolerance) {
-      robotVelocityX = _prevRobotVelocityX;
-      robotVelocityY = _prevRobotVelocityY;
-    }
-
     // treat tiny robot velocity as 0
     if (robotVelocityNorm < SwerveConstants.translationalDeadband.in(MetersPerSecond)) {
       robotVelocityX = 0;
       robotVelocityY = 0;
-    }
 
-    _prevRobotVelocityX = robotVelocityX;
-    _prevRobotVelocityY = robotVelocityY;
+      robotVelocityNorm = 0;
+    }
 
     double robotToVirtualTargetX = target.getX() - robotPose.getX();
     double robotToVirtualTargetY = target.getY() - robotPose.getY();
@@ -269,6 +251,8 @@ public class FieldUtil {
     for (int i = 0; i < maxIter; i++) {
       robotToVirtualTargetX = target.getX() - robotPose.getX() - robotVelocityX * t;
       robotToVirtualTargetY = target.getY() - robotPose.getY() - robotVelocityY * t;
+
+      robotToVirtualTargetNorm = Math.hypot(robotToVirtualTargetX, robotToVirtualTargetY);
 
       robotToVirtualTarget_dot_robotVelocity =
           robotToVirtualTargetX * robotVelocityX + robotToVirtualTargetY * robotVelocityY;

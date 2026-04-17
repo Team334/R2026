@@ -24,6 +24,7 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -88,6 +89,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
       new HolonomicController(getKinematics().getModules());
 
   // for drive facing
+  private final LinearFilter _omegaFeedforwardFilter =
+      LinearFilter.singlePoleIIR(0.2, Robot.kDefaultPeriod);
+
   private Rotation2d _previousRotationSetpoint = Rotation2d.kZero;
   private double _lastRotationLoopTime = 0;
 
@@ -362,6 +366,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
                           Math.PI)
                       / (Timer.getFPGATimestamp() - _lastRotationLoopTime);
 
+              // filter out spikes in heading.get() derivative
+              omegaFeedforward = _omegaFeedforwardFilter.calculate(omegaFeedforward);
+
               _previousRotationSetpoint = heading.get();
               _lastRotationLoopTime = Timer.getFPGATimestamp();
 
@@ -440,6 +447,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
         MathUtil.inputModulus(
                 heading.getRadians() - _previousRotationSetpoint.getRadians(), -Math.PI, Math.PI)
             / (Timer.getFPGATimestamp() - _lastRotationLoopTime);
+
+    // filter out spikes in heading derivative
+    desiredSpeeds.omegaRadiansPerSecond =
+        _omegaFeedforwardFilter.calculate(desiredSpeeds.omegaRadiansPerSecond);
 
     _previousRotationSetpoint = heading;
     _lastRotationLoopTime = Timer.getFPGATimestamp();
