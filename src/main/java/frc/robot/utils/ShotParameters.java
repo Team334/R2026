@@ -6,7 +6,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
@@ -18,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ShotConstants;
 import java.util.function.BooleanSupplier;
 
-@Logged
 public class ShotParameters {
   @Logged(name = "Flywheel Speed")
   private final MutAngularVelocity _flywheelSpeed = RotationsPerSecond.mutable(0);
@@ -49,7 +47,7 @@ public class ShotParameters {
   @Logged(name = "Is Error Sensitive")
   public boolean isErrorSensitive = false;
 
-  @NotLogged private final BooleanSupplier _isReadyToShoot;
+  private final BooleanSupplier _isReadyToShoot;
 
   @Logged(name = "Is Manual")
   public boolean isManual = false;
@@ -68,15 +66,12 @@ public class ShotParameters {
   public boolean failedToConverge = false;
 
   // tunables for manual control
-  @NotLogged
   private final DoubleSubscriber _manualFlywheelSpeed =
       DogLog.tunable("Flywheel Speed RPS", ShotConstants.towerFlywheelSpeed);
 
-  @NotLogged
   private final DoubleSubscriber _manualFloorSpeed =
       DogLog.tunable("Floor Speed RPS", ShotConstants.towerFloorSpeed);
 
-  @NotLogged
   private final DoubleSubscriber _manualRollerSpeed =
       DogLog.tunable("Roller Speed RPS", ShotConstants.towerRollerSpeed);
 
@@ -132,7 +127,6 @@ public class ShotParameters {
         };
   }
 
-  @NotLogged
   public AngularVelocity getFlywheelSpeed() {
     if (isManual) {
       return _flywheelSpeed.mut_setMagnitude(_manualFlywheelSpeed.get());
@@ -141,7 +135,6 @@ public class ShotParameters {
     return _flywheelSpeed;
   }
 
-  @NotLogged
   public AngularVelocity getRollerSpeed() {
     if (isManual) {
       return _rollerSpeed.mut_setMagnitude(_manualRollerSpeed.get());
@@ -150,7 +143,6 @@ public class ShotParameters {
     return _rollerSpeed;
   }
 
-  @NotLogged
   public AngularVelocity getFloorSpeed() {
     if (isManual) {
       return _floorSpeed.mut_setMagnitude(_manualFloorSpeed.get());

@@ -40,6 +40,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.utils.VisionPoseEstimator.VisionPoseEstimatorConstants;
 
@@ -69,6 +70,7 @@ public final class Constants {
     return id;
   }
 
+  public static final Time robotPeriod = Seconds.of(0.02);
   public static final Frequency simNotifierFrequency = Hertz.of(200);
 
   public static final CANBus subsystemBus = determineBus("subsystems");

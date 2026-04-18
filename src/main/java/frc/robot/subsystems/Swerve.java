@@ -20,7 +20,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest.*;
 import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -44,7 +43,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -74,7 +72,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import org.photonvision.simulation.VisionSystemSim;
 
-@Logged(strategy = Strategy.OPT_IN)
 public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChecked {
   // teleop requests
   private final RobotCentric _robotCentricRequest = new RobotCentric();
@@ -85,15 +82,14 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   // auton request for choreo / pose controller
   private final ApplyFieldSpeeds _fieldSpeedsRequest = new ApplyFieldSpeeds();
 
+  @Logged(name = "Holonomic Controller")
   private final HolonomicController _holonomicController =
       new HolonomicController(getKinematics().getModules());
 
   // for drive facing
   private final LinearFilter _omegaFeedforwardFilter =
-      LinearFilter.singlePoleIIR(0.2, Robot.kDefaultPeriod);
-
+      LinearFilter.singlePoleIIR(0.2, Constants.robotPeriod.in(Seconds));
   private Rotation2d _previousRotationSetpoint = Rotation2d.kZero;
-  private double _lastRotationLoopTime = 0;
 
   private double _lastSimTime = 0;
   private Notifier _simNotifier;
@@ -364,13 +360,11 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
                           heading.get().getRadians() - _previousRotationSetpoint.getRadians(),
                           -Math.PI,
                           Math.PI)
-                      / (Timer.getFPGATimestamp() - _lastRotationLoopTime);
+                      / Constants.robotPeriod.in(Seconds);
 
               // filter out spikes in heading.get() derivative
               omegaFeedforward = _omegaFeedforwardFilter.calculate(omegaFeedforward);
-
               _previousRotationSetpoint = heading.get();
-              _lastRotationLoopTime = Timer.getFPGATimestamp();
 
               double omega =
                   _holonomicController.calculate(
@@ -380,7 +374,13 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
               return omega;
             })
-        .beforeStarting(runOnce(() -> isOpenLoop = false))
+        .beforeStarting(
+            runOnce(
+                () -> {
+                  isOpenLoop = false;
+
+                  _holonomicController.useFilteringHeading(true);
+                }))
         .withName("Drive Facing");
   }
 
@@ -421,6 +421,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param sample The SwerveSample.
    */
   public void followTrajectory(SwerveSample sample) {
+    _holonomicController.useFilteringTranslation(false);
+    _holonomicController.useFilteringHeading(false);
+
     ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
     Pose2d desiredPose = sample.getPose();
 
@@ -441,19 +444,23 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    * @param heading Heading to follow.
    */
   public void followTrajectoryFacing(SwerveSample sample, Rotation2d heading) {
+    _holonomicController.useFilteringTranslation(false);
+
+    if (!_holonomicController.isFilteringHeading()) {
+      _holonomicController.useFilteringHeading(true);
+    }
+
     ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
 
     desiredSpeeds.omegaRadiansPerSecond =
         MathUtil.inputModulus(
                 heading.getRadians() - _previousRotationSetpoint.getRadians(), -Math.PI, Math.PI)
-            / (Timer.getFPGATimestamp() - _lastRotationLoopTime);
+            / Constants.robotPeriod.in(Seconds);
 
     // filter out spikes in heading derivative
     desiredSpeeds.omegaRadiansPerSecond =
         _omegaFeedforwardFilter.calculate(desiredSpeeds.omegaRadiansPerSecond);
-
     _previousRotationSetpoint = heading;
-    _lastRotationLoopTime = Timer.getFPGATimestamp();
 
     desiredSpeeds =
         _holonomicController.calculate(
@@ -494,6 +501,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
         })
         .beforeStarting(
             () -> {
+              _holonomicController.useFilteringTranslation(false);
+              _holonomicController.useFilteringHeading(false);
+
               _holonomicController.reset(
                   getPose(),
                   goalPose.get(),

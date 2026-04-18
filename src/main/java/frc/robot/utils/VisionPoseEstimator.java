@@ -7,7 +7,6 @@ package frc.robot.utils;
 import dev.doglog.DogLog;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -28,7 +27,6 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 /** Handles pose estimation coming from a single PhotonVision camera. */
-@Logged(strategy = Strategy.OPT_IN)
 public class VisionPoseEstimator implements AutoCloseable {
   /** The camera's NT name. */
   @Logged(name = "Camera Name")

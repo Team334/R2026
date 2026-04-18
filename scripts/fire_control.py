@@ -48,9 +48,7 @@ def dTOF_dt(v: np.ndarray, g: np.ndarray, t: float) -> float:
 
     return -np.dot(v, virtual_goal) / (distance * projectile_velocity)
 
-def Newton(max_iter: int):
-    # print("Newton")
-
+def Newton(max_iter: int, plot: bool):
     t = np.linalg.norm(g) / (np.dot(g, v) / np.linalg.norm(g) + projectile_velocity)
 
     virtual_targets = []
@@ -69,59 +67,66 @@ def Newton(max_iter: int):
         E = t - T
         dE_dt = 1 - dT_dt
 
-        # print(f"newton iteration {i+1}: t = {t}, E={E}, E'={dE_dt}, D = {np.linalg.norm(g - v * t)}")
-
         if abs(E) < 0.1:
-            # print(f"t has been found - converged after {i + 1} iterations")
             break
 
         t = t - (E / dE_dt)
 
-    if i == max_iter - 1: print("ran out of iterations!")
+    if plot:
+        _, axs_vec = plt.subplots(figsize=(6, 6))
 
-    # plot everything
-    # _, axs_vec = plt.subplots(figsize=(6, 6))
+        axs_vec.set_xlim(-5, 5)
+        axs_vec.set_ylim(-5, 5)
 
-    # axs_vec.set_xlim(-20, 20)
-    # axs_vec.set_ylim(-20, 20)
+        axs_vec.spines['left'].set_position('center')
+        axs_vec.spines['bottom'].set_position('center')
+        axs_vec.spines['right'].set_color('none')
+        axs_vec.spines['top'].set_color('none')
 
-    # axs_vec.spines['left'].set_position('center')
-    # axs_vec.spines['bottom'].set_position('center')
-    # axs_vec.spines['right'].set_color('none')
-    # axs_vec.spines['top'].set_color('none')
+        axs_vec.set_aspect('equal', adjustable='box')
+        axs_vec.grid(True, linestyle=':', linewidth=0.5)
+        axs_vec.set_title("newton method virtual targets")
 
-    # axs_vec.set_aspect('equal', adjustable='box')
-    # axs_vec.grid(True, linestyle=':', linewidth=0.5)
-    # axs_vec.set_title("Newton Method Virtual Targets")
+        axs_vec.plot(g[0], g[1], 'o', color='blue', markersize=8)
+        
+        alphas = np.linspace(0.2, 1.0, len(virtual_targets)) # LIGHT TO DARK
+        
+        for i, vt in enumerate(virtual_targets):
+            axs_vec.plot(vt[0], vt[1], 'o', color='green', alpha=alphas[i], markersize=6)
 
-    # axs_vec.plot(g[0], g[1], 'o', color='blue', markersize=8)
-    
-    # alphas = np.linspace(0.2, 1.0, len(virtual_targets)) # light to dark
-    
-    # for i, vt in enumerate(virtual_targets):
-    #     axs_vec.plot(vt[0], vt[1], 'o', color='green', alpha=alphas[i], markersize=6)
+        axs = plt.subplots(1, 1, figsize=(6, 4))[1]
 
-    # axs = plt.subplots(1, 1, figsize=(6, 4))[1]
+        t_values = np.linspace(-5, 5, 50)
 
-    # axs.plot(t_values, E_values, label='E(t)')
-    # axs.plot(t_values, dE_dt_values, label='E\'(t)')
+        E_values = [t - TOF(v, g, t) for t in t_values]
+        dE_dt_values = []
 
-    # for i, tg in enumerate(t_guesses):
-    #     axs.plot(tg, tg - TOF(v, g, tg), 'o', color='green', alpha=alphas[i], markersize=6)
+        # build dE_dt values CORRECTLY
+        for t in t_values:
+            if np.linalg.norm(g - v * t) != clamp(np.linalg.norm(g - v * t), min_shot_distance, max_shot_distance):
+                dE_dt_values.append(1)
+                continue
 
-    # axs.set_xlabel('t')
-    # axs.set_ylabel('E / E\'')
-    # axs.set_title('Newton Method ({} iterations)'.format(i + 1))
-    # axs.grid(True)
-    # axs.legend()
+            dE_dt_values.append(1 - dTOF_dt(v, g, t))
 
-    return t
+        axs.plot(t_values, E_values, label='E(t)')
+        axs.plot(t_values, dE_dt_values, label='E\'(t)')
 
+        for i, tg in enumerate(t_guesses):
+            axs.plot(tg, tg - TOF(v, g, tg), 'o', color='green', alpha=alphas[i], markersize=6)
+
+        axs.set_xlabel('t')
+        axs.set_ylabel('E / E\'')
+        axs.set_title('newton method ({} iterations)'.format(i + 1))
+        axs.grid(True)
+        axs.legend()
+
+    return t, i < max_iter
 
 ang = 90
 s = 1.5
 
-G = np.array([1.5, 0])
+G = np.array([0.5, 0])
 V = np.array([np.cos(np.deg2rad(ang)), np.sin(np.deg2rad(ang))]) * s
 
 g = G
@@ -132,29 +137,14 @@ projectile_velocity = 2.722
 max_iter = 10
 
 projectile_tof_lookup = LookupTable({
-    1.89: 0.955,
-    2.665: 1.08,
-    3.768: 1.38,
-    4.574: 1.53,
-    5.252: 1.51
+    2.0: 0.885,
+    2.97: 1.05,
+    4.26: 1.275,
+    5.012: 1.41
 })
 
-min_shot_distance = 1.89
-max_shot_distance = 5.252
-
-t_values = np.linspace(-20, 20, 100)
-
-E_values = [t - TOF(v, g, t) for t in t_values]
-dE_dt_values = []
-
-# build dE_dt CORRECTLY
-for t in t_values:
-    if np.linalg.norm(g - v * t) != clamp(np.linalg.norm(g - v * t), min_shot_distance, max_shot_distance):
-        dE_dt_values.append(1)
-        continue
-
-    dE_dt_values.append(1 - dTOF_dt(v, g, t))
-
+min_shot_distance = 2.0
+max_shot_distance = 5.012
 
 x_values = []
 shot_heading_values = []
@@ -165,9 +155,15 @@ robot_poses = []
 
 for x in np.linspace(-1, 1, 100):
     g = G - v * x
-    vg = g - v * Newton(max_iter)
+
+    t, suc = Newton(max_iter, False)
+
+    vg = g - v * t
 
     shot_heading = np.rad2deg(np.arctan2(vg[1], vg[0]))
+
+    if not suc:
+        print("newton's method failed to converge at x = " + str(x))
 
     dshot_heading_dx = 0
 
@@ -175,13 +171,6 @@ for x in np.linspace(-1, 1, 100):
         dshot_heading_dx = (shot_heading - shot_heading_values[-1]) / (x - x_values[-1])
 
     dshot_heading_dx_values.append(dshot_heading_dx)
-
-    # really bad simulation of SwerveDriveKinematics desaturateWheelSpeeds
-    # if abs(dshot_heading_dx) > 180:
-    #     v = 2 / 3 * V
-    
-    # else:
-    #     v = V
 
     x_values.append(x)
     shot_heading_values.append(shot_heading)

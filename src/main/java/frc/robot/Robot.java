@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 
@@ -106,7 +107,7 @@ public class Robot extends TimedRobot {
           _swerve,
           _superstructure,
           () -> _shotParameters,
-          r -> addPeriodic(r, kDefaultPeriod));
+          r -> addPeriodic(r, getPeriod()));
 
   private final Field2d _field2d = new Field2d();
 
@@ -125,6 +126,8 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot(NetworkTableInstance ntInst) {
+    super(Constants.robotPeriod.in(Seconds));
+
     _ntInst = ntInst;
 
     // set up loggers
@@ -327,49 +330,6 @@ public class Robot extends TimedRobot {
 
       _fileOnlySet = true;
     }
-
-    // 2ms block
-    // CANBusStatus swerveBusStatus = TunerConstants.kCANBus.getStatus();
-    // CANBusStatus subsystemBusStatus = Constants.subsystemBus.getStatus();
-
-    // if (swerveBusStatus.Status != StatusCode.OK) {
-    //   String name = "CANBus " + TunerConstants.kCANBus.getName();
-
-    //   try {
-    //     Process p =
-    //         Runtime.getRuntime()
-    //             .exec(
-    //                 new String[] {
-    //                   "sh", "-c", "dmesg | grep -iE 'usb|can0|canivore|emi' | tail -30"
-    //                 });
-
-    //     String output = new String(p.getInputStream().readAllBytes());
-    //     FaultLogger.report(name + "- dmesg output: " + output, FaultType.WARNING);
-    //   } catch (Exception e) {
-    //     FaultLogger.report(name + "- failed to read dmesg output", FaultType.ERROR);
-    //   }
-    // }
-
-    // if (subsystemBusStatus.Status != StatusCode.OK) {
-    //   String name = "CANBus " + Constants.subsystemBus.getName();
-
-    //   try {
-    //     Process p =
-    //         Runtime.getRuntime()
-    //             .exec(
-    //                 new String[] {
-    //                   "sh", "-c", "dmesg | grep -iE 'usb|can0|canivore|emi' | tail -30"
-    //                 });
-
-    //     String output = new String(p.getInputStream().readAllBytes());
-    //     FaultLogger.report(name + "- dmesg output: " + output, FaultType.WARNING);
-    //   } catch (Exception e) {
-    //     FaultLogger.report(name + "- failed to read dmesg output", FaultType.ERROR);
-    //   }
-    // }
-
-    // SignalLogger.writeDouble("Swerve Bus Utilization", swerveBusStatus.BusUtilization);
-    // SignalLogger.writeDouble("Subsystem Bus Utilization", subsystemBusStatus.BusUtilization);
 
     FieldUtil.log(_swerve.getPose());
 

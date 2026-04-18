@@ -5,9 +5,9 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.utility.WheelForceCalculator;
 import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
 import dev.doglog.DogLog;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,10 +15,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import frc.lib.FilteredPIDController;
+import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.Robot;
 
 public class HolonomicController {
+  // pid part of these controllers is UNUSED, this class is just used since it already
+  // manages updating the profile setpoint and goal internally
   private final ProfiledPIDController _translationProfile =
       new ProfiledPIDController(
           0,
@@ -41,22 +44,22 @@ public class HolonomicController {
 
   private Pose2d _startPose = Pose2d.kZero;
 
-  private final PIDController _xController =
-      new PIDController(
+  private final FilteredPIDController _xController =
+      new FilteredPIDController(
           SwerveConstants.poseTranslationalkP.in(MetersPerSecond.per(Meter)),
-          0,
-          SwerveConstants.poseTranslationalkD.in(MetersPerSecond.per(MetersPerSecond)));
-  private final PIDController _yController =
-      new PIDController(
+          SwerveConstants.poseTranslationalkD.in(MetersPerSecond.per(MetersPerSecond)),
+          Constants.robotPeriod.in(Seconds));
+  private final FilteredPIDController _yController =
+      new FilteredPIDController(
           SwerveConstants.poseTranslationalkP.in(MetersPerSecond.per(Meter)),
-          0,
-          SwerveConstants.poseTranslationalkD.in(MetersPerSecond.per(MetersPerSecond)));
+          SwerveConstants.poseTranslationalkD.in(MetersPerSecond.per(MetersPerSecond)),
+          Constants.robotPeriod.in(Seconds));
 
-  private final PIDController _headingController =
-      new PIDController(
+  private final FilteredPIDController _headingController =
+      new FilteredPIDController(
           SwerveConstants.poseRotationkP.in(RadiansPerSecond.per(Radian)),
-          0,
-          SwerveConstants.poseRotationkD.in(RadiansPerSecond.per(RadiansPerSecond)));
+          SwerveConstants.poseRotationkD.in(RadiansPerSecond.per(RadiansPerSecond)),
+          Constants.robotPeriod.in(Seconds));
 
   private ChassisSpeeds _pidSpeeds = new ChassisSpeeds();
 
@@ -81,6 +84,38 @@ public class HolonomicController {
 
     _wheelForceCalculator =
         new WheelForceCalculator(moduleLocations, SwerveConstants.mass, SwerveConstants.moi);
+  }
+
+  /** Whether r'(t) on the translation PID controllers is being filtered. */
+  @Logged(name = "Is Filtering Translation")
+  public boolean isFilteringTranslation() {
+    return _xController.isFilteringSetpointVelocity() && _yController.isFilteringSetpointVelocity();
+  }
+
+  /** Sets r'(t) low-pass filtering on the translation pid controllers. */
+  public void useFilteringTranslation(boolean use) {
+    if (use) {
+      _xController.enableSetpointVelocityFilter(0.2);
+      _yController.enableSetpointVelocityFilter(0.2);
+    } else {
+      _xController.disableSetpointVelocityFilter();
+      _yController.disableSetpointVelocityFilter();
+    }
+  }
+
+  /** Whether r'(t) on the heading PID controller is being filtered. */
+  @Logged(name = "Is Filtering Heading")
+  public boolean isFilteringHeading() {
+    return _headingController.isFilteringSetpointVelocity();
+  }
+
+  /** Sets r'(t) low-pass filtering on the heading pid controller. */
+  public void useFilteringHeading(boolean use) {
+    if (use) {
+      _headingController.enableSetpointVelocityFilter(0.2);
+    } else {
+      _headingController.disableSetpointVelocityFilter();
+    }
   }
 
   /** Wheel force calculator for any external calculations. */
@@ -204,7 +239,8 @@ public class HolonomicController {
     _setpointSpeeds.omegaRadiansPerSecond = _headingProfile.getSetpoint().velocity;
 
     _wheelForces =
-        _wheelForceCalculator.calculate(Robot.kDefaultPeriod, _prevSetpointSpeeds, _setpointSpeeds);
+        _wheelForceCalculator.calculate(
+            Constants.robotPeriod.in(Seconds), _prevSetpointSpeeds, _setpointSpeeds);
 
     _prevSetpointSpeeds = _setpointSpeeds;
   }
@@ -231,8 +267,8 @@ public class HolonomicController {
    * @return New field-relative speeds.
    */
   public ChassisSpeeds calculate(ChassisSpeeds baseSpeeds, Pose2d desiredPose, Pose2d currentPose) {
-    DogLog.log("Auto/Controller Desired Pose", desiredPose);
-    DogLog.log("Auto/Controller Actual Pose", currentPose);
+    DogLog.log("Swerve/Holonomic Controller/Controller Desired Pose", desiredPose);
+    DogLog.log("Swerve/Holonomic Controller/Controller Actual Pose", currentPose);
 
     if (!SwerveConstants.ignorePoseTolerance) {
       // if error is very small on a certain axis, don't move on that axis
