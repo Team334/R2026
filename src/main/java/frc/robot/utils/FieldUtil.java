@@ -16,13 +16,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShotConstants;
-import frc.robot.Constants.SwerveConstants;
 
 public class FieldUtil {
   // newton's method constants
   private static final int maxIter = 15;
   private static final double E_tolerance = 0.1;
   private static final double couplingDegreesTolerance = 20;
+
+  private static final double robotVelocityNormTolerance = 0.4;
 
   private static final double hubActiveLeadTime = 1.0;
 
@@ -227,7 +228,7 @@ public class FieldUtil {
     double robotVelocityNorm = Math.hypot(robotVelocityX, robotVelocityY);
 
     // treat tiny robot velocity as 0
-    if (robotVelocityNorm < SwerveConstants.translationalDeadband.in(MetersPerSecond)) {
+    if (robotVelocityNorm < robotVelocityNormTolerance) {
       robotVelocityX = 0;
       robotVelocityY = 0;
 

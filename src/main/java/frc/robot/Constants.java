@@ -297,15 +297,15 @@ public final class Constants {
 
     public static final Current feedSupplyLimit = Amps.of(40);
 
-    public static final Voltage pivotkG = Volts.of(0.23323);
-    public static final Voltage pivotkS = Volts.of(0.48903);
+    public static final Voltage pivotkG = Volts.of(0.12365);
+    public static final Voltage pivotkS = Volts.of(0.21257);
 
     public static final Per<VoltageUnit, AngularVelocityUnit> pivotkV =
-        Volts.per(RotationsPerSecond).ofNative(7.5034);
+        Volts.per(RotationsPerSecond).ofNative(8.7388);
     public static final Per<VoltageUnit, AngularAccelerationUnit> pivotkA =
-        Volts.per(RotationsPerSecondPerSecond).ofNative(0.50228);
+        Volts.per(RotationsPerSecondPerSecond).ofNative(0.50935);
 
-    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(4);
+    public static final Per<VoltageUnit, AngleUnit> pivotkP = Volts.per(Rotations).ofNative(8);
 
     public static final AngularVelocity pivotVelocity = RotationsPerSecond.of(0.5);
     public static final AngularAcceleration pivotAcceleration = RotationsPerSecondPerSecond.of(0.5);
@@ -318,11 +318,10 @@ public final class Constants {
     public static final double pivotGearRatio = 72;
 
     public static final Angle pivotRaised = Rotations.of(0.22);
-    public static final Angle pivotTucked = Rotations.of(0.4);
-    public static final Angle pivotLowered = Rotations.of(0.56);
+    public static final Angle pivotLowered = Rotations.of(0.54);
 
-    public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.2);
-    public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.62);
+    public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.17);
+    public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.59);
 
     public static final AngularVelocity feedSpeed = RotationsPerSecond.of(90);
   }

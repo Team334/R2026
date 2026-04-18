@@ -84,8 +84,7 @@ public class Robot extends TimedRobot {
   private final Hopper _hopper = new Hopper(() -> _shotParameters);
 
   @Logged(name = "IntakePivot")
-  private final IntakePivot _intakePivot =
-      new IntakePivot(() -> _shotParameters, () -> FieldUtil.inBumpZone(_swerve.getPose()));
+  private final IntakePivot _intakePivot = new IntakePivot(() -> _shotParameters);
 
   @Logged(name = "IntakeFeed")
   private final IntakeFeed _intakeFeed = new IntakeFeed();

@@ -33,7 +33,6 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Robot;
 import frc.robot.utils.ShotParameters;
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 public class IntakePivot extends AdvancedSubsystem {
@@ -52,7 +51,6 @@ public class IntakePivot extends AdvancedSubsystem {
   private boolean _lowerDefault = true;
 
   private final Supplier<ShotParameters> _shotParametersSupplier;
-  private final BooleanSupplier _inBumpZoneSupplier;
 
   private DCMotorSim _pivotSim;
 
@@ -71,10 +69,8 @@ public class IntakePivot extends AdvancedSubsystem {
               null,
               this));
 
-  public IntakePivot(
-      Supplier<ShotParameters> shotParametersSupplier, BooleanSupplier inBumpZoneSupplier) {
+  public IntakePivot(Supplier<ShotParameters> shotParametersSupplier) {
     _shotParametersSupplier = shotParametersSupplier;
-    _inBumpZoneSupplier = inBumpZoneSupplier;
 
     var pivotMotorConfigs = new TalonFXConfiguration();
 
@@ -159,7 +155,7 @@ public class IntakePivot extends AdvancedSubsystem {
       startSimThread();
     }
 
-    setDefaultCommand(lower());
+    setDefaultCommand(_lowerDefault ? lower() : raise());
   }
 
   private void startSimThread() {
@@ -243,18 +239,9 @@ public class IntakePivot extends AdvancedSubsystem {
         .withName("Raise Shooting");
   }
 
-  /** Lowers the intake, tucking it if necessary. */
+  /** Lowers the intake. */
   public Command lower() {
     return run(() -> {
-          // if (_inBumpZoneSupplier.getAsBoolean()) {
-          //   _pivotMotor.setControl(
-          //       _pivotAngleSetter
-          //           .withPosition(IntakeConstants.pivotTucked)
-          //           .withVelocity(IntakeConstants.pivotVelocity)
-          //           .withAcceleration(IntakeConstants.pivotAcceleration));
-          //   return;
-          // }
-
           _pivotMotor.setControl(
               _pivotAngleSetter
                   .withPosition(IntakeConstants.pivotLowered)

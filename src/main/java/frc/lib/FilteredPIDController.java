@@ -65,7 +65,8 @@ public final class FilteredPIDController {
 
       error = MathUtil.inputModulus(setpoint - measurement, -bound, bound);
 
-      measurementDerivative = MathUtil.inputModulus(measurement - _prevMeasurement, -bound, bound) / period;
+      measurementDerivative =
+          MathUtil.inputModulus(measurement - _prevMeasurement, -bound, bound) / period;
       setpointDerivative = MathUtil.inputModulus(setpoint - _prevSetpoint, -bound, bound) / period;
     } else {
       error = setpoint - measurement;
