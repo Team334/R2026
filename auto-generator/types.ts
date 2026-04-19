@@ -12,7 +12,7 @@ export type GenericLocation = "start" | "neutralbump" | "neutralmiddle" | "depot
 
 export type Location = `${Side}_${GenericLocation}`;
 
-export type EventName = "pivot lower" | "pivot raise" | "feed in" | "feed stop" | "shoot" | "shoot still" | "stop shooting" | "extend";
+export type EventName = "pivot lower" | "pivot lower depot" | "pivot raise" | "feed in" | "feed stop" | "shoot" | "shoot still" | "stop shooting" | "extend";
 
 export interface LocationProperties {
     leftWaypoints?: Waypoint<Expr>[],
