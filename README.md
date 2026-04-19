@@ -3,4 +3,4 @@
 Robot code for the 2026 season.
 
 Controls
-![Controls](controls.png)
+![Controls](controls.jpg)
