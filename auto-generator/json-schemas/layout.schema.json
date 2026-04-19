@@ -17,8 +17,7 @@
         "feed stop",
         "shoot",
         "shoot still",
-        "stop shooting",
-        "extend"
+        "stop shooting"
       ],
       "type": "string"
     },

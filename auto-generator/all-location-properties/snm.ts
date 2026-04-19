@@ -3,10 +3,10 @@ import { makeWaypoint, reflectWaypoints, makeEventMarker, makeConstraint, toExpr
 export const allLocationProperties: AllLocationProperties = {
     start: {
         leftWaypoints: [
-            makeWaypoint(3.5480897426605225, 7.474021911621094, 0.0)
+            makeWaypoint(4.4603095054626465, 7.474021911621094, 0.0)
         ],
         rightWaypoints: reflectWaypoints(
-            makeWaypoint(3.5480897426605225, 7.474021911621094, 0.0)
+            makeWaypoint(4.4603095054626465, 7.474021911621094, 0.0)
         ),
         eventMarkers: [
             makeEventMarker("pivot lower", 0, 0.3)
@@ -14,14 +14,16 @@ export const allLocationProperties: AllLocationProperties = {
     },
     neutralbump: {
         leftWaypoints: [
-            makeWaypoint(5.576541423797607, 7.480874061584473, 0, true, true),
+            makeWaypoint(3.2754716873168945, 7.364711284637451, 0, true, true),
+            makeWaypoint(5.722487449645996, 7.351062297821045, 0, false, false),
             makeWaypoint(5.955106735229492, 5.9437713623046875, -1.5707963267948966),
             makeWaypoint(5.955106735229492, 4.313876152038574, -1.5707963267948966),
             makeWaypoint(5.693442344665527, 7.406031608581543, 3.131788918491988),
             makeWaypoint(2.770551919937134, 7.13850736618042, -1.0286093969667478, true, true, true)
         ],
         rightWaypoints: reflectWaypoints(
-            makeWaypoint(5.576541423797607, 7.480874061584473, 0, true, true),
+            makeWaypoint(3.2754716873168945, 7.364711284637451, 0, true, true),
+            makeWaypoint(5.722487449645996, 7.351062297821045, 0, false, false),
             makeWaypoint(5.955106735229492, 5.9437713623046875, -1.5707963267948966),
             makeWaypoint(5.955106735229492, 4.313876152038574, -1.5707963267948966),
             makeWaypoint(5.693442344665527, 7.406031608581543, 3.131788918491988),
@@ -29,26 +31,26 @@ export const allLocationProperties: AllLocationProperties = {
         ),
         constraints: [
             makeConstraint(5, undefined, {type: "StopPoint", props: {}}),
-            makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}})
+            makeConstraint(2, 3, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}})
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),
             makeEventMarker("feed in", 1, 0),
-            makeEventMarker("feed stop", 2, 0.4),
+            makeEventMarker("feed stop", 5, -0.3),
         ]
     },
     neutralmiddle: {
         leftWaypoints: [
-            makeWaypoint(3.7149038314819336, 7.477536201477051, 0.0, true, false),
-            makeWaypoint(4.809019565582275, 7.520789623260498, 0.0),
+            makeWaypoint(4.6, 7.477536201477051, 0.0, true, false),
+            makeWaypoint(4.809019565582275, 7.477536201477051, 0.0),
             makeWaypoint(7.484222412109375, 6.948218822479248, -1.4711286226200226),
             makeWaypoint(7.4373555183410645, 5.014767646789551, -2.0576957311828057),
             makeWaypoint(5.6979265213012695, 7.4296064376831055, 3.141592653589793),
             makeWaypoint(3.2754716873168945, 7.364711284637451, -1.1729889971693404, true, true, true)
         ],
         rightWaypoints: reflectWaypoints(
-            makeWaypoint(3.7149038314819336, 7.477536201477051, 0.0, true, false),
-            makeWaypoint(4.809019565582275, 7.520789623260498, 0.0),
+            makeWaypoint(4.6, 7.477536201477051, 0.0, true, false),
+            makeWaypoint(4.809019565582275, 7.477536201477051, 0.0),
             makeWaypoint(7.484222412109375, 6.948218822479248, -1.4711286226200226),
             makeWaypoint(7.4373555183410645, 5.014767646789551, -2.0576957311828057),
             makeWaypoint(5.6979265213012695, 7.4296064376831055, 3.141592653589793),
@@ -60,7 +62,7 @@ export const allLocationProperties: AllLocationProperties = {
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),
             makeEventMarker("feed in", 2, 0),
-            makeEventMarker("feed stop", 3, 0.4),
+            makeEventMarker("feed stop", 5, -0.3),
         ]
     },
     depot: {
