@@ -227,7 +227,7 @@ public class FieldUtil {
 
     double robotVelocityNorm = Math.hypot(robotVelocityX, robotVelocityY);
 
-    // treat tiny robot velocity as 0
+    // treat small robot velocity as 0
     if (robotVelocityNorm < robotVelocityNormTolerance) {
       robotVelocityX = 0;
       robotVelocityY = 0;

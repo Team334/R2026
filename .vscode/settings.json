@@ -58,5 +58,11 @@
     "edu.wpi.first.math.**.struct.*",
   ],
   "java.dependency.enableDependencyCheckup": false,
-  "java.compile.nullAnalysis.mode": "disabled"
+  "java.compile.nullAnalysis.mode": "disabled",
+  "json.schemas": [
+    {
+      "fileMatch": ["/src/main/deploy/layouts/*.json"],
+      "url": "./auto-generator/layout.schema.json"
+    }
+  ]
 }

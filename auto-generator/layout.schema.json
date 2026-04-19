@@ -1,0 +1,70 @@
+{
+  "$ref": "#/definitions/Layout",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "EventName": {
+      "enum": [
+        "pivot lower",
+        "pivot raise",
+        "feed in",
+        "feed stop",
+        "shoot",
+        "shoot still",
+        "stop shooting",
+        "extend",
+        "climb"
+      ],
+      "type": "string"
+    },
+    "Layout": {
+      "additionalProperties": false,
+      "properties": {
+        "layout": {
+          "items": {
+            "$ref": "#/definitions/Location"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "splitCommands": {
+          "additionalProperties": {
+            "items": {
+              "$ref": "#/definitions/EventName"
+            },
+            "type": "array"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "layout",
+        "splitCommands"
+      ],
+      "type": "object"
+    },
+    "Location": {
+      "enum": [
+        "l_start",
+        "l_neutralbump",
+        "l_neutralmiddle",
+        "l_depot",
+        "l_climb",
+        "c_start",
+        "c_neutralbump",
+        "c_neutralmiddle",
+        "c_depot",
+        "c_climb",
+        "r_start",
+        "r_neutralbump",
+        "r_neutralmiddle",
+        "r_depot",
+        "r_climb"
+      ],
+      "type": "string"
+    }
+  }
+}
+

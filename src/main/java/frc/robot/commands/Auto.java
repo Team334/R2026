@@ -276,8 +276,10 @@ public class Auto {
     for (int i = 0; i < splits; i++) {
       SequentialCommandGroup splitCommand = new SequentialCommandGroup();
 
-      for (String command : splitCommands.get(Integer.toString(i))) {
-        splitCommand.addCommands(getBinding(command));
+      if (splitCommands.get(Integer.toString(i)) != null) {
+        for (String command : splitCommands.get(Integer.toString(i))) {
+          splitCommand.addCommands(getBinding(command));
+        }
       }
 
       if (i + 1 < splits) {
