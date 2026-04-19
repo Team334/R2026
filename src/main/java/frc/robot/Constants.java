@@ -309,6 +309,8 @@ public final class Constants {
     public static final Angle pivotRaised = Rotations.of(0.22);
     public static final Angle pivotLowered = Rotations.of(0.54);
 
+    public static final Angle pivotLoweredDepot = Rotations.of(0.5);
+
     public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.17);
     public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.59);
 

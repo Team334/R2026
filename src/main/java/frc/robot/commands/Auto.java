@@ -127,7 +127,7 @@ public class Auto {
 
     _bindings.put(
         "shoot still",
-        () -> superstructure.shoot(InputStream.zero, InputStream.zero).withTimeout(3));
+        () -> superstructure.shoot(InputStream.zero, InputStream.zero, true).withTimeout(3));
 
     _bindings.put("pivot lower", intakePivot::lower);
 

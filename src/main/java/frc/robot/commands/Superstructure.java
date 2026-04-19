@@ -42,11 +42,11 @@ public class Superstructure {
   }
 
   /** Shoots. */
-  public Command shoot(InputStream velX, InputStream velY) {
+  public Command shoot(InputStream velX, InputStream velY, boolean shouldPivot) {
     return parallel(
             _shooter.shoot(),
             _hopper.feedShot(),
-            _intakePivot.raiseShooting(),
+            shouldPivot ? _intakePivot.raiseShooting() : none(),
             _swerve.driveFacing(
                 velX,
                 velY,
@@ -57,11 +57,12 @@ public class Superstructure {
   /**
    * Shoot to use when {@link ShotParameters#isManual} is true. Gives the driver control over omega.
    */
-  public Command shootManually(InputStream velX, InputStream velY, InputStream velOmega) {
+  public Command shootManually(
+      InputStream velX, InputStream velY, InputStream velOmega, boolean shouldPivot) {
     return parallel(
             _shooter.shoot(),
             _hopper.feedShot(),
-            _intakePivot.raiseShooting(),
+            shouldPivot ? _intakePivot.raiseShooting() : none(),
             _swerve.drive(velX, velY, velOmega))
         .beforeStarting(
             () -> {

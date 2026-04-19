@@ -52,11 +52,11 @@ function saveTrajectory(traj: Trajectory) : void {
 function generateTrajectory(traj: Trajectory) : void {
     exec(`${CHOREO_CLI} --chor ${CONFIG} --trajectory ${traj.name}.traj -g`, (error: Error | null, stdout: string, stderr: string) => {
         if (error) {
-            console.error("Choreo Error:", error);
+            console.error("choreo cli:", error);
             return;
         }
 
-        console.log("Choreo Output:");
+        console.log("choreo cli:");
         console.log(stdout);
     });
 }

@@ -1,4 +1,9 @@
 {
+  "System Joysticks": {
+    "window": {
+      "visible": false
+    }
+  },
   "keyboardJoysticks": [
     {
       "axisConfig": [
@@ -11,13 +16,14 @@
           "incKey": 83
         },
         {
-          "decayRate": 0.0,
-          "keyRate": 0.009999999776482582
+          "decayRate": 1.0,
+          "incKey": 72,
+          "keyRate": 0.20000000298023224
         },
         {
           "decayRate": 1.0,
           "incKey": 75,
-          "keyRate": 1.0
+          "keyRate": 0.20000000298023224
         },
         {
           "decKey": 263,
@@ -25,13 +31,14 @@
         }
       ],
       "axisCount": 5,
-      "buttonCount": 4,
+      "buttonCount": 6,
       "buttonKeys": [
-        90,
-        88,
         67,
+        88,
         86,
-        -1
+        90,
+        74,
+        76
       ],
       "povConfig": [
         {
@@ -45,14 +52,11 @@
           "key90": 326
         }
       ],
-      "povCount": 1
+      "povCount": 0
     },
     {
       "axisConfig": [
-        {
-          "decKey": 74,
-          "incKey": 76
-        },
+        {},
         {
           "decKey": 73
         }

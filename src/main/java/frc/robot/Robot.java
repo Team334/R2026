@@ -254,6 +254,32 @@ public class Robot extends TimedRobot {
     final InputStream baseVelOmega =
         InputStream.of(_driverController::getRightX).deadband(0.02, 1).negate().signedPow(2);
 
+    final Command shoot =
+        _superstructure.shoot(
+            baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+            baseVelY.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+            true);
+
+    final Command shootManually =
+        _superstructure.shootManually(
+            baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+            baseVelY.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+            baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)),
+            true);
+
+    final Command shootNoPivot =
+        _superstructure.shoot(
+            baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+            baseVelY.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+            false);
+
+    final Command shootManuallyNoPivot =
+        _superstructure.shootManually(
+            baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+            baseVelY.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
+            baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)),
+            false);
+
     _swerve.setDefaultCommand(
         _swerve
             .drive(
@@ -262,20 +288,13 @@ public class Robot extends TimedRobot {
                 baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
             .beforeStarting(() -> _swerve.isOpenLoop = true));
 
-    final Command shoot =
-        _superstructure.shoot(
-            baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
-            baseVelY.scale(
-                SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)));
-
-    final Command shootManually =
-        _superstructure.shootManually(
-            baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
-            baseVelY.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
-            baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)));
-
     _driverController.rightTrigger().and(() -> !_shotParameters.isManual).whileTrue(shoot);
     _driverController.rightTrigger().and(() -> _shotParameters.isManual).whileTrue(shootManually);
+
+    _driverController
+        .rightBumper()
+        .onTrue(runOnce(() -> _intakePivot.lowerDepot = true))
+        .onFalse(runOnce(() -> _intakePivot.lowerDepot = false));
 
     _driverController.leftTrigger().whileTrue(_intakeFeed.feedIn());
 
@@ -288,6 +307,9 @@ public class Robot extends TimedRobot {
         .onTrue(runOnce(() -> _shotParameters.isManual = !_shotParameters.isManual));
 
     _driverController.a().whileTrue(_superstructure.unjam());
+
+    _driverController.x().and(() -> !_shotParameters.isManual).whileTrue(shootNoPivot);
+    _driverController.x().and(() -> _shotParameters.isManual).whileTrue(shootManuallyNoPivot);
   }
 
   /**

@@ -50,6 +50,9 @@ public class IntakePivot extends AdvancedSubsystem {
   @Logged(name = "Lower Default")
   private boolean _lowerDefault = true;
 
+  @Logged(name = "Lower Depot")
+  public boolean lowerDepot = false;
+
   private final Supplier<ShotParameters> _shotParametersSupplier;
 
   private DCMotorSim _pivotSim;
@@ -193,7 +196,7 @@ public class IntakePivot extends AdvancedSubsystem {
     return _pivotAngleGetter.refresh().getValue();
   }
 
-  /** Toggles the lower default. */
+  /** Toggles the lower default, then schedules the default. */
   public Command toggleLowerDefault() {
     return runOnce(
         () -> {
@@ -239,12 +242,16 @@ public class IntakePivot extends AdvancedSubsystem {
         .withName("Raise Shooting");
   }
 
-  /** Lowers the intake. */
+  /**
+   * Lowers the intake. If {@link #lowerDepot} is true, the pivot will be lowered to the depot
+   * angle.
+   */
   public Command lower() {
     return run(() -> {
           _pivotMotor.setControl(
               _pivotAngleSetter
-                  .withPosition(IntakeConstants.pivotLowered)
+                  .withPosition(
+                      lowerDepot ? IntakeConstants.pivotLoweredDepot : IntakeConstants.pivotLowered)
                   .withVelocity(IntakeConstants.pivotVelocity)
                   .withAcceleration(IntakeConstants.pivotAcceleration));
         })
