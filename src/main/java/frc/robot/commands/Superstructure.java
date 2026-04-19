@@ -9,14 +9,11 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.InputStream;
-import frc.robot.Constants.ClimbConstants;
-import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.intake.IntakeFeed;
 import frc.robot.subsystems.intake.IntakePivot;
-import frc.robot.utils.FieldUtil;
 import frc.robot.utils.ShotParameters;
 import java.util.function.Supplier;
 
@@ -25,7 +22,6 @@ public class Superstructure {
   private final Shooter _shooter;
   private final Hopper _hopper;
   private final IntakePivot _intakePivot;
-  private final Climb _climb;
   private final Swerve _swerve;
 
   private final Supplier<ShotParameters> _shotParametersSupplier;
@@ -35,13 +31,11 @@ public class Superstructure {
       Hopper hopper,
       IntakePivot intakePivot,
       IntakeFeed intakeFeed,
-      Climb climb,
       Swerve swerve,
       Supplier<ShotParameters> shotParametersSupplier) {
     _shooter = shooter;
     _hopper = hopper;
     _intakePivot = intakePivot;
-    _climb = climb;
     _swerve = swerve;
 
     _shotParametersSupplier = shotParametersSupplier;
@@ -84,28 +78,5 @@ public class Superstructure {
   /** Unjam the shooter and hopper. */
   public Command unjam() {
     return parallel(_shooter.unjam(), _hopper.unjam()).withName("Unjam");
-  }
-
-  /**
-   * Drives while extending the climb, stops before the tower to let the climb extend, and finally
-   * drives to L1 before climbing.
-   */
-  public Command climbRoutine() {
-    return sequence(
-            // drive to pre-climb pose while extending, wait for climb to finish extending,
-            // and finally drive to climb pose and climb
-            parallel(
-                _swerve.driveTo(FieldUtil::getPreClimb),
-                _climb
-                    .extend()
-                    .until(
-                        () ->
-                            _climb
-                                .getHeight()
-                                .isNear(
-                                    ClimbConstants.extended, ClimbConstants.extendedTolerance))),
-            _swerve.driveTo(FieldUtil::getClimb),
-            _climb.climb())
-        .withName("Climb Routine");
   }
 }

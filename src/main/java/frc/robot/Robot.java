@@ -45,7 +45,6 @@ import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.Auto;
 import frc.robot.commands.Superstructure;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
@@ -89,12 +88,9 @@ public class Robot extends TimedRobot {
   @Logged(name = "IntakeFeed")
   private final IntakeFeed _intakeFeed = new IntakeFeed();
 
-  @Logged(name = "Climb")
-  private final Climb _climb = new Climb();
-
   private final Superstructure _superstructure =
       new Superstructure(
-          _shooter, _hopper, _intakePivot, _intakeFeed, _climb, _swerve, () -> _shotParameters);
+          _shooter, _hopper, _intakePivot, _intakeFeed, _swerve, () -> _shotParameters);
 
   private final Auto _auto =
       new Auto(
@@ -102,7 +98,6 @@ public class Robot extends TimedRobot {
           _hopper,
           _intakePivot,
           _intakeFeed,
-          _climb,
           _swerve,
           _superstructure,
           () -> _shotParameters,
@@ -193,7 +188,6 @@ public class Robot extends TimedRobot {
                 _hopper.fullSelfCheck(),
                 _intakePivot.fullSelfCheck(),
                 _intakeFeed.fullSelfCheck(),
-                _climb.fullSelfCheck(),
                 _swerve.fullSelfCheck(),
                 runOnce(() -> DataLogManager.log("Robot Self Check Finished")))
             .withName("Robot Self Check"));
@@ -289,15 +283,13 @@ public class Robot extends TimedRobot {
 
     _driverController.leftBumper().onTrue(_intakePivot.toggleLowerDefault());
 
-    // _driverController.a().toggleOnTrue(_superstructure.climbRoutine());
+    _driverController.y().whileTrue(_intakeFeed.feedOut());
 
     _driverController
         .b()
         .onTrue(runOnce(() -> _shotParameters.isManual = !_shotParameters.isManual));
 
-    _driverController.y().whileTrue(_intakeFeed.feedOut());
-
-    _driverController.x().whileTrue(_superstructure.unjam());
+    _driverController.a().whileTrue(_superstructure.unjam());
   }
 
   /**
@@ -368,6 +360,5 @@ public class Robot extends TimedRobot {
     _hopper.close();
     _intakePivot.close();
     _intakeFeed.close();
-    _climb.close();
   }
 }

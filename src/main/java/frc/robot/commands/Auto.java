@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.FaultLogger;
 import frc.lib.FaultsTable.FaultType;
 import frc.lib.InputStream;
-import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
@@ -80,7 +79,6 @@ public class Auto {
       Hopper hopper,
       IntakePivot intakePivot,
       IntakeFeed intakeFeed,
-      Climb climb,
       Swerve swerve,
       Superstructure superstructure,
       Supplier<ShotParameters> shotParametersSupplier,
@@ -139,15 +137,9 @@ public class Auto {
 
     _bindings.put("feed stop", intakeFeed::feedStop);
 
-    _bindings.put("extend", climb::extend);
-
-    _bindings.put("climb", climb::climb);
-
     _bindings.forEach((name, command) -> _factory.bind(name, command.get()));
 
-    autonomous()
-        .onTrue(runOnce(() -> _aimAtTarget = false))
-        .onTrue(intakePivot.raise()); // raised pivot to hold preload
+    autonomous().onTrue(runOnce(() -> _aimAtTarget = false));
 
     // -- NT --
     _useLayoutAuto = DogLog.tunable("Use Layout Auto", true, unused -> _shouldGenerate.set(true));

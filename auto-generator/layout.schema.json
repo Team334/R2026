@@ -11,8 +11,7 @@
         "shoot",
         "shoot still",
         "stop shooting",
-        "extend",
-        "climb"
+        "extend"
       ],
       "type": "string"
     },
@@ -51,17 +50,14 @@
         "l_neutralbump",
         "l_neutralmiddle",
         "l_depot",
-        "l_climb",
         "c_start",
         "c_neutralbump",
         "c_neutralmiddle",
         "c_depot",
-        "c_climb",
         "r_start",
         "r_neutralbump",
         "r_neutralmiddle",
-        "r_depot",
-        "r_climb"
+        "r_depot"
       ],
       "type": "string"
     }

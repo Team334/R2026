@@ -88,30 +88,5 @@ export const allLocationProperties: AllLocationProperties = {
             makeEventMarker("feed in", 1, 0),
             makeEventMarker("feed stop", 3, 0.4),
         ]
-    },
-    climb: {
-        leftWaypoints: [
-            makeWaypoint(2.7496304512023926, 4.047032356262207, 0, true, false),
-            makeWaypoint(0.8680239319801331, 2.0315675735473633, 3.141592653589793),
-            makeWaypoint(0.8600184917449951, 2.784078598022461, 0, true, false)
-        ],
-        rightWaypoints: [
-            // (same as left)
-            makeWaypoint(2.7496304512023926, 4.047032356262207, 0, true, false),
-            makeWaypoint(0.8680239319801331, 2.0315675735473633, 3.141592653589793),
-            makeWaypoint(0.8600184917449951, 2.784078598022461, 0, true, false)
-        ],
-        constraints: [
-            makeConstraint(0, 1, {type: "KeepOutCircle", props: {x: toExpr(0.91920355707407, "m"), y: toExpr(3.742240246385336, "m"), r: toExpr(0.8, "m")}}),
-            makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}}),
-            makeConstraint(1, 2, {type: "MaxAngularVelocity", props: {max: toExpr(0, "rad/s")}}),
-            makeConstraint(1, 2, {type: "MaxVelocity", props: {max: toExpr(1, "m/s")}})
-        ],
-        eventMarkers: [
-            makeEventMarker("stop shooting", 0, 0),
-            makeEventMarker("pivot raise", 0, 0.1),
-            makeEventMarker("extend", 0, 0.3),
-            makeEventMarker("climb", 2, 0)
-        ]
     }
 }

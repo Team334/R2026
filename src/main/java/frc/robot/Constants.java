@@ -11,7 +11,6 @@ import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -121,12 +120,6 @@ public final class Constants {
         new Rectangle2d(new Translation2d(4.0626, 1.5844), new Translation2d(5.1844, 6.4898));
     public static final Rectangle2d redBumpZone =
         new Rectangle2d(new Translation2d(11.3493, 1.5844), new Translation2d(12.475, 6.4898));
-
-    public static final Pose2d bluePreClimb = new Pose2d();
-    public static final Pose2d redPreClimb = new Pose2d();
-
-    public static final Pose2d blueClimb = new Pose2d();
-    public static final Pose2d redClimb = new Pose2d();
 
     // uncomment if using the test tag layout
     // public static final AprilTagFieldLayout tagLayout;
@@ -324,34 +317,6 @@ public final class Constants {
     public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.59);
 
     public static final AngularVelocity feedSpeed = RotationsPerSecond.of(90);
-  }
-
-  public static class ClimbConstants {
-    public static final int climbMotorID = determineID(7);
-
-    public static final Voltage kS = Volts.of(0);
-    public static final Voltage kG = Volts.of(0);
-    public static final Per<VoltageUnit, AngularVelocityUnit> kV =
-        Volts.per(RotationsPerSecond).ofNative(0);
-    public static final Per<VoltageUnit, AngularAccelerationUnit> kA =
-        Volts.per(RotationsPerSecondPerSecond).ofNative(0);
-
-    public static final Per<VoltageUnit, AngleUnit> kP = Volts.per(Rotations).ofNative(0);
-
-    public static final Voltage climbingkG = Volts.of(0);
-    public static final Per<VoltageUnit, AngularAccelerationUnit> climbingkA =
-        Volts.per(RotationsPerSecondPerSecond).ofNative(0);
-    public static final Per<VoltageUnit, AngleUnit> climbingkP = Volts.per(Rotations).ofNative(0);
-
-    public static final Angle retracted = Rotations.of(0);
-    public static final Angle extended = Rotations.of(10);
-
-    public static final Angle extendedTolerance = Rotations.of(0.5);
-
-    public static final Angle forwardSoftLimitThreshold = Rotations.of(11);
-    public static final Angle reverseSoftLimitThreshold = Rotations.of(-1);
-
-    public static final double climbGearRatio = 3;
   }
 
   public static class SwerveConstants {

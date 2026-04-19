@@ -8,11 +8,11 @@ export function toExpr(val: number, unit: string) : Expr {
 export const FIELD_WIDTH = 8.0629;
 
 export type Side = "l" | "c" | "r";
-export type GenericLocation = "start" | "neutralbump" | "neutralmiddle" | "depot" | "climb";
+export type GenericLocation = "start" | "neutralbump" | "neutralmiddle" | "depot";
 
 export type Location = `${Side}_${GenericLocation}`;
 
-export type EventName = "pivot lower" | "pivot raise" | "feed in" | "feed stop" | "shoot" | "shoot still" | "stop shooting" | "extend" | "climb";
+export type EventName = "pivot lower" | "pivot raise" | "feed in" | "feed stop" | "shoot" | "shoot still" | "stop shooting" | "extend";
 
 export interface LocationProperties {
     leftWaypoints?: Waypoint<Expr>[],
