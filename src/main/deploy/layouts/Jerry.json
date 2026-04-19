@@ -1,5 +1,6 @@
 {
     "name": "Jerry",
+    "allLocationProperties": "snm",
     "layout": [
         "r_start",
         "r_neutralmiddle",

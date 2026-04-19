@@ -146,7 +146,7 @@ var baseTraj: Trajectory = {
 
 async function main() {
     var layout: Layout = loadLayout(await prompt("layout to generate: "));
-    var allLocationProperties: AllLocationProperties = await loadAllLocationProperties(await prompt("all location properties to use: "))
+    var allLocationProperties: AllLocationProperties = await loadAllLocationProperties(layout.allLocationProperties);
 
     var traj: Trajectory = buildTrajectory(baseTraj, layout.name, layout.layout, allLocationProperties);
     

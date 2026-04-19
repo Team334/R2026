@@ -24,8 +24,12 @@ export interface LocationProperties {
 
 export type AllLocationProperties = Record<GenericLocation, LocationProperties>;
 
+// UPDATE AFTER FILE ADD/DELETE CHANGES TO all-location-properties
+export type AllLocationPropertiesName = "sotm" | "snm"
+
 export interface Layout {
     name: string,
+    allLocationProperties: AllLocationPropertiesName,
     layout: Location[],
     splitCommands: Record<number, EventName[]>
 }

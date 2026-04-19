@@ -62,7 +62,7 @@
   "json.schemas": [
     {
       "fileMatch": ["/src/main/deploy/layouts/*.json"],
-      "url": "./auto-generator/layout.schema.json"
+      "url": "./auto-generator/json-schemas/layout.schema.json"
     }
   ]
 }
