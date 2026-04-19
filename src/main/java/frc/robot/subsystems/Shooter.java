@@ -241,15 +241,6 @@ public class Shooter extends AdvancedSubsystem {
         .withName("Shoot");
   }
 
-  /** Spits the fuel in front of the robot at a fixed angle and speed. */
-  public Command spit() {
-    return run(() -> {
-          _flywheelMotor.setControl(
-              _flywheelVelocitySetter.withVelocity(ShotConstants.spitFlywheelSpeed));
-        })
-        .withName("Spit");
-  }
-
   /** Unjams fuel by maximing reverse stator current. */
   public Command unjam() {
     return run(() -> {

@@ -70,11 +70,6 @@ public class Superstructure {
         .withName("Shoot Manually");
   }
 
-  /** Spits fuel at a short range without aiming. */
-  public Command spit() {
-    return parallel(_shooter.spit(), _hopper.feedSpit()).withName("Spit");
-  }
-
   /** Unjam the shooter and hopper. */
   public Command unjam() {
     return parallel(_shooter.unjam(), _hopper.unjam()).withName("Unjam");

@@ -277,8 +277,6 @@ public class Robot extends TimedRobot {
     _driverController.rightTrigger().and(() -> !_shotParameters.isManual).whileTrue(shoot);
     _driverController.rightTrigger().and(() -> _shotParameters.isManual).whileTrue(shootManually);
 
-    _driverController.rightBumper().whileTrue(_superstructure.spit());
-
     _driverController.leftTrigger().whileTrue(_intakeFeed.feedIn());
 
     _driverController.leftBumper().onTrue(_intakePivot.toggleLowerDefault());

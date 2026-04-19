@@ -124,15 +124,6 @@ public class Hopper extends AdvancedSubsystem {
         .withName("Feed Shot");
   }
 
-  /** Feeds fuel for spitting. */
-  public Command feedSpit() {
-    return run(() -> {
-          setFloorSpeed(ShotConstants.spitFloorSpeed);
-          setRollerSpeed(ShotConstants.spitRollerSpeed);
-        })
-        .withName("Feed Spit");
-  }
-
   /** Unjams the hopper with fuel. */
   public Command unjam() {
     return run(() -> {
