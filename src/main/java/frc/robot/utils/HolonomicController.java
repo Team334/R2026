@@ -48,18 +48,21 @@ public class HolonomicController {
       new FilteredPIDController(
           SwerveConstants.poseTranslationalkP.in(MetersPerSecond.per(Meter)),
           SwerveConstants.poseTranslationalkD.in(MetersPerSecond.per(MetersPerSecond)),
-          Constants.robotPeriod.in(Seconds));
+          Constants.robotPeriod.in(Seconds),
+          0.2);
   private final FilteredPIDController _yController =
       new FilteredPIDController(
           SwerveConstants.poseTranslationalkP.in(MetersPerSecond.per(Meter)),
           SwerveConstants.poseTranslationalkD.in(MetersPerSecond.per(MetersPerSecond)),
-          Constants.robotPeriod.in(Seconds));
+          Constants.robotPeriod.in(Seconds),
+          0.2);
 
   private final FilteredPIDController _headingController =
       new FilteredPIDController(
           SwerveConstants.poseRotationkP.in(RadiansPerSecond.per(Radian)),
           SwerveConstants.poseRotationkD.in(RadiansPerSecond.per(RadiansPerSecond)),
-          Constants.robotPeriod.in(Seconds));
+          Constants.robotPeriod.in(Seconds),
+          0.2);
 
   private ChassisSpeeds _pidSpeeds = new ChassisSpeeds();
 
@@ -95,8 +98,8 @@ public class HolonomicController {
   /** Sets r'(t) low-pass filtering on the translation pid controllers. */
   public void useFilteringTranslation(boolean use) {
     if (use) {
-      _xController.enableSetpointVelocityFilter(0.2);
-      _yController.enableSetpointVelocityFilter(0.2);
+      _xController.enableSetpointVelocityFilter();
+      _yController.enableSetpointVelocityFilter();
     } else {
       _xController.disableSetpointVelocityFilter();
       _yController.disableSetpointVelocityFilter();
@@ -112,7 +115,7 @@ public class HolonomicController {
   /** Sets r'(t) low-pass filtering on the heading pid controller. */
   public void useFilteringHeading(boolean use) {
     if (use) {
-      _headingController.enableSetpointVelocityFilter(0.2);
+      _headingController.enableSetpointVelocityFilter();
     } else {
       _headingController.disableSetpointVelocityFilter();
     }

@@ -2,6 +2,7 @@ package frc.lib;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.wpilibj.Timer;
 
 public final class FilteredPIDController {
   private final double kP;
@@ -10,7 +11,9 @@ public final class FilteredPIDController {
   private final double period;
 
   private boolean _filterSetpointVelocity;
-  private LinearFilter _setpointVelocityFilter;
+  private final LinearFilter _setpointVelocityFilter;
+
+  private final Timer _setpointVelocityFilterTimer = new Timer();
 
   private double _prevSetpoint;
   private double _prevMeasurement;
@@ -19,25 +22,25 @@ public final class FilteredPIDController {
   private double _maximumInput;
   private double _minimumInput;
 
-  public FilteredPIDController(double kP, double kD, double period) {
+  public FilteredPIDController(double kP, double kD, double period, double tau) {
     this.kP = kP;
     this.kD = kD;
 
     this.period = period;
+
+    _setpointVelocityFilter = LinearFilter.singlePoleIIR(tau, this.period);
   }
 
   public boolean isFilteringSetpointVelocity() {
     return _filterSetpointVelocity;
   }
 
-  public void enableSetpointVelocityFilter(double tau) {
+  public void enableSetpointVelocityFilter() {
     _filterSetpointVelocity = true;
-    _setpointVelocityFilter = LinearFilter.singlePoleIIR(tau, period);
   }
 
   public void disableSetpointVelocityFilter() {
     _filterSetpointVelocity = false;
-    _setpointVelocityFilter = null;
   }
 
   public boolean isContinuousInput() {
@@ -76,7 +79,14 @@ public final class FilteredPIDController {
     }
 
     if (_filterSetpointVelocity) {
+      // TODO make reset time a constant?
+      if (_setpointVelocityFilterTimer.hasElapsed(2)) {
+        _setpointVelocityFilter.reset();
+      }
+
       setpointDerivative = _setpointVelocityFilter.calculate(setpointDerivative);
+
+      _setpointVelocityFilterTimer.restart();
     }
 
     _prevMeasurement = measurement;
