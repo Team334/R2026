@@ -235,7 +235,7 @@ public class IntakePivot extends AdvancedSubsystem {
 
           _pivotMotor.setControl(
               _pivotAngleSetter
-                  .withPosition(IntakeConstants.pivotRaised)
+                  .withPosition(IntakeConstants.pivotRaisedShooting)
                   .withVelocity(IntakeConstants.shootingPivotVelocity)
                   .withAcceleration(IntakeConstants.shootingPivotAcceleration));
         })

@@ -12,6 +12,7 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.FieldConstants;
@@ -23,15 +24,14 @@ public class FieldUtil {
   private static final double E_tolerance = 0.1;
   private static final double couplingDegreesTolerance = 20;
 
-  private static final double robotVelocityNormTolerance = 0.4;
+  private static final double robotVelocityNormTolerance = 0.1;
 
   private static final double hubActiveLeadTime = 1.0;
 
   private static boolean _prevHubActive;
   private static double _prevShiftTime = -1;
 
-  // private static final BooleanSubscriber _useFudge = DogLog.tunable("Use Fudge", false); // TODO:
-  // unused rn
+  private static final BooleanSubscriber _useFudge = DogLog.tunable("Use Fudge", true);
 
   static {
     // teleop().onTrue(runOnce(() -> _useFudge.getTopic().publish().set(true)));
@@ -272,7 +272,10 @@ public class FieldUtil {
 
         shotParameters.isErrorSensitive = shotParameters.couplingDegrees < couplingDegreesTolerance;
 
-        shotParameters.setPreset(presets.get(robotToVirtualTargetNorm));
+        shotParameters.setPreset(
+            presets.get(
+                robotToVirtualTargetNorm
+                    + (_useFudge.get() ? ShotConstants.distanceToTargetFudge.in(Meters) : 0)));
         shotParameters.setShotHeading(Math.atan2(robotToVirtualTargetY, robotToVirtualTargetX));
 
         double virtualTargetX = target.getX() - robotVelocityX * t;
