@@ -2,18 +2,15 @@ package frc.lib.math;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.wpilibj.Timer;
 
 public final class FilteredPIDController {
-  private final double kP;
-  private final double kD;
+  private final double _kP;
+  private final double _kD;
 
-  private final double period;
+  private final double _period;
 
   private boolean _filterSetpointVelocity;
-  private final LinearFilter _setpointVelocityFilter;
-
-  private final Timer _setpointVelocityFilterTimer = new Timer();
+  private final TimeoutLinearFilter _setpointVelocityFilter;
 
   private double _prevSetpoint;
   private double _prevMeasurement;
@@ -23,12 +20,13 @@ public final class FilteredPIDController {
   private double _minimumInput;
 
   public FilteredPIDController(double kP, double kD, double period, double tau) {
-    this.kP = kP;
-    this.kD = kD;
+    this._kP = kP;
+    this._kD = kD;
 
-    this.period = period;
+    this._period = period;
 
-    _setpointVelocityFilter = LinearFilter.singlePoleIIR(tau, this.period);
+    _setpointVelocityFilter =
+        new TimeoutLinearFilter(LinearFilter.singlePoleIIR(tau, this._period), 2);
   }
 
   public boolean isFilteringSetpointVelocity() {
@@ -69,8 +67,8 @@ public final class FilteredPIDController {
       error = MathUtil.inputModulus(setpoint - measurement, -bound, bound);
 
       measurementDerivative =
-          MathUtil.inputModulus(measurement - _prevMeasurement, -bound, bound) / period;
-      setpointDerivative = MathUtil.inputModulus(setpoint - _prevSetpoint, -bound, bound) / period;
+          MathUtil.inputModulus(measurement - _prevMeasurement, -bound, bound) / _period;
+      setpointDerivative = MathUtil.inputModulus(setpoint - _prevSetpoint, -bound, bound) / _period;
     } else {
       error = setpoint - measurement;
 
@@ -79,19 +77,12 @@ public final class FilteredPIDController {
     }
 
     if (_filterSetpointVelocity) {
-      // TODO make reset time a constant?
-      if (_setpointVelocityFilterTimer.hasElapsed(2)) {
-        _setpointVelocityFilter.reset();
-      }
-
       setpointDerivative = _setpointVelocityFilter.calculate(setpointDerivative);
-
-      _setpointVelocityFilterTimer.restart();
     }
 
     _prevMeasurement = measurement;
     _prevSetpoint = setpoint;
 
-    return kP * error + kD * (setpointDerivative - measurementDerivative);
+    return _kP * error + _kD * (setpointDerivative - measurementDerivative);
   }
 }

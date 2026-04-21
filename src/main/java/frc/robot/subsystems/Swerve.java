@@ -53,6 +53,7 @@ import frc.lib.fault.FaultLogger;
 import frc.lib.fault.FaultsTable;
 import frc.lib.fault.FaultsTable.Fault;
 import frc.lib.fault.FaultsTable.FaultType;
+import frc.lib.math.TimeoutLinearFilter;
 import frc.lib.subsystem.SelfChecked;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
@@ -87,8 +88,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
       new HolonomicController(getKinematics().getModules());
 
   // for drive facing
-  private final LinearFilter _omegaFeedforwardFilter =
-      LinearFilter.singlePoleIIR(0.2, Constants.robotPeriod.in(Seconds));
+  private final TimeoutLinearFilter _omegaFeedforwardFilter =
+      new TimeoutLinearFilter(
+          LinearFilter.singlePoleIIR(0.2, Constants.robotPeriod.in(Seconds)), 2);
   private Rotation2d _previousRotationSetpoint = Rotation2d.kZero;
 
   private double _lastSimTime = 0;
