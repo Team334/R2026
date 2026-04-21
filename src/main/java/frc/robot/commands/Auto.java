@@ -182,6 +182,7 @@ public class Auto {
 
     _routineChooser.addOption("Reset Odometry", Pair.of("Reset Odometry", this::resetOdometry));
     _routineChooser.addOption("8 Piece", Pair.of("8 Piece", this::eightPiece));
+    _routineChooser.addOption("Test", Pair.of("Test", this::test));
 
     _layoutChooser.onChange(
         l -> {
@@ -235,6 +236,15 @@ public class Auto {
 
   private Command getBinding(String binding) {
     return _bindings.get(binding).get();
+  }
+
+  private Command test() {
+    AutoRoutine routine = _factory.newRoutine("Test");
+    AutoTrajectory trajectory = routine.trajectory("Test");
+
+    routine.active().onTrue(sequence(trajectory.resetOdometry(), trajectory.cmd()));
+
+    return routine.cmd();
   }
 
   private Command resetOdometry() {

@@ -707,13 +707,13 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
               double maxTorque = 0;
 
               for (var module : getModules()) {
-                var suc =
+                var failed =
                     CTREUtil.attempt(
                         () ->
                             module.getDriveMotor().getConfigurator().refresh(currentLimitsConfigs),
                         module.getDriveMotor());
 
-                if (!suc) {
+                if (failed) {
                   FaultLogger.report(
                       "Failed to calculate motor max torque! Make sure all drive motors are connected.",
                       FaultType.ERROR);

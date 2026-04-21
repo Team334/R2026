@@ -309,11 +309,11 @@ public final class Constants {
     public static final Angle pivotRaised = Rotations.of(0.22);
     public static final Angle pivotRaisedShooting = Rotations.of(0.28);
 
-    public static final Angle pivotLowered = Rotations.of(0.54);
+    public static final Angle pivotLowered = Rotations.of(0.56);
     public static final Angle pivotLoweredDepot = Rotations.of(0.45);
 
     public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.17);
-    public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.59);
+    public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.61);
 
     public static final AngularVelocity feedSpeed = RotationsPerSecond.of(90);
   }
@@ -321,8 +321,8 @@ public final class Constants {
   public static class SwerveConstants {
     public static final Frequency odometryFrequency = Hertz.of(250);
 
-    public static final Mass mass = Pounds.of(136);
-    public static final MomentOfInertia moi = KilogramSquareMeters.of(8.79);
+    public static final Mass mass = Pounds.of(133.7);
+    public static final MomentOfInertia moi = KilogramSquareMeters.of(8.234);
 
     public static final Current frontSlipCurrent = Amps.of(40);
 
