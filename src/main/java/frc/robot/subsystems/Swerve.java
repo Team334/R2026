@@ -47,13 +47,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.lib.FaultLogger;
-import frc.lib.FaultsTable;
-import frc.lib.FaultsTable.Fault;
-import frc.lib.FaultsTable.FaultType;
 import frc.lib.InputStream;
-import frc.lib.SelfChecked;
 import frc.lib.SysId;
+import frc.lib.fault.FaultLogger;
+import frc.lib.fault.FaultsTable;
+import frc.lib.fault.FaultsTable.Fault;
+import frc.lib.fault.FaultsTable.FaultType;
+import frc.lib.subsystem.SelfChecked;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.MotorConstants;
@@ -240,7 +240,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   }
 
   /** Adds a new fault under this subsystem. */
-  private final void addFault(String description, FaultType faultType) {
+  public final void addFault(String description, FaultType faultType) {
     _hasError = (faultType == FaultType.ERROR);
 
     Fault fault = new Fault(description, faultType);

@@ -1,15 +1,15 @@
-package frc.lib;
+package frc.lib.subsystem;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.lib.FaultsTable.FaultType;
+import frc.lib.fault.FaultsTable.FaultType;
 
 public interface SelfChecked {
   /**
    * Returns a Command that self checks this system. This command should utilize the advanced
-   * subsytem's {@link AdvancedSubsystem#addFault(String, FaultType)}.
+   * subsystem's {@link AdvancedSubsystem#addFault(String, FaultType)}.
    */
   public default Command selfCheck() {
     return none();

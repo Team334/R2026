@@ -1,14 +1,16 @@
 package frc.lib;
 
-import static frc.lib.UnitTestingUtil.*;
+import static frc.lib.util.UnitTestingUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
-import frc.lib.FaultsTable.Fault;
-import frc.lib.FaultsTable.FaultType;
+import frc.lib.fault.FaultLogger;
+import frc.lib.fault.FaultsTable.Fault;
+import frc.lib.fault.FaultsTable.FaultType;
+import frc.lib.util.CTREUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

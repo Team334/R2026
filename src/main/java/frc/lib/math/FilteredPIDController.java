@@ -1,4 +1,4 @@
-package frc.lib;
+package frc.lib.math;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;

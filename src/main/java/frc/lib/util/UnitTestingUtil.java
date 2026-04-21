@@ -1,4 +1,4 @@
-package frc.lib;
+package frc.lib.util;
 
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.lib.fault.FaultLogger;
 
 /** Provides helper methods that run a command when performing unit tests. */
 public class UnitTestingUtil {

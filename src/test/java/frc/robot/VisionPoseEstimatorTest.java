@@ -1,6 +1,6 @@
 package frc.robot;
 
-import static frc.lib.UnitTestingUtil.*;
+import static frc.lib.util.UnitTestingUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.wpi.first.apriltag.AprilTag;

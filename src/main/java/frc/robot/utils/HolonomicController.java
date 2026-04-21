@@ -15,7 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import frc.lib.FilteredPIDController;
+import frc.lib.math.FilteredPIDController;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
 

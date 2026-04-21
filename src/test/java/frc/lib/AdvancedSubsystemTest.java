@@ -5,17 +5,56 @@
 package frc.lib;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
-import static frc.lib.UnitTestingUtil.*;
+import static frc.lib.util.UnitTestingUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.lib.FaultsTable.Fault;
-import frc.lib.FaultsTable.FaultType;
+import frc.lib.fault.FaultsTable.Fault;
+import frc.lib.fault.FaultsTable.FaultType;
+import frc.lib.subsystem.AdvancedSubsystem;
+import frc.lib.util.UnitTestingUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class AdvancedSubsystemTest {
+  private class TestImpl extends AdvancedSubsystem {
+    public TestImpl() {
+      super(UnitTestingUtil.getNtInst());
+    }
+
+    public double speed() {
+      return 0;
+    }
+
+    @Override
+    public Command selfCheck() {
+      return shiftSequence(
+          // check devices first
+          runOnce(
+              () -> {
+                if (true) addFault("FAULT 1", FaultType.WARNING);
+              }),
+          runOnce(
+              () -> {
+                if (true) addFault("FAULT 2", FaultType.WARNING);
+              }),
+          runOnce(
+              () -> {
+                if (true) addFault("FAULT 3", FaultType.ERROR);
+              }),
+
+          // then check the subsystem
+          runOnce(
+              () -> {
+                if (speed() < 2) addFault("TOO SLOW", FaultType.WARNING);
+              }));
+    }
+
+    @Override
+    public void close() {}
+  }
+
   private TestImpl _sub;
 
   @BeforeEach
@@ -94,42 +133,5 @@ public class AdvancedSubsystemTest {
     run(test, 3);
 
     assertEquals("Test Command", _sub.currentCommandName());
-  }
-
-  public class TestImpl extends AdvancedSubsystem {
-    public TestImpl() {
-      super(UnitTestingUtil.getNtInst());
-    }
-
-    public double speed() {
-      return 0;
-    }
-
-    @Override
-    public Command selfCheck() {
-      return shiftSequence(
-          // check devices first
-          runOnce(
-              () -> {
-                if (true) addFault("FAULT 1", FaultType.WARNING);
-              }),
-          runOnce(
-              () -> {
-                if (true) addFault("FAULT 2", FaultType.WARNING);
-              }),
-          runOnce(
-              () -> {
-                if (true) addFault("FAULT 3", FaultType.ERROR);
-              }),
-
-          // then check the subsystem
-          runOnce(
-              () -> {
-                if (speed() < 2) addFault("TOO SLOW", FaultType.WARNING);
-              }));
-    }
-
-    @Override
-    public void close() {}
   }
 }
