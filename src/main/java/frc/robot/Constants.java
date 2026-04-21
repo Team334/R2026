@@ -324,6 +324,8 @@ public final class Constants {
     public static final Mass mass = Pounds.of(136);
     public static final MomentOfInertia moi = KilogramSquareMeters.of(8.79);
 
+    public static final Current frontSlipCurrent = Amps.of(40);
+
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
     public static final LinearVelocity driverTranslationalVelocityBump = MetersPerSecond.of(1.5);
     public static final AngularVelocity driverAngularVelocity = RadiansPerSecond.of(Math.PI * 2);

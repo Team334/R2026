@@ -10,6 +10,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
@@ -34,6 +35,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -55,6 +57,7 @@ import frc.lib.fault.FaultsTable.Fault;
 import frc.lib.fault.FaultsTable.FaultType;
 import frc.lib.math.TimeoutLinearFilter;
 import frc.lib.subsystem.SelfChecked;
+import frc.lib.util.CTREUtil;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.MotorConstants;
@@ -196,6 +199,25 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
       SwerveDrivetrainConstants drivetrainConstants,
       SwerveModuleConstants<?, ?, ?>... moduleConstants) {
     super(drivetrainConstants, SwerveConstants.odometryFrequency.in(Hertz), moduleConstants);
+
+    final var frontLeftDriveConfigurator = getModule(0).getDriveMotor().getConfigurator();
+    final var frontRightDriveConfigurator = getModule(1).getDriveMotor().getConfigurator();
+
+    final var currentLimitConfigs = new CurrentLimitsConfigs();
+
+    CTREUtil.attempt(
+        () -> frontLeftDriveConfigurator.refresh(currentLimitConfigs),
+        getModule(0).getDriveMotor());
+    currentLimitConfigs.StatorCurrentLimit = SwerveConstants.frontSlipCurrent.in(Amps);
+    CTREUtil.attempt(
+        () -> frontLeftDriveConfigurator.apply(currentLimitConfigs), getModule(0).getDriveMotor());
+
+    CTREUtil.attempt(
+        () -> frontRightDriveConfigurator.refresh(currentLimitConfigs),
+        getModule(1).getDriveMotor());
+    currentLimitConfigs.StatorCurrentLimit = SwerveConstants.frontSlipCurrent.in(Amps);
+    CTREUtil.attempt(
+        () -> frontRightDriveConfigurator.apply(currentLimitConfigs), getModule(1).getDriveMotor());
 
     _robotCentricRequest
         .withDeadband(SwerveConstants.translationalDeadband)
@@ -631,55 +653,37 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   @Override
   public void simulationPeriodic() {
-    _visionSystemSim.update(getPose()); // TODO: odom only?
+    _visionSystemSim.update(getPose());
   }
 
-  /** Calculates the chassis MOI given angular chassis kA in volts/rad/s^2. */
+  /** Calculates the chassis MOI given angular chassis kA in volts/rad/s^2 per each module. */
   public Command calculateMOI() {
-    final Distance driveRadius =
-        Meters.of(
-            Math.sqrt(
-                Math.pow(TunerConstants.FrontLeft.LocationX, 2)
-                    + Math.pow(TunerConstants.FrontLeft.LocationY, 2)));
+    // volts/rad/s^2 for each individual drive motor in the correct order
+    final DoubleArraySubscriber angularkAPerModule =
+        DogLog.tunable("Calculator/Angular kA Per Module", new double[4]);
 
-    final DoubleSubscriber angularkA = DogLog.tunable("Calculator/Angular kA", 1.0);
+    final DCMotor driveMotor = MotorConstants.krakenX60;
 
     return Commands.runOnce(
             () -> {
-              DCMotor driveMotor = MotorConstants.krakenX60;
+              double chassisTorque = 0;
 
-              double chassisTorque =
-                  (driveMotor.getTorque(driveMotor.getCurrent(0, angularkA.get()))
-                          * TunerConstants.FrontLeft.DriveMotorGearRatio
-                          / TunerConstants.FrontLeft.WheelRadius)
-                      * driveRadius.in(Meters)
-                      * 4;
-              double MOI = chassisTorque / 1.0;
+              for (int module = 0; module < 4; module++) {
+                double moduleToCenter = getModuleLocations()[module].getNorm();
+                double moduleForce =
+                    driveMotor.getTorque(driveMotor.getCurrent(0, angularkAPerModule.get()[module]))
+                        * TunerConstants.FrontLeft.DriveMotorGearRatio
+                        / TunerConstants.FrontLeft.WheelRadius;
+
+                chassisTorque += moduleForce * moduleToCenter;
+              }
+
+              double MOI = chassisTorque; // since α = 1, I = τ
 
               FaultLogger.report("Chassis MOI: " + MOI, FaultType.INFO);
             })
         .ignoringDisable(true)
         .withName("Calculate Chassis MOI");
-  }
-
-  /** Calculates the drive wheel coefficient of static friction. */
-  public Command calculateWheelCOF() {
-    return Commands.runOnce(
-            () -> {
-              DCMotor driveMotor = MotorConstants.krakenX60;
-
-              double totalFrictionForce =
-                  (driveMotor.getTorque(TunerConstants.FrontLeft.SlipCurrent)
-                          * TunerConstants.FrontLeft.DriveMotorGearRatio
-                          / TunerConstants.FrontLeft.WheelRadius)
-                      * 4;
-
-              double cof = totalFrictionForce / (SwerveConstants.mass.in(Kilograms) * 9.81);
-
-              FaultLogger.report("Calculator/Drive Wheel COF: " + cof, FaultType.INFO);
-            })
-        .ignoringDisable(true)
-        .withName("Calculate Wheel COF");
   }
 
   /**
@@ -690,15 +694,37 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     // percentage of max achievable speed and torque, leaving headroom for pose PID
     final DoubleSubscriber headroom = DogLog.tunable("Calculator/Headroom", .8);
 
+    final DCMotor driveMotor = MotorConstants.krakenX60;
+
+    final CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
+
     return Commands.runOnce(
             () -> {
-              DCMotor driveMotor = MotorConstants.krakenX60;
-
               double maxSpeed =
                   Units.radiansPerSecondToRotationsPerMinute(
                       driveMotor.freeSpeedRadPerSec * headroom.get());
-              double maxTorque =
-                  driveMotor.getTorque(TunerConstants.FrontLeft.SlipCurrent) * headroom.get();
+
+              double maxTorque = 0;
+
+              for (var module : getModules()) {
+                var suc =
+                    CTREUtil.attempt(
+                        () ->
+                            module.getDriveMotor().getConfigurator().refresh(currentLimitsConfigs),
+                        module.getDriveMotor());
+
+                if (!suc) {
+                  FaultLogger.report(
+                      "Failed to calculate motor max torque! Make sure all drive motors are connected.",
+                      FaultType.ERROR);
+                  return;
+                }
+
+                maxTorque +=
+                    driveMotor.getTorque(currentLimitsConfigs.StatorCurrentLimit) * headroom.get();
+              }
+
+              maxTorque /= 4;
 
               FaultLogger.report(
                   "Motor Max Speed (rpm): " + maxSpeed + ", Motor Max Torque: " + maxTorque,
@@ -798,7 +824,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
         .withName("Wheel Radius Characterization");
   }
 
-  // TODO: add self check routines
   private Command selfCheckModule(String name, SwerveModule<TalonFX, TalonFX, CANcoder> module) {
     return shiftSequence();
   }

@@ -175,7 +175,6 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
 
-    SmartDashboard.putData("Calculate Wheel COF", _swerve.calculateWheelCOF());
     SmartDashboard.putData("Calculate Chassis MOI", _swerve.calculateMOI());
     SmartDashboard.putData(
         "Calculate Motor Max Speed And Torque", _swerve.calculateMotorMaxSpeedAndTorque());
