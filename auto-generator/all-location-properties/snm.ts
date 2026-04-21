@@ -30,8 +30,8 @@ export const allLocationProperties: AllLocationProperties = {
             makeWaypoint(2.770551919937134, 7.13850736618042, -1.0286093969667478, true, true, true)
         ),
         constraints: [
-            makeConstraint(5, undefined, {type: "StopPoint", props: {}}),
-            makeConstraint(2, 3, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}})
+            makeConstraint(5, undefined, { type: "StopPoint", props: {} }),
+            makeConstraint(2, 3, { type: "KeepInLane", props: { tolerance: toExpr(0.03, "m") } })
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),
@@ -57,7 +57,7 @@ export const allLocationProperties: AllLocationProperties = {
             makeWaypoint(3.2754716873168945, 7.364711284637451, -1.1729889971693404, true, true, true)
         ),
         constraints: [
-            makeConstraint(5, undefined, {type: "StopPoint", props: {}})
+            makeConstraint(5, undefined, { type: "StopPoint", props: {} })
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),
@@ -81,9 +81,9 @@ export const allLocationProperties: AllLocationProperties = {
             makeWaypoint(0.99637770652771, 5.633697986602783, -1.5707963267948966, true, true, true)
         ],
         constraints: [
-            makeConstraint(1, 2, {type: "KeepInLane", props: {tolerance: toExpr(0.03, "m")}}),
-            makeConstraint(1, 2, {type: "MaxAngularVelocity", props: {max: toExpr(0, "rad")}}),
-            makeConstraint(4, undefined, {type: "StopPoint", props: {}})
+            makeConstraint(1, 2, { type: "KeepInLane", props: { tolerance: toExpr(0.03, "m") } }),
+            makeConstraint(1, 2, { type: "MaxAngularVelocity", props: { max: toExpr(0, "rad") } }),
+            makeConstraint(4, undefined, { type: "StopPoint", props: {} })
         ],
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0),

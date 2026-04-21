@@ -130,15 +130,11 @@ public class Auto {
 
     _bindings.put("pivot lower", intakePivot::lower);
 
-    _bindings.put(
-        "pivot lower depot",
-        () ->
-            intakePivot
-                .lower()
-                .beforeStarting(() -> intakePivot.lowerDepot = true)
-                .finallyDo(() -> intakePivot.lowerDepot = false));
-
     _bindings.put("pivot raise", intakePivot::raise);
+
+    _bindings.put("lower depot enable", () -> runOnce(() -> intakePivot.lowerDepot = true));
+
+    _bindings.put("lower depot disable", () -> runOnce(() -> intakePivot.lowerDepot = false));
 
     _bindings.put("feed in", intakeFeed::feedIn);
 

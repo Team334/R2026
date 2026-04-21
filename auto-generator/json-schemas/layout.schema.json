@@ -13,11 +13,14 @@
       "enum": [
         "pivot lower",
         "pivot raise",
+        "lower depot enable",
+        "lower depot disable",
         "feed in",
         "feed stop",
         "shoot",
         "shoot still",
-        "stop shooting"
+        "stop shooting",
+        "extend"
       ],
       "type": "string"
     },

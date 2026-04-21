@@ -31,25 +31,25 @@ const rl = readline.createInterface({
 });
 
 async function prompt(q: string) {
-  return await rl.question(q);
+    return await rl.question(q);
 }
 
-function loadLayout(name: string) : Layout {
+function loadLayout(name: string): Layout {
     const layoutData = fs.readFileSync(`${LAYOUT_DIR}/${name}.json`, 'utf-8');
-    
+
     return JSON.parse(layoutData) as Layout;
 }
 
-async function loadAllLocationProperties(name: string) : Promise<AllLocationProperties> {
+async function loadAllLocationProperties(name: string): Promise<AllLocationProperties> {
     const file = await import(`./all-location-properties/${name}.ts`);
     return file.allLocationProperties as AllLocationProperties;
 }
 
-function saveTrajectory(traj: Trajectory) : void {
+function saveTrajectory(traj: Trajectory): void {
     fs.writeFileSync(`${TRAJ_DIR}/${traj.name}.traj`, JSON.stringify(traj, null, 2));
 }
 
-function generateTrajectory(traj: Trajectory) : void {
+function generateTrajectory(traj: Trajectory): void {
     exec(`${CHOREO_CLI} --chor ${CONFIG} --trajectory ${traj.name}.traj -g`, (error: Error | null, stdout: string, stderr: string) => {
         if (error) {
             console.error("choreo cli:", error);
@@ -61,7 +61,7 @@ function generateTrajectory(traj: Trajectory) : void {
     });
 }
 
-function buildTrajectory(baseTraj: Trajectory, name: string, layout: Location[], allLocationProperties: AllLocationProperties) : Trajectory {
+function buildTrajectory(baseTraj: Trajectory, name: string, layout: Location[], allLocationProperties: AllLocationProperties): Trajectory {
     let trajWaypoints: Waypoint<Expr>[] = [];
     let trajConstraints: Constraint[] = [];
     let trajEventMarkers: EventMarker[] = [];
@@ -82,7 +82,7 @@ function buildTrajectory(baseTraj: Trajectory, name: string, layout: Location[],
             case "l":
                 locationWaypoints = locationProperties.leftWaypoints ?? [];
                 break;
-    
+
             case "c":
                 locationWaypoints = locationProperties.centerWaypoints ?? [];
                 break;
@@ -119,13 +119,13 @@ var baseTraj: Trajectory = {
     params: {
         waypoints: [],
         constraints: [
-            {from: "first", data: {type: "StopPoint", props: {}}, enabled: true},
-            {from: "last", data: {type: "StopPoint", props: {}}, enabled: true},
-            {from: "first", to: "last", data: {type: "MaxVelocity", props: {max: toExpr(2.5, "m/s")}}, enabled: true},
-            {from: "first", to: "last", data: {type: "MaxAcceleration", props: {max: toExpr(3, "m/s^2")}}, enabled: true},
-            {from: "first", to: "last", data: {type: "KeepOutCircle", props: {x: toExpr(4.66, "m"), y: toExpr(6.18, "m"), r: toExpr(0.826396949005302, "m")}}, enabled: true},
-            {from: "first", to: "last", data: {type: "KeepOutCircle", props: {x: toExpr(4.66, "m"), y: toExpr(1.8892, "m"), r: toExpr(0.826396949005302, "m")}}, enabled: true},
-            {from: "first", to: "last", data: {type: "KeepInRectangle", props: {x: toExpr(0, "m"), y: toExpr(0.0392, "m"), w: toExpr(16.541, "m"), h: toExpr(7.9908, "m")}}, enabled: true}
+            { from: "first", data: { type: "StopPoint", props: {} }, enabled: true },
+            { from: "last", data: { type: "StopPoint", props: {} }, enabled: true },
+            { from: "first", to: "last", data: { type: "MaxVelocity", props: { max: toExpr(2.5, "m/s") } }, enabled: true },
+            { from: "first", to: "last", data: { type: "MaxAcceleration", props: { max: toExpr(3, "m/s^2") } }, enabled: true },
+            { from: "first", to: "last", data: { type: "KeepOutCircle", props: { x: toExpr(4.66, "m"), y: toExpr(6.18, "m"), r: toExpr(0.826396949005302, "m") } }, enabled: true },
+            { from: "first", to: "last", data: { type: "KeepOutCircle", props: { x: toExpr(4.66, "m"), y: toExpr(1.8892, "m"), r: toExpr(0.826396949005302, "m") } }, enabled: true },
+            { from: "first", to: "last", data: { type: "KeepInRectangle", props: { x: toExpr(0, "m"), y: toExpr(0.0392, "m"), w: toExpr(16.541, "m"), h: toExpr(7.9908, "m") } }, enabled: true }
         ],
         targetDt: toExpr(0.05, "s")
     },
@@ -149,7 +149,7 @@ async function main() {
     var allLocationProperties: AllLocationProperties = await loadAllLocationProperties(layout.allLocationProperties);
 
     var traj: Trajectory = buildTrajectory(baseTraj, layout.name, layout.layout, allLocationProperties);
-    
+
     saveTrajectory(traj);
 
     console.log(`\nconverted layout into ${traj.name}.traj`)

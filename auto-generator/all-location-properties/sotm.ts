@@ -77,11 +77,11 @@ export const allLocationProperties: AllLocationProperties = {
             makeWaypoint(0.6906939148902893, 5.215888500213623, 0, true, false),
             makeWaypoint(0.99637770652771, 5.633697986602783, 0.0, true, false)
         ],
-         centerWaypoints: [
+        centerWaypoints: [
             makeWaypoint(0.9916285276412964, 5.015804767608643, 0.0, true, false),
             makeWaypoint(0.4727896749973297, 5.050980091094971, 1.5708),
             makeWaypoint(0.45200252532958984, 7.020524978637695, 0.0, true, false),
-            
+
         ],
         rightWaypoints: [
             makeWaypoint(1.5006606578826904, 5.137444972991943, 0.0, true, false),

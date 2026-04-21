@@ -1,8 +1,8 @@
 import { ConstraintData } from "./choreo/ConstraintDefinitions";
 import { Constraint, EventMarker, Expr, Waypoint } from "./choreo/DocumentTypes";
 
-export function toExpr(val: number, unit: string) : Expr {
-  return { exp: `${val} ${unit}`, val: val };
+export function toExpr(val: number, unit: string): Expr {
+    return { exp: `${val} ${unit}`, val: val };
 }
 
 export const FIELD_WIDTH = 8.0629;
@@ -12,7 +12,7 @@ export type GenericLocation = "start" | "neutralbump" | "neutralmiddle" | "depot
 
 export type Location = `${Side}_${GenericLocation}`;
 
-export type EventName = "pivot lower" | "pivot lower depot" | "pivot raise" | "feed in" | "feed stop" | "shoot" | "shoot still" | "stop shooting" | "extend";
+export type EventName = "pivot lower" | "pivot raise" | "lower depot enable" | "lower depot disable" | "feed in" | "feed stop" | "shoot" | "shoot still" | "stop shooting" | "extend";
 
 export interface LocationProperties {
     leftWaypoints?: Waypoint<Expr>[],
@@ -42,7 +42,7 @@ export const reflectWaypoints = (...waypoints: Waypoint<Expr>[]) => {
     }));
 };
 
-export const makeWaypoint = (x: number, y: number, heading: number, fixTranslation: boolean = true, fixHeading: boolean = true, split: boolean = false) : Waypoint<Expr> => {
+export const makeWaypoint = (x: number, y: number, heading: number, fixTranslation: boolean = true, fixHeading: boolean = true, split: boolean = false): Waypoint<Expr> => {
     return {
         x: toExpr(x, "m"),
         y: toExpr(y, "m"),
@@ -55,7 +55,7 @@ export const makeWaypoint = (x: number, y: number, heading: number, fixTranslati
     };
 };
 
-export const makeConstraint = (from: number, to: number | undefined, data: ConstraintData) : Constraint => {
+export const makeConstraint = (from: number, to: number | undefined, data: ConstraintData): Constraint => {
     return {
         from: from,
         ...(to !== undefined && { to: to }),
@@ -64,12 +64,12 @@ export const makeConstraint = (from: number, to: number | undefined, data: Const
     };
 }
 
-export const makeEventMarker = (name: EventName, target: number, offset: number) : EventMarker => {
+export const makeEventMarker = (name: EventName, target: number, offset: number): EventMarker => {
     return {
         name: name,
         from: {
-            target: target, 
-            offset: toExpr(offset, "s"), 
+            target: target,
+            offset: toExpr(offset, "s"),
             targetTimestamp: undefined
         },
         event: null
@@ -82,7 +82,7 @@ export const makeEventMarker = (name: EventName, target: number, offset: number)
  * @param waypointOffset The waypoint offset in the trajectory.
  * @returns New shifted location properties.
  */
-export function shiftLocationProperties(locationProperties: LocationProperties, waypointOffset: number) : LocationProperties {
+export function shiftLocationProperties(locationProperties: LocationProperties, waypointOffset: number): LocationProperties {
     const clonedLocationProperties: LocationProperties = structuredClone(locationProperties);
 
     let shiftedConstraints: Constraint[] | undefined = undefined;
