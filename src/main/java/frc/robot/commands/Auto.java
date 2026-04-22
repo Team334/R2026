@@ -115,7 +115,7 @@ public class Auto {
         () ->
             sequence(
                 runOnce(() -> _aimAtTarget = true), // follow trajectory facing from here
-                parallel(hopper.feedShot(), shooter.shoot(), intakePivot.raiseShooting())));
+                parallel(hopper.feedShot(), shooter.shoot(), intakePivot.pivotShooting())));
 
     _bindings.put(
         "stop shooting",

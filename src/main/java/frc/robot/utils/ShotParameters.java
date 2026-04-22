@@ -83,11 +83,13 @@ public class ShotParameters {
    * Creates a new ShotParameters.
    *
    * @param shooterInTolerance Shooter flywheel is in tolerance of the shot parameters.
+   * @param intakePivotInSafeZone The intake pivot is in its safe zone.
    * @param headingInTolerance Heading is in tolerance of the shoot parameters.
    * @param isShotValid Shot is valid depending on the hub status.
    */
   public ShotParameters(
       BooleanSupplier shooterInTolerance,
+      BooleanSupplier intakePivotInSafeZone,
       BooleanSupplier headingInTolerance,
       BooleanSupplier isShotValid) {
     new Trigger(() -> isManual)
@@ -120,6 +122,7 @@ public class ShotParameters {
           }
 
           return shooterInTolerance.getAsBoolean()
+              && intakePivotInSafeZone.getAsBoolean()
               && headingInTolerance.getAsBoolean()
               && isShotValid.getAsBoolean()
               && inBounds

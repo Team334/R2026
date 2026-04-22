@@ -191,6 +191,12 @@ public class IntakePivot extends AdvancedSubsystem {
     _simNotifier.startPeriodic(1 / Constants.simNotifierFrequency.in(Hertz));
   }
 
+  /** In safe zone for shooting. */
+  @Logged(name = "In Safe Zone")
+  public boolean inSafeZone() {
+    return getAngle().gte(IntakeConstants.pivotMinShooting);
+  }
+
   @Logged(name = "Angle")
   public Angle getAngle() {
     return _pivotAngleGetter.refresh().getValue();
@@ -225,23 +231,6 @@ public class IntakePivot extends AdvancedSubsystem {
         .withName("Raise");
   }
 
-  /** Raises the intake slower while shooting */
-  public Command raiseShooting() {
-    return run(() -> {
-          if (!_shotParametersSupplier.get().isReadyToShoot()) {
-            _pivotMotor.setControl(_pivotVelocitySetter.withVelocity(0));
-            return;
-          }
-
-          _pivotMotor.setControl(
-              _pivotAngleSetter
-                  .withPosition(IntakeConstants.pivotRaisedShooting)
-                  .withVelocity(IntakeConstants.shootingPivotVelocity)
-                  .withAcceleration(IntakeConstants.shootingPivotAcceleration));
-        })
-        .withName("Raise Shooting");
-  }
-
   /**
    * Lowers the intake. If {@link #lowerDepot} is true, the pivot will be lowered to the depot
    * angle.
@@ -256,6 +245,36 @@ public class IntakePivot extends AdvancedSubsystem {
                   .withAcceleration(IntakeConstants.pivotAcceleration));
         })
         .withName("Lower");
+  }
+
+  /**
+   * Pivoting behavior while shooting. If the intake is in the safe zone, the pivot raises slowly to
+   * the shooting angle once the rest of the subsystems are ready to shoot. If the intake is not in
+   * the safe zone, the pivot lowers at regular speed to the shooting angle.
+   */
+  public Command pivotShooting() {
+    return run(() -> {
+          if (!inSafeZone()) {
+            _pivotMotor.setControl(
+                _pivotAngleSetter
+                    .withPosition(IntakeConstants.pivotRaisedShooting)
+                    .withVelocity(IntakeConstants.pivotVelocity)
+                    .withAcceleration(IntakeConstants.pivotAcceleration));
+            return;
+          }
+
+          if (!_shotParametersSupplier.get().isReadyToShoot()) {
+            _pivotMotor.setControl(_pivotVelocitySetter.withVelocity(0));
+            return;
+          }
+
+          _pivotMotor.setControl(
+              _pivotAngleSetter
+                  .withPosition(IntakeConstants.pivotRaisedShooting)
+                  .withVelocity(IntakeConstants.shootingPivotVelocity)
+                  .withAcceleration(IntakeConstants.shootingPivotAcceleration));
+        })
+        .withName("Pivot Shooting");
   }
 
   @Override

@@ -306,8 +306,10 @@ public final class Constants {
     public static final double feedGearRatio = 1;
     public static final double pivotGearRatio = 72;
 
+    public static final Angle pivotMinShooting = Rotations.of(0.27);
+
     public static final Angle pivotRaised = Rotations.of(0.22);
-    public static final Angle pivotRaisedShooting = Rotations.of(0.28);
+    public static final Angle pivotRaisedShooting = Rotations.of(0.3);
 
     public static final Angle pivotLowered = Rotations.of(0.56);
     public static final Angle pivotLoweredDepot = Rotations.of(0.45);

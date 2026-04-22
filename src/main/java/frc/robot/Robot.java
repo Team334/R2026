@@ -4,10 +4,7 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 
@@ -144,6 +141,7 @@ public class Robot extends TimedRobot {
                     && _shooter
                         .getFlywheelReference()
                         .isNear(_shotParameters.getFlywheelSpeed(), 0.02),
+            _intakePivot::inSafeZone,
             () ->
                 Math.abs(_shotParameters.getShotHeading() - _swerve.getHeading().getRadians())
                     < 0.08,
@@ -257,27 +255,27 @@ public class Robot extends TimedRobot {
         _superstructure.shoot(
             baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
             baseVelY.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
-            true);
+            false);
 
     final Command shootManually =
         _superstructure.shootManually(
             baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
             baseVelY.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
             baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)),
-            true);
+            false);
 
     final Command shootNoPivot =
         _superstructure.shoot(
             baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
             baseVelY.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
-            false);
+            true);
 
     final Command shootManuallyNoPivot =
         _superstructure.shootManually(
             baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
             baseVelY.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
             baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)),
-            false);
+            true);
 
     _swerve.setDefaultCommand(
         _swerve
