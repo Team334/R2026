@@ -8,7 +8,7 @@ export function toExpr(val: number, unit: string): Expr {
 export const FIELD_WIDTH = 8.0629;
 
 export type Side = "l" | "c" | "r";
-export type GenericLocation = "start" | "neutralbump" | "neutralmiddle" | "depot";
+export type GenericLocation = "start" | "neutralbump" | "neutralmiddle" | "depot" | "human";
 
 export type Location = `${Side}_${GenericLocation}`;
 
@@ -25,7 +25,7 @@ export interface LocationProperties {
 export type AllLocationProperties = Record<GenericLocation, LocationProperties>;
 
 // UPDATE AFTER FILE ADD/DELETE CHANGES TO all-location-properties
-export type AllLocationPropertiesName = "sotm" | "snm"
+export type AllLocationPropertiesName = "snm"
 
 export interface Layout {
     name: string,

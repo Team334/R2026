@@ -3,10 +3,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
     "AllLocationPropertiesName": {
-      "enum": [
-        "sotm",
-        "snm"
-      ],
+      "const": "snm",
       "type": "string"
     },
     "EventName": {
@@ -63,14 +60,17 @@
         "l_neutralbump",
         "l_neutralmiddle",
         "l_depot",
+        "l_human",
         "c_start",
         "c_neutralbump",
         "c_neutralmiddle",
         "c_depot",
+        "c_human",
         "r_start",
         "r_neutralbump",
         "r_neutralmiddle",
-        "r_depot"
+        "r_depot",
+        "r_human"
       ],
       "type": "string"
     }
