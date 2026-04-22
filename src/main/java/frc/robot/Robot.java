@@ -264,13 +264,13 @@ public class Robot extends TimedRobot {
             baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)),
             false);
 
-    final Command shootNoPivot =
+    final Command shootPivotLowered =
         _superstructure.shoot(
             baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
             baseVelY.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
             true);
 
-    final Command shootManuallyNoPivot =
+    final Command shootManuallyPivotLowered =
         _superstructure.shootManually(
             baseVelX.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
             baseVelY.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
@@ -305,8 +305,8 @@ public class Robot extends TimedRobot {
 
     _driverController.a().whileTrue(_superstructure.unjam());
 
-    _driverController.x().and(() -> !_shotParameters.isManual).whileTrue(shootNoPivot);
-    _driverController.x().and(() -> _shotParameters.isManual).whileTrue(shootManuallyNoPivot);
+    _driverController.x().and(() -> !_shotParameters.isManual).whileTrue(shootPivotLowered);
+    _driverController.x().and(() -> _shotParameters.isManual).whileTrue(shootManuallyPivotLowered);
   }
 
   /**
