@@ -183,6 +183,7 @@ public class Auto {
     _routineChooser.addOption("Reset Odometry", Pair.of("Reset Odometry", this::resetOdometry));
     _routineChooser.addOption("8 Piece", Pair.of("8 Piece", this::eightPiece));
     _routineChooser.addOption("Test", Pair.of("Test", this::test));
+    _routineChooser.addOption("Houston", Pair.of("Houston", this::houston));
 
     _layoutChooser.onChange(
         l -> {
@@ -259,6 +260,16 @@ public class Auto {
   private Command eightPiece() {
     AutoRoutine routine = _factory.newRoutine("Eight Piece");
     AutoTrajectory trajectory = routine.trajectory("EightPiece");
+
+    routine.active().onTrue(sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    trajectory.done().onTrue(getBinding("shoot still"));
+
+    return routine.cmd();
+  }
+
+  private Command houston() {
+    AutoRoutine routine = _factory.newRoutine("Houston");
+    AutoTrajectory trajectory = routine.trajectory("Houston");
 
     routine.active().onTrue(sequence(trajectory.resetOdometry(), trajectory.cmd()));
     trajectory.done().onTrue(getBinding("shoot still"));

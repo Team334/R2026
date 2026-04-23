@@ -387,7 +387,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
                       / Constants.robotPeriod.in(Seconds);
 
               // filter out spikes in heading.get() derivative
-              omegaFeedforward = _omegaFeedforwardFilter.calculate(omegaFeedforward);
+              if (!DriverStation.isAutonomous()) {
+                omegaFeedforward = _omegaFeedforwardFilter.calculate(omegaFeedforward);
+              }
+
               _previousRotationSetpoint = heading.get();
 
               double omega =
@@ -403,7 +406,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
                 () -> {
                   isOpenLoop = false;
 
-                  _holonomicController.useFilteringHeading(true);
+                  _holonomicController.useFilteringHeading(!DriverStation.isAutonomous());
                 }))
         .withName("Drive Facing");
   }

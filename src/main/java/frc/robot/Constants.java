@@ -284,7 +284,7 @@ public final class Constants {
     public static final Per<VoltageUnit, AngularVelocityUnit> feedkP =
         Volts.per(RotationsPerSecond).ofNative(0.35);
 
-    public static final Current feedSupplyLimit = Amps.of(40);
+    public static final Current feedSupplyLimit = Amps.of(45);
 
     public static final Voltage pivotkG = Volts.of(0.12365);
     public static final Voltage pivotkS = Volts.of(0.21257);
@@ -317,7 +317,7 @@ public final class Constants {
     public static final Angle pivotReverseSoftLimitThreshold = Rotations.of(0.17);
     public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.61);
 
-    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(90);
+    public static final AngularVelocity feedSpeed = RotationsPerSecond.of(100);
   }
 
   public static class SwerveConstants {
