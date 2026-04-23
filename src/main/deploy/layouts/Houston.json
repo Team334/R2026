@@ -1,0 +1,11 @@
+{
+    "name": "Houston",
+    "allLocationProperties": "snm",
+    "layout": [
+        "c_start",
+        "c_human"
+    ],
+    "splitCommands": {
+        "0": ["shoot still"]
+    }
+}

@@ -1,5 +1,5 @@
 import { ConstraintData } from "./choreo/ConstraintDefinitions";
-import { Constraint, EventMarker, Expr, Waypoint } from "./choreo/DocumentTypes";
+import { Constraint, EventMarker, Expr, Trajectory, Waypoint } from "./choreo/DocumentTypes";
 
 export function toExpr(val: number, unit: string): Expr {
     return { exp: `${val} ${unit}`, val: val };
@@ -126,4 +126,64 @@ export function shiftLocationProperties(locationProperties: LocationProperties, 
         constraints: shiftedConstraints,
         eventMarkers: shiftedEventMarkers
     }
+}
+
+/**
+ * Stiches together a list of {@link Location}s to form an auto trajectory based off some given {@link AllLocationProperties}.
+ * @param baseTraj The base trajectory to build off of.
+ * @param name The name of the trajectory.
+ * @param layout The list of locations.
+ * @param allLocationProperties The set of location properties to use.
+ * @returns Updated baseTraj.
+ */
+export function buildTrajectory(baseTraj: Trajectory, name: string, layout: Location[], allLocationProperties: AllLocationProperties): Trajectory {
+    let trajWaypoints: Waypoint<Expr>[] = [];
+    let trajConstraints: Constraint[] = [];
+    let trajEventMarkers: EventMarker[] = [];
+
+    let waypointOffset: number = 0;
+
+    for (const location of layout) {
+        const side = location.split('_')[0] as Side;
+
+        const locationProperties: LocationProperties = shiftLocationProperties(
+            allLocationProperties[location.split('_')[1] as GenericLocation],
+            waypointOffset
+        );
+
+        let locationWaypoints: Waypoint<Expr>[] = [];
+
+        switch (side) {
+            case "l":
+                locationWaypoints = locationProperties.leftWaypoints ?? [];
+                break;
+
+            case "c":
+                locationWaypoints = locationProperties.centerWaypoints ?? [];
+                break;
+
+            case "r":
+                locationWaypoints = locationProperties.rightWaypoints ?? [];
+                break;
+
+            default:
+                break;
+        }
+
+        trajWaypoints.push(...locationWaypoints);
+        trajConstraints.push(...(locationProperties.constraints ?? []));
+        trajEventMarkers.push(...(locationProperties.eventMarkers ?? []));
+
+        waypointOffset += locationWaypoints.length
+    }
+
+    const updatedTraj: Trajectory = baseTraj;
+
+    updatedTraj.name = name;
+
+    updatedTraj.params.waypoints = trajWaypoints;
+    updatedTraj.params.constraints.push(...trajConstraints);
+    updatedTraj.events.push(...trajEventMarkers);
+
+    return updatedTraj;
 }

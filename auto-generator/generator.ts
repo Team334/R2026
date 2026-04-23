@@ -1,5 +1,5 @@
 import { Expr, Constraint, Trajectory, TRAJ_SCHEMA_VERSION, Waypoint, EventMarker } from "./choreo/DocumentTypes";
-import { AllLocationProperties, GenericLocation, Layout, Location, LocationProperties, shiftLocationProperties, Side, toExpr } from "./types";
+import { AllLocationProperties, buildTrajectory, FIELD_WIDTH, GenericLocation, Layout, Location, LocationProperties, shiftLocationProperties, Side, toExpr } from "./types";
 
 // @ts-ignore
 import * as fs from "fs";
@@ -61,59 +61,7 @@ function generateTrajectory(traj: Trajectory): void {
     });
 }
 
-function buildTrajectory(baseTraj: Trajectory, name: string, layout: Location[], allLocationProperties: AllLocationProperties): Trajectory {
-    let trajWaypoints: Waypoint<Expr>[] = [];
-    let trajConstraints: Constraint[] = [];
-    let trajEventMarkers: EventMarker[] = [];
-
-    let waypointOffset: number = 0;
-
-    for (const location of layout) {
-        const side = location.split('_')[0] as Side;
-
-        const locationProperties: LocationProperties = shiftLocationProperties(
-            allLocationProperties[location.split('_')[1] as GenericLocation],
-            waypointOffset
-        );
-
-        let locationWaypoints: Waypoint<Expr>[] = [];
-
-        switch (side) {
-            case "l":
-                locationWaypoints = locationProperties.leftWaypoints ?? [];
-                break;
-
-            case "c":
-                locationWaypoints = locationProperties.centerWaypoints ?? [];
-                break;
-
-            case "r":
-                locationWaypoints = locationProperties.rightWaypoints ?? [];
-                break;
-
-            default:
-                break;
-        }
-
-        trajWaypoints.push(...locationWaypoints);
-        trajConstraints.push(...(locationProperties.constraints ?? []));
-        trajEventMarkers.push(...(locationProperties.eventMarkers ?? []));
-
-        waypointOffset += locationWaypoints.length
-    }
-
-    const updatedTraj: Trajectory = baseTraj;
-
-    updatedTraj.name = name;
-
-    updatedTraj.params.waypoints = trajWaypoints;
-    updatedTraj.params.constraints.push(...trajConstraints);
-    updatedTraj.events.push(...trajEventMarkers);
-
-    return updatedTraj;
-}
-
-var baseTraj: Trajectory = {
+var rebuiltTraj: Trajectory = {
     name: "",
     version: TRAJ_SCHEMA_VERSION,
     params: {
@@ -123,13 +71,13 @@ var baseTraj: Trajectory = {
             { from: "last", data: { type: "StopPoint", props: {} }, enabled: true },
             { from: "first", to: "last", data: { type: "MaxVelocity", props: { max: toExpr(3.5, "m/s") } }, enabled: true },
             { from: "first", to: "last", data: { type: "MaxAcceleration", props: { max: toExpr(3.5, "m/s^2") } }, enabled: true },
-            { from: "first", to: "last", data: { type: "KeepOutCircle", props: { x: toExpr(4.66, "m"), y: toExpr(6.18, "m"), r: toExpr(0.826396949005302, "m") } }, enabled: true },
-            { from: "first", to: "last", data: { type: "KeepOutCircle", props: { x: toExpr(4.66, "m"), y: toExpr(1.8892, "m"), r: toExpr(0.826396949005302, "m") } }, enabled: true },
-            { from: "first", to: "last", data: { type: "KeepInRectangle", props: { x: toExpr(0, "m"), y: toExpr(0.0392, "m"), w: toExpr(16.541, "m"), h: toExpr(7.9908, "m") } }, enabled: true }
+            { from: "first", to: "last", data: { type: "KeepOutCircle", props: { x: toExpr(4.612211856842041, "m"), y: toExpr(6.084839515686035, "m"), r: toExpr(0.9316006363189093, "m") } }, enabled: true },
+            { from: "first", to: "last", data: { type: "KeepOutCircle", props: { x: toExpr(4.612211856842041, "m"), y: toExpr(FIELD_WIDTH - 6.084839515686035, "m"), r: toExpr(0.9316006363189093, "m") } }, enabled: true },
+            { from: "first", to: "last", data: { type: "KeepInRectangle", props: { x: toExpr(0, "m"), y: toExpr(0.0292, "m"), w: toExpr(16.541, "m"), h: toExpr(8.0008, "m") } }, enabled: true }
         ],
         targetDt: toExpr(0.05, "s")
     },
-    snapshot: { // ignore
+    snapshot: {
         waypoints: [],
         constraints: [],
         targetDt: 0.05
@@ -148,7 +96,7 @@ async function main() {
     var layout: Layout = loadLayout(await prompt("layout to generate: "));
     var allLocationProperties: AllLocationProperties = await loadAllLocationProperties(layout.allLocationProperties);
 
-    var traj: Trajectory = buildTrajectory(baseTraj, layout.name, layout.layout, allLocationProperties);
+    var traj: Trajectory = buildTrajectory(rebuiltTraj, layout.name, layout.layout, allLocationProperties);
 
     saveTrajectory(traj);
 
