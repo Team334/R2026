@@ -104,6 +104,8 @@ public class Robot extends TimedRobot {
 
   private final GcStatsCollector _gcStatsCollector = new GcStatsCollector();
 
+  private final ChassisSpeeds zeroSpeeds = new ChassisSpeeds();
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -320,9 +322,13 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     DogLog.time("Timing/Robot/robotPeriodic()");
 
+    // auton hack for now for snm
     FieldUtil.getShotParameters(
         _swerve.getPose(),
-        ChassisSpeeds.fromRobotRelativeSpeeds(_swerve.getChassisSpeeds(), _swerve.getHeading()),
+        DriverStation.isAutonomousEnabled()
+            ? zeroSpeeds
+            : ChassisSpeeds.fromRobotRelativeSpeeds(
+                _swerve.getChassisSpeeds(), _swerve.getHeading()),
         _shotParameters);
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
