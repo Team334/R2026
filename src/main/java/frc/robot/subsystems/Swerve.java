@@ -387,7 +387,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
                       / Constants.robotPeriod.in(Seconds);
 
               // filter out spikes in heading.get() derivative
-              if (!DriverStation.isAutonomous()) {
+              // (auton hack for now for snm)
+              if (DriverStation.isTeleop()) {
                 omegaFeedforward = _omegaFeedforwardFilter.calculate(omegaFeedforward);
               }
 
@@ -406,7 +407,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
                 () -> {
                   isOpenLoop = false;
 
-                  _holonomicController.useFilteringHeading(!DriverStation.isAutonomous());
+                  // auton hack for now for snm
+                  _holonomicController.useFilteringHeading(DriverStation.isTeleop());
                 }))
         .withName("Drive Facing");
   }
@@ -472,10 +474,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    */
   public void followTrajectoryFacing(SwerveSample sample, Rotation2d heading) {
     _holonomicController.useFilteringTranslation(false);
-
-    if (!_holonomicController.isFilteringHeading()) {
-      _holonomicController.useFilteringHeading(true);
-    }
+    _holonomicController.useFilteringHeading(true);
 
     ChassisSpeeds desiredSpeeds = sample.getChassisSpeeds();
 

@@ -292,8 +292,12 @@ public class Robot extends TimedRobot {
 
     _driverController
         .rightBumper()
-        .onTrue(runOnce(() -> _intakePivot.lowerDepot = true))
-        .onFalse(runOnce(() -> _intakePivot.lowerDepot = false));
+        .and(() -> !_shotParameters.isManual)
+        .whileTrue(shootPivotLowered);
+    _driverController
+        .rightBumper()
+        .and(() -> _shotParameters.isManual)
+        .whileTrue(shootManuallyPivotLowered);
 
     _driverController.leftTrigger().whileTrue(_intakeFeed.feedIn());
 
@@ -306,9 +310,6 @@ public class Robot extends TimedRobot {
         .onTrue(runOnce(() -> _shotParameters.isManual = !_shotParameters.isManual));
 
     _driverController.a().whileTrue(_superstructure.unjam());
-
-    _driverController.x().and(() -> !_shotParameters.isManual).whileTrue(shootPivotLowered);
-    _driverController.x().and(() -> _shotParameters.isManual).whileTrue(shootManuallyPivotLowered);
   }
 
   /**
@@ -325,10 +326,10 @@ public class Robot extends TimedRobot {
     // auton hack for now for snm
     FieldUtil.getShotParameters(
         _swerve.getPose(),
-        DriverStation.isAutonomousEnabled()
-            ? zeroSpeeds
-            : ChassisSpeeds.fromRobotRelativeSpeeds(
-                _swerve.getChassisSpeeds(), _swerve.getHeading()),
+        DriverStation.isTeleop()
+            ? ChassisSpeeds.fromRobotRelativeSpeeds(
+                _swerve.getChassisSpeeds(), _swerve.getHeading())
+            : zeroSpeeds,
         _shotParameters);
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled

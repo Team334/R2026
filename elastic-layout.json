@@ -206,23 +206,6 @@
             }
           },
           {
-            "title": "Is Auto Generated",
-            "x": 180.0,
-            "y": 180.0,
-            "width": 270.0,
-            "height": 270.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Robot/Auto/Is Auto Generated",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "Checkmark",
-              "false_icon": "X"
-            }
-          },
-          {
             "title": "Active Faults",
             "x": 450.0,
             "y": 0.0,
@@ -247,29 +230,16 @@
             }
           },
           {
-            "title": "Routine Chooser",
+            "title": "Use Layout Auto",
             "x": 0.0,
-            "y": 180.0,
+            "y": 360.0,
             "width": 180.0,
-            "height": 180.0,
-            "type": "ComboBox Chooser",
+            "height": 90.0,
+            "type": "Toggle Switch",
             "properties": {
-              "topic": "/SmartDashboard/Routine Chooser",
+              "topic": "/Tunable/Use Layout Auto",
               "period": 0.06,
-              "sort_options": false
-            }
-          },
-          {
-            "title": "Layout Chooser",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 180.0,
-            "height": 180.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/Layout Chooser",
-              "period": 0.06,
-              "sort_options": false
+              "data_type": "boolean"
             }
           },
           {
@@ -286,16 +256,46 @@
             }
           },
           {
-            "title": "Use Layout Auto",
-            "x": 0.0,
-            "y": 360.0,
-            "width": 180.0,
-            "height": 90.0,
-            "type": "Toggle Switch",
+            "title": "Is Auto Generated",
+            "x": 180.0,
+            "y": 180.0,
+            "width": 270.0,
+            "height": 270.0,
+            "type": "Boolean Box",
             "properties": {
-              "topic": "/Tunable/Use Layout Auto",
+              "topic": "/Robot/Auto/Is Auto Generated",
               "period": 0.06,
-              "data_type": "boolean"
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "Checkmark",
+              "false_icon": "X"
+            }
+          },
+          {
+            "title": "Layout Chooser",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 180.0,
+            "height": 180.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Layout Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "Routine Chooser",
+            "x": 0.0,
+            "y": 180.0,
+            "width": 180.0,
+            "height": 180.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Routine Chooser",
+              "period": 0.06,
+              "sort_options": false
             }
           }
         ]
