@@ -213,8 +213,10 @@ public final class Constants {
       hubPresets.put(5.012, vec3(61, 50, 50));
 
       // ferry presets
-      ferryPresets.put(8.2705, vec3(61, 50, 50)); // PLACEHOLDER
-      ferryPresets.put(16.541, vec3(90, 50, 50)); // PLACEHOLDER
+      ferryPresets.put(5.3, vec3(53.5, 50, 50));
+      ferryPresets.put(7.92, vec3(65, 50, 50));
+      ferryPresets.put(11.28, vec3(88, 50, 50));
+      ferryPresets.put(12.0, vec3(100, 50, 50));
 
       // hub TOFS
       hubTOFs.put(2.0, 0.885);
@@ -223,8 +225,10 @@ public final class Constants {
       hubTOFs.put(5.012, 1.41);
 
       // ferry TOFS
-      ferryTOFs.put(8.2705, 2.0); // PLACEHOLDER
-      ferryTOFs.put(16.541, 4.0); // PLACEHOLDER
+      ferryTOFs.put(5.3, 1.54);
+      ferryTOFs.put(7.92, 1.78);
+      ferryTOFs.put(11.28, 2.085);
+      ferryTOFs.put(12.0, 2.33);
     }
   }
 
