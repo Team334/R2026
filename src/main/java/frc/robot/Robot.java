@@ -294,11 +294,11 @@ public class Robot extends TimedRobot {
     _driverController
         .rightBumper()
         .and(() -> !_shotParameters.isManual)
-        .whileTrue(shootPivotLowered);
+        .whileTrue(parallel(shootPivotLowered, _intakeFeed.feedIn()));
     _driverController
         .rightBumper()
         .and(() -> _shotParameters.isManual)
-        .whileTrue(shootManuallyPivotLowered);
+        .whileTrue(parallel(shootManuallyPivotLowered, _intakeFeed.feedIn()));
 
     _driverController.leftTrigger().whileTrue(_intakeFeed.feedIn());
 
