@@ -170,13 +170,13 @@ public class Auto {
     _layoutChooser.onChange(
         l -> {
           _latestLayout.set(l);
-          _shouldGenerate.set(true);
+          _shouldGenerate.set(_useLayoutAuto.get());
         });
 
     _routineChooser.onChange(
-        l -> {
-          _latestRoutine.set(l);
-          _shouldGenerate.set(true);
+        r -> {
+          _latestRoutine.set(r);
+          _shouldGenerate.set(!_useLayoutAuto.get());
         });
 
     SmartDashboard.putData("Layout Chooser", _layoutChooser);

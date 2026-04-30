@@ -125,7 +125,7 @@ public class Robot extends TimedRobot {
     _ntInst = ntInst;
 
     // set up loggers
-    DogLog.setOptions(DogLog.getOptions().withCaptureDs(true));
+    DogLog.setOptions(DogLog.getOptions().withCaptureDs(true).withNtTunables(true));
     DogLog.setPdh(new PowerDistribution());
 
     setFileOnly(false); // file-only once connected to fms
