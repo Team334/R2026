@@ -167,6 +167,7 @@ public class Auto {
     _routineChooser.addOption("Preload", Pair.of("Preload", this::preload));
     _routineChooser.addOption("Test", Pair.of("Test", this::test));
     _routineChooser.addOption("Houston", Pair.of("Houston", this::houston));
+    _routineChooser.addOption("Bump", Pair.of("Bump", this::bump));
 
     _layoutChooser.onChange(
         l -> {
@@ -266,6 +267,15 @@ public class Auto {
 
     routine.active().onTrue(sequence(trajectory.resetOdometry(), trajectory.cmd()));
     trajectory.done().onTrue(getBinding("shoot still"));
+
+    return routine.cmd();
+  }
+
+  private Command bump() {
+    AutoRoutine routine = _factory.newRoutine("Bump");
+    AutoTrajectory trajectory = routine.trajectory("Bump");
+
+    routine.active().onTrue(sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
     return routine.cmd();
   }

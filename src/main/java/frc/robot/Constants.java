@@ -156,8 +156,8 @@ public final class Constants {
                     Units.inchesToMeters(20.2395)),
                 new Rotation3d(0, 0, -Units.degreesToRadians(15))),
             0.1,
-            3,
-            7);
+            5,
+            9);
 
     public static final VisionPoseEstimatorConstants rightArducam =
         new VisionPoseEstimatorConstants(
@@ -169,8 +169,8 @@ public final class Constants {
                     Units.inchesToMeters(20.2395)),
                 new Rotation3d(0, 0, Units.degreesToRadians(15))),
             0.1,
-            3,
-            7);
+            5,
+            9);
   }
 
   public static class ShotConstants {
