@@ -379,10 +379,21 @@ public class VisionPoseEstimator implements AutoCloseable {
     if (isValid) {
       double tagAmountStdDevsScaler = tagAmount == 1 ? VisionConstants.singleTagStdDevsScaler : 1;
 
-      double xStdDevs = Math.pow(avgTagDistance, 2) * tagAmountStdDevsScaler * cameraStdDevsScaler;
-      double yStdDevs = Math.pow(avgTagDistance, 2) * tagAmountStdDevsScaler * cameraStdDevsScaler;
+      double xStdDevs =
+          Math.pow(avgTagDistance, 2)
+              * tagAmountStdDevsScaler
+              * VisionConstants.translationStdDevsScaler
+              * cameraStdDevsScaler;
+      double yStdDevs =
+          Math.pow(avgTagDistance, 2)
+              * tagAmountStdDevsScaler
+              * VisionConstants.translationStdDevsScaler
+              * cameraStdDevsScaler;
       double thetaStdDevs =
-          Math.pow(avgTagDistance, 2) * tagAmountStdDevsScaler * cameraStdDevsScaler;
+          Math.pow(avgTagDistance, 2)
+              * tagAmountStdDevsScaler
+              * VisionConstants.thetaStdDevsScaler
+              * cameraStdDevsScaler;
 
       if (ignoreThetaEstimate) thetaStdDevs = 999999999;
 

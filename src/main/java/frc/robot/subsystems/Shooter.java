@@ -33,7 +33,6 @@ import frc.lib.util.CTREUtil;
 import frc.robot.Constants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.ShotConstants;
 import frc.robot.Robot;
 import frc.robot.utils.ShotParameters;
 import java.util.function.Supplier;
@@ -59,6 +58,9 @@ public class Shooter extends AdvancedSubsystem {
   private boolean _inTolerance = false;
 
   private final Supplier<ShotParameters> _shotParametersSupplier;
+
+  @Logged(name = "Idle Velcity Percentage")
+  private final double idleVelocityPercentage = 0.5;
 
   private final SysIdRoutine _flywheelRoutine =
       new SysIdRoutine(
@@ -226,7 +228,9 @@ public class Shooter extends AdvancedSubsystem {
   /** Idle at a constant speed. */
   public Command idle() {
     return run(() -> {
-          setShootingSpeed(ShotConstants.idleSpeed);
+          ShotParameters parameters = _shotParametersSupplier.get();
+
+          setShootingSpeed(parameters.getFlywheelSpeed().times(idleVelocityPercentage));
         })
         .withName("Idle");
   }

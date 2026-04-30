@@ -137,6 +137,9 @@ public final class Constants {
   public static class VisionConstants {
     public static final double singleTagStdDevsScaler = 5;
 
+    public static final double translationStdDevsScaler = 1;
+    public static final double thetaStdDevsScaler = 1;
+
     public static final double ambiguityThreshold = 0.2;
 
     public static final double xBoundMargin = 0.01;
@@ -178,8 +181,6 @@ public final class Constants {
     public static final AngularVelocity towerRollerSpeed = RotationsPerSecond.of(50);
     public static final AngularVelocity towerFloorSpeed = RotationsPerSecond.of(50);
 
-    public static final AngularVelocity idleSpeed = RotationsPerSecond.of(30);
-
     public static final AngularVelocity unjamRollerSpeed = RotationsPerSecond.of(-20);
     public static final AngularVelocity unjamFloorSpeed = RotationsPerSecond.of(-20);
 
@@ -194,12 +195,12 @@ public final class Constants {
     public static final Distance hubMinDistance = Meters.of(1.89);
     public static final Distance hubMaxDistance = Meters.of(5.252);
 
-    public static final Distance ferryMinDistance = Meters.of(0); // PLACEHOLDER
-    public static final Distance ferryMaxDistance = Meters.of(20); // PLACEHOLDER
+    public static final Distance ferryMinDistance = Meters.of(5.3);
+    public static final Distance ferryMaxDistance = Meters.of(12.0);
 
     public static final LinearVelocity hubProjectileHorizontalVelocity = MetersPerSecond.of(2.722);
     public static final LinearVelocity ferryProjectileHorizontalVelocity =
-        MetersPerSecond.of(2.722); // PLACEHOLDER
+        MetersPerSecond.of(4.613);
 
     // distanceMeters : TOFSecs
     public static final InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
