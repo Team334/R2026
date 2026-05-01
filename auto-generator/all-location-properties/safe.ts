@@ -36,7 +36,7 @@ export const allLocationProperties: AllLocationProperties = {
         eventMarkers: [
             makeEventMarker("stop shooting", 0, 0.2),
             makeEventMarker("feed in", 2, 0),
-            makeEventMarker("feed stop", 5, -0.3)
+            makeEventMarker("feed stop", 5, -0.3),
         ]
     },
     neutralbump: {
@@ -44,17 +44,17 @@ export const allLocationProperties: AllLocationProperties = {
             makeWaypoint(3.2754716873168945, 7.364711284637451, -1.1729889971693404),
             makeWaypoint(4.809019565582275, 7.477536201477051, 0.0),
             makeWaypoint(7.610898208618164, 7.091128826141357, -1.4711286226200226),
-            makeWaypoint(7.621798992156982, 5.009193420410156, -2.4227627089480697),
-            makeWaypoint(6.000335693359375, 4.742671012878418, 1.5495226816598229),
+            makeWaypoint(7.67971134185791, 5.55126660385, -2.4227627089480697),
+            makeWaypoint(6.009313106536865, 5.40075271645, 1.5495226816598229),
             makeWaypoint(5.693442344665527, 7.406031608581543, 3.131788918491988),
             makeWaypoint(2.770551919937134, 7.13850736618042, -1.0286093969667478, true, true, true)
         ],
         rightWaypoints: reflectWaypoints(
-           makeWaypoint(3.2754716873168945, 7.364711284637451, -1.1729889971693404),
+            makeWaypoint(3.2754716873168945, 7.364711284637451, -1.1729889971693404),
             makeWaypoint(4.809019565582275, 7.477536201477051, 0.0),
             makeWaypoint(7.610898208618164, 7.091128826141357, -1.4711286226200226),
-            makeWaypoint(7.621798992156982, 5.009193420410156, -2.4227627089480697),
-            makeWaypoint(6.000335693359375, 4.742671012878418, 1.5495226816598229),
+            makeWaypoint(7.67971134185791, 5.55126660385, -2.4227627089480697),
+            makeWaypoint(6.009313106536865, 5.40075271645, 1.5495226816598229),
             makeWaypoint(5.693442344665527, 7.406031608581543, 3.131788918491988),
             makeWaypoint(2.770551919937134, 7.13850736618042, -1.0286093969667478, true, true, true)
         ),

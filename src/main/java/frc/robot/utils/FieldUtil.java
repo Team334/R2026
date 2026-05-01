@@ -288,7 +288,9 @@ public class FieldUtil {
 
         // check if shot is in bounds
         shotParameters.inBounds =
-            minDistance <= robotToVirtualTargetNorm && robotToVirtualTargetNorm <= maxDistance;
+            inAllianceZone(robotPose)
+                ? minDistance <= robotToVirtualTargetNorm && robotToVirtualTargetNorm <= maxDistance
+                : true;
 
         return;
       }
