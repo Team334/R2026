@@ -102,7 +102,7 @@ public class ShotParameters {
         () -> {
           if (isManual) {
             // if shooting manually just wait for the shooter
-            return shooterInTolerance.getAsBoolean();
+            return shooterInTolerance.getAsBoolean() && intakePivotInSafeZone.getAsBoolean();
           }
 
           return shooterInTolerance.getAsBoolean()
