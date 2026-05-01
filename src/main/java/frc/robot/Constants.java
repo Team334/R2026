@@ -338,7 +338,7 @@ public final class Constants {
     public static final AngularVelocity driverAngularVelocity = RadiansPerSecond.of(Math.PI * 2);
 
     public static final LinearVelocity driverTranslationalShootingVelocity =
-        MetersPerSecond.of(1.5);
+        MetersPerSecond.of(2.25);
 
     public static final LinearVelocity profileTranslationalVelocity = MetersPerSecond.of(1);
     public static final LinearAcceleration profileTranslationalAcceleration =
