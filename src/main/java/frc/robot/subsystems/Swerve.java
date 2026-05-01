@@ -93,7 +93,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   // for drive facing
   private final TimeoutLinearFilter _omegaFeedforwardFilter =
       new TimeoutLinearFilter(
-          LinearFilter.singlePoleIIR(0.2, Constants.robotPeriod.in(Seconds)), 2);
+          LinearFilter.singlePoleIIR(0.1, Constants.robotPeriod.in(Seconds)), 2);
   private Rotation2d _previousRotationSetpoint = Rotation2d.kZero;
 
   private double _lastSimTime = 0;

@@ -51,8 +51,6 @@ public class Shooter extends AdvancedSubsystem {
   private final StatusSignal<AngularVelocity> _flywheelVelocityGetter =
       _flywheelMotor.getVelocity();
 
-  private final StatusSignal<Double> _flywheelReferenceGetter =
-      _flywheelMotor.getClosedLoopReference();
   private final MutAngularVelocity _flywheelReference = RotationsPerSecond.mutable(0);
 
   private boolean _inTolerance = false;
@@ -205,6 +203,8 @@ public class Shooter extends AdvancedSubsystem {
   }
 
   private void setShootingSpeed(AngularVelocity speed) {
+    _flywheelReference.mut_setMagnitude(speed.in(RotationsPerSecond));
+
     double errorRPS = speed.minus(getFlywheelSpeed()).in(RotationsPerSecond);
     double toleranceRPS =
         _inTolerance
@@ -266,7 +266,7 @@ public class Shooter extends AdvancedSubsystem {
 
   @Logged(name = "Flywheel Reference")
   public AngularVelocity getFlywheelReference() {
-    return _flywheelReference.mut_setMagnitude(_flywheelReferenceGetter.refresh().getValue());
+    return _flywheelReference;
   }
 
   @Override

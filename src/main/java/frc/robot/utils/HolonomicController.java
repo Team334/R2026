@@ -49,20 +49,20 @@ public class HolonomicController {
           SwerveConstants.poseTranslationalkP.in(MetersPerSecond.per(Meter)),
           SwerveConstants.poseTranslationalkD.in(MetersPerSecond.per(MetersPerSecond)),
           Constants.robotPeriod.in(Seconds),
-          0.2);
+          0.1);
   private final FilteredPIDController _yController =
       new FilteredPIDController(
           SwerveConstants.poseTranslationalkP.in(MetersPerSecond.per(Meter)),
           SwerveConstants.poseTranslationalkD.in(MetersPerSecond.per(MetersPerSecond)),
           Constants.robotPeriod.in(Seconds),
-          0.2);
+          0.1);
 
   private final FilteredPIDController _headingController =
       new FilteredPIDController(
           SwerveConstants.poseRotationkP.in(RadiansPerSecond.per(Radian)),
           SwerveConstants.poseRotationkD.in(RadiansPerSecond.per(RadiansPerSecond)),
           Constants.robotPeriod.in(Seconds),
-          0.2);
+          0.1);
 
   private ChassisSpeeds _pidSpeeds = new ChassisSpeeds();
 

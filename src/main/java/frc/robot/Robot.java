@@ -286,7 +286,8 @@ public class Robot extends TimedRobot {
                 baseVelX.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
                 baseVelY.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
                 baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
-            .beforeStarting(() -> _swerve.isOpenLoop = true));
+            .beforeStarting(() -> _swerve.isOpenLoop = true)
+            .withName("Drive"));
 
     _driverController.rightTrigger().and(() -> !_shotParameters.isManual).whileTrue(shoot);
     _driverController.rightTrigger().and(() -> _shotParameters.isManual).whileTrue(shootManually);
@@ -294,11 +295,14 @@ public class Robot extends TimedRobot {
     _driverController
         .rightBumper()
         .and(() -> !_shotParameters.isManual)
-        .whileTrue(parallel(shootPivotLowered, _intakeFeed.feedIn()));
+        .whileTrue(
+            parallel(shootPivotLowered, _intakeFeed.feedIn()).withName("Shoot Pivot Lowered"));
     _driverController
         .rightBumper()
         .and(() -> _shotParameters.isManual)
-        .whileTrue(parallel(shootManuallyPivotLowered, _intakeFeed.feedIn()));
+        .whileTrue(
+            parallel(shootManuallyPivotLowered, _intakeFeed.feedIn())
+                .withName("Shoot Manually Pivot Lowered"));
 
     _driverController.leftTrigger().whileTrue(_intakeFeed.feedIn());
 
