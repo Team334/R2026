@@ -228,6 +228,9 @@ public class Robot extends TimedRobot {
         "java.lang.FdLibm$Hypot",
         "choreo.trajectory.Trajectory",
         "choreo.trajectory.SwerveSample");
+
+    // choreo warmup
+    CommandScheduler.getInstance().schedule(_auto.warmup());
   }
 
   // set logging to be file only or not

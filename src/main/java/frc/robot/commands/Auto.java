@@ -233,6 +233,12 @@ public class Auto {
     return _bindings.get(binding).get();
   }
 
+  public Command warmup() {
+    return sequence(_factory.trajectoryCmd("Warmup"), print("Choreo warmup command ran"))
+        .ignoringDisable(true)
+        .withName("Warmup");
+  }
+
   private Command test() {
     AutoRoutine routine = _factory.newRoutine("Test");
     AutoTrajectory trajectory = routine.trajectory("Test");

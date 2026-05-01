@@ -181,7 +181,7 @@ public final class Constants {
     public static final AngularVelocity towerRollerSpeed = RotationsPerSecond.of(50);
     public static final AngularVelocity towerFloorSpeed = RotationsPerSecond.of(50);
 
-    public static final AngularVelocity ferryFlywheelSpeed = RotationsPerSecond.of(80);
+    public static final AngularVelocity ferryFlywheelSpeed = RotationsPerSecond.of(60);
     public static final AngularVelocity ferryRollerSpeed = RotationsPerSecond.of(50);
     public static final AngularVelocity ferryFloorSpeed = RotationsPerSecond.of(50);
 
@@ -200,11 +200,11 @@ public final class Constants {
     public static final Distance hubMaxDistance = Meters.of(5.252);
 
     public static final Distance ferryMinDistance = Meters.of(5.3);
-    public static final Distance ferryMaxDistance = Meters.of(12.0);
+    public static final Distance ferryMaxDistance = Meters.of(7.92);
 
     public static final LinearVelocity hubProjectileHorizontalVelocity = MetersPerSecond.of(2.722);
     public static final LinearVelocity ferryProjectileHorizontalVelocity =
-        MetersPerSecond.of(4.613);
+        MetersPerSecond.of(3.946);
 
     // distanceMeters : TOFSecs
     public static final InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
@@ -220,8 +220,6 @@ public final class Constants {
       // ferry presets
       ferryPresets.put(5.3, vec3(53.5, 50, 50));
       ferryPresets.put(7.92, vec3(65, 50, 50));
-      ferryPresets.put(11.28, vec3(88, 50, 50));
-      ferryPresets.put(12.0, vec3(100, 50, 50));
 
       // hub TOFS
       hubTOFs.put(2.0, 0.885);
@@ -232,8 +230,6 @@ public final class Constants {
       // ferry TOFS
       ferryTOFs.put(5.3, 1.54);
       ferryTOFs.put(7.92, 1.78);
-      ferryTOFs.put(11.28, 2.085);
-      ferryTOFs.put(12.0, 2.33);
     }
   }
 
