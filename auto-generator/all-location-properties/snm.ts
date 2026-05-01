@@ -63,7 +63,7 @@ export const allLocationProperties: AllLocationProperties = {
             makeConstraint(2, 4, { type: "MaxVelocity", props: {max: toExpr(1.5, "m/s")} })
         ],
         eventMarkers: [
-            makeEventMarker("stop shooting", 0, 0.2),
+            makeEventMarker("stop shooting", 0, 0),
             makeEventMarker("feed in", 1, 0),
             makeEventMarker("feed stop", 5, -0.3),
         ]
