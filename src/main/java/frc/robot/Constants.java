@@ -181,6 +181,10 @@ public final class Constants {
     public static final AngularVelocity towerRollerSpeed = RotationsPerSecond.of(50);
     public static final AngularVelocity towerFloorSpeed = RotationsPerSecond.of(50);
 
+    public static final AngularVelocity ferryFlywheelSpeed = RotationsPerSecond.of(80);
+    public static final AngularVelocity ferryRollerSpeed = RotationsPerSecond.of(50);
+    public static final AngularVelocity ferryFloorSpeed = RotationsPerSecond.of(50);
+
     public static final AngularVelocity unjamRollerSpeed = RotationsPerSecond.of(-20);
     public static final AngularVelocity unjamFloorSpeed = RotationsPerSecond.of(-20);
 

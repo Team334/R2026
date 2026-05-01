@@ -4,17 +4,14 @@ import static edu.wpi.first.math.Nat.*;
 import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 
-import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ShotConstants;
 import java.util.function.BooleanSupplier;
 
 public class ShotParameters {
@@ -65,16 +62,6 @@ public class ShotParameters {
   @Logged(name = "Failed To Converge")
   public boolean failedToConverge = false;
 
-  // tunables for manual control
-  private final DoubleSubscriber _manualFlywheelSpeed =
-      DogLog.tunable("Flywheel Speed RPS", ShotConstants.towerFlywheelSpeed);
-
-  private final DoubleSubscriber _manualFloorSpeed =
-      DogLog.tunable("Floor Speed RPS", ShotConstants.towerFloorSpeed);
-
-  private final DoubleSubscriber _manualRollerSpeed =
-      DogLog.tunable("Roller Speed RPS", ShotConstants.towerRollerSpeed);
-
   public static Matrix<N3, N1> vec3(double a, double b, double c) {
     return new Matrix<N3, N1>(N3(), N1(), new double[] {a, b, c});
   }
@@ -97,9 +84,6 @@ public class ShotParameters {
             runOnce(
                 () -> {
                   // switch to manually set shot parameters
-                  _flywheelSpeed.mut_setMagnitude(_manualFlywheelSpeed.get());
-                  _rollerSpeed.mut_setMagnitude(_manualRollerSpeed.get());
-                  _floorSpeed.mut_setMagnitude(_manualFloorSpeed.get());
                   _shotHeading = 0;
 
                   _target = new double[3];
@@ -131,26 +115,14 @@ public class ShotParameters {
   }
 
   public AngularVelocity getFlywheelSpeed() {
-    if (isManual) {
-      return _flywheelSpeed.mut_setMagnitude(_manualFlywheelSpeed.get());
-    }
-
     return _flywheelSpeed;
   }
 
   public AngularVelocity getRollerSpeed() {
-    if (isManual) {
-      return _rollerSpeed.mut_setMagnitude(_manualRollerSpeed.get());
-    }
-
     return _rollerSpeed;
   }
 
   public AngularVelocity getFloorSpeed() {
-    if (isManual) {
-      return _floorSpeed.mut_setMagnitude(_manualFloorSpeed.get());
-    }
-
     return _floorSpeed;
   }
 
@@ -170,6 +142,13 @@ public class ShotParameters {
   @Logged(name = "Is Ready To Shoot")
   public boolean isReadyToShoot() {
     return _isReadyToShoot.getAsBoolean();
+  }
+
+  public void setPreset(
+      AngularVelocity flywheelSpeed, AngularVelocity rollerSpeed, AngularVelocity floorSpeed) {
+    _flywheelSpeed.mut_setMagnitude(flywheelSpeed.in(RotationsPerSecond));
+    _rollerSpeed.mut_setMagnitude(rollerSpeed.in(RotationsPerSecond));
+    _floorSpeed.mut_setMagnitude(floorSpeed.in(RotationsPerSecond));
   }
 
   public void setPreset(Matrix<N3, N1> preset) {

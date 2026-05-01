@@ -39,48 +39,6 @@
             }
           },
           {
-            "title": "Flywheel Speed RPS",
-            "x": 0.0,
-            "y": 540.0,
-            "width": 540.0,
-            "height": 90.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tunable/Flywheel Speed RPS",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Floor Speed RPS",
-            "x": 540.0,
-            "y": 540.0,
-            "width": 360.0,
-            "height": 90.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tunable/Floor Speed RPS",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Roller Speed RPS",
-            "x": 900.0,
-            "y": 540.0,
-            "width": 360.0,
-            "height": 90.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tunable/Roller Speed RPS",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
             "title": "Shift Time",
             "x": 360.0,
             "y": 0.0,
@@ -230,19 +188,6 @@
             }
           },
           {
-            "title": "Routine Chooser",
-            "x": 0.0,
-            "y": 180.0,
-            "width": 180.0,
-            "height": 180.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/Routine Chooser",
-              "period": 0.06,
-              "sort_options": false
-            }
-          },
-          {
             "title": "Is Auto Generated",
             "x": 180.0,
             "y": 180.0,
@@ -257,19 +202,6 @@
               "false_color": 4294198070,
               "true_icon": "Checkmark",
               "false_icon": "X"
-            }
-          },
-          {
-            "title": "Layout Chooser",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 180.0,
-            "height": 180.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/Layout Chooser",
-              "period": 0.06,
-              "sort_options": false
             }
           },
           {
@@ -296,6 +228,32 @@
               "topic": "/Robot/Auto/Generated Auto",
               "period": 0.06,
               "data_type": "string"
+            }
+          },
+          {
+            "title": "Layout Chooser",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 180.0,
+            "height": 180.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Layout Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "Routine Chooser",
+            "x": 0.0,
+            "y": 180.0,
+            "width": 180.0,
+            "height": 180.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Routine Chooser",
+              "period": 0.06,
+              "sort_options": false
             }
           }
         ]

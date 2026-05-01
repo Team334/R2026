@@ -39,6 +39,7 @@ import frc.lib.InputStream;
 import frc.lib.fault.FaultLogger;
 import frc.lib.fault.FaultsTable.FaultType;
 import frc.robot.Constants.Ports;
+import frc.robot.Constants.ShotConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.Auto;
 import frc.robot.commands.Superstructure;
@@ -328,14 +329,28 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     DogLog.time("Timing/Robot/robotPeriodic()");
 
-    // auton hack for now for snm
-    FieldUtil.getShotParameters(
-        _swerve.getPose(),
-        DriverStation.isTeleop()
-            ? ChassisSpeeds.fromRobotRelativeSpeeds(
-                _swerve.getChassisSpeeds(), _swerve.getHeading())
-            : zeroSpeeds,
-        _shotParameters);
+    if (_shotParameters.isManual) {
+      if (_driverController.x().getAsBoolean()) {
+        _shotParameters.setPreset(
+            ShotConstants.ferryFlywheelSpeed,
+            ShotConstants.ferryRollerSpeed,
+            ShotConstants.ferryFloorSpeed);
+      } else {
+        _shotParameters.setPreset(
+            ShotConstants.towerFlywheelSpeed,
+            ShotConstants.towerRollerSpeed,
+            ShotConstants.towerFloorSpeed);
+      }
+    } else {
+      // auton hack for now for snm
+      FieldUtil.getShotParameters(
+          _swerve.getPose(),
+          DriverStation.isTeleop()
+              ? ChassisSpeeds.fromRobotRelativeSpeeds(
+                  _swerve.getChassisSpeeds(), _swerve.getHeading())
+              : zeroSpeeds,
+          _shotParameters);
+    }
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
