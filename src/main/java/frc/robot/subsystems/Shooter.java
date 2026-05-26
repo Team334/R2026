@@ -57,7 +57,7 @@ public class Shooter extends AdvancedSubsystem {
 
   private final Supplier<ShotParameters> _shotParametersSupplier;
 
-  @Logged(name = "Idle Velcity Percentage")
+  @Logged(name = "Idle Velocity Percentage")
   private final double idleVelocityPercentage = 0.5;
 
   private final SysIdRoutine _flywheelRoutine =
