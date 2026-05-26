@@ -182,11 +182,6 @@ public class FieldUtil {
    */
   public static void getShotParameters(
       Pose2d robotPose, ChassisSpeeds robotSpeeds, ShotParameters shotParameters) {
-    if (shotParameters.isManual) {
-      // unnecessary call if shot parameters are manually set
-      return;
-    }
-
     InterpolatingMatrixTreeMap<Double, N3, N1> presets =
         inAllianceZone(robotPose) ? ShotConstants.hubPresets : ShotConstants.ferryPresets;
 
@@ -288,7 +283,9 @@ public class FieldUtil {
 
         // check if shot is in bounds
         shotParameters.inBounds =
-            minDistance <= robotToVirtualTargetNorm && robotToVirtualTargetNorm <= maxDistance;
+            inAllianceZone(robotPose)
+                ? minDistance <= robotToVirtualTargetNorm && robotToVirtualTargetNorm <= maxDistance
+                : true;
 
         return;
       }

@@ -137,6 +137,9 @@ public final class Constants {
   public static class VisionConstants {
     public static final double singleTagStdDevsScaler = 5;
 
+    public static final double translationStdDevsScaler = 1;
+    public static final double thetaStdDevsScaler = 1;
+
     public static final double ambiguityThreshold = 0.2;
 
     public static final double xBoundMargin = 0.01;
@@ -156,8 +159,8 @@ public final class Constants {
                     Units.inchesToMeters(20.2395)),
                 new Rotation3d(0, 0, -Units.degreesToRadians(15))),
             0.1,
-            3,
-            7);
+            5,
+            9);
 
     public static final VisionPoseEstimatorConstants rightArducam =
         new VisionPoseEstimatorConstants(
@@ -169,8 +172,8 @@ public final class Constants {
                     Units.inchesToMeters(20.2395)),
                 new Rotation3d(0, 0, Units.degreesToRadians(15))),
             0.1,
-            3,
-            7);
+            5,
+            9);
   }
 
   public static class ShotConstants {
@@ -178,7 +181,9 @@ public final class Constants {
     public static final AngularVelocity towerRollerSpeed = RotationsPerSecond.of(50);
     public static final AngularVelocity towerFloorSpeed = RotationsPerSecond.of(50);
 
-    public static final AngularVelocity idleSpeed = RotationsPerSecond.of(30);
+    public static final AngularVelocity ferryFlywheelSpeed = RotationsPerSecond.of(60);
+    public static final AngularVelocity ferryRollerSpeed = RotationsPerSecond.of(50);
+    public static final AngularVelocity ferryFloorSpeed = RotationsPerSecond.of(50);
 
     public static final AngularVelocity unjamRollerSpeed = RotationsPerSecond.of(-20);
     public static final AngularVelocity unjamFloorSpeed = RotationsPerSecond.of(-20);
@@ -194,12 +199,12 @@ public final class Constants {
     public static final Distance hubMinDistance = Meters.of(1.89);
     public static final Distance hubMaxDistance = Meters.of(5.252);
 
-    public static final Distance ferryMinDistance = Meters.of(0); // PLACEHOLDER
-    public static final Distance ferryMaxDistance = Meters.of(20); // PLACEHOLDER
+    public static final Distance ferryMinDistance = Meters.of(5.3);
+    public static final Distance ferryMaxDistance = Meters.of(7.92);
 
     public static final LinearVelocity hubProjectileHorizontalVelocity = MetersPerSecond.of(2.722);
     public static final LinearVelocity ferryProjectileHorizontalVelocity =
-        MetersPerSecond.of(2.722); // PLACEHOLDER
+        MetersPerSecond.of(3.946);
 
     // distanceMeters : TOFSecs
     public static final InterpolatingDoubleTreeMap hubTOFs = new InterpolatingDoubleTreeMap();
@@ -213,8 +218,8 @@ public final class Constants {
       hubPresets.put(5.012, vec3(61, 50, 50));
 
       // ferry presets
-      ferryPresets.put(8.2705, vec3(61, 50, 50)); // PLACEHOLDER
-      ferryPresets.put(16.541, vec3(90, 50, 50)); // PLACEHOLDER
+      ferryPresets.put(5.3, vec3(53.5, 50, 50));
+      ferryPresets.put(7.92, vec3(65, 50, 50));
 
       // hub TOFS
       hubTOFs.put(2.0, 0.885);
@@ -223,8 +228,8 @@ public final class Constants {
       hubTOFs.put(5.012, 1.41);
 
       // ferry TOFS
-      ferryTOFs.put(8.2705, 2.0); // PLACEHOLDER
-      ferryTOFs.put(16.541, 4.0); // PLACEHOLDER
+      ferryTOFs.put(5.3, 1.54);
+      ferryTOFs.put(7.92, 1.78);
     }
   }
 
@@ -333,7 +338,7 @@ public final class Constants {
     public static final AngularVelocity driverAngularVelocity = RadiansPerSecond.of(Math.PI * 2);
 
     public static final LinearVelocity driverTranslationalShootingVelocity =
-        MetersPerSecond.of(1.5);
+        MetersPerSecond.of(2.25);
 
     public static final LinearVelocity profileTranslationalVelocity = MetersPerSecond.of(1);
     public static final LinearAcceleration profileTranslationalAcceleration =

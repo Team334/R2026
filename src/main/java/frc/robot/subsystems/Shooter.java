@@ -33,7 +33,6 @@ import frc.lib.util.CTREUtil;
 import frc.robot.Constants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.ShotConstants;
 import frc.robot.Robot;
 import frc.robot.utils.ShotParameters;
 import java.util.function.Supplier;
@@ -52,13 +51,14 @@ public class Shooter extends AdvancedSubsystem {
   private final StatusSignal<AngularVelocity> _flywheelVelocityGetter =
       _flywheelMotor.getVelocity();
 
-  private final StatusSignal<Double> _flywheelReferenceGetter =
-      _flywheelMotor.getClosedLoopReference();
   private final MutAngularVelocity _flywheelReference = RotationsPerSecond.mutable(0);
 
   private boolean _inTolerance = false;
 
   private final Supplier<ShotParameters> _shotParametersSupplier;
+
+  @Logged(name = "Idle Velocity Percentage")
+  private final double idleVelocityPercentage = 0.5;
 
   private final SysIdRoutine _flywheelRoutine =
       new SysIdRoutine(
@@ -203,6 +203,8 @@ public class Shooter extends AdvancedSubsystem {
   }
 
   private void setShootingSpeed(AngularVelocity speed) {
+    _flywheelReference.mut_setMagnitude(speed.in(RotationsPerSecond));
+
     double errorRPS = speed.minus(getFlywheelSpeed()).in(RotationsPerSecond);
     double toleranceRPS =
         _inTolerance
@@ -226,7 +228,9 @@ public class Shooter extends AdvancedSubsystem {
   /** Idle at a constant speed. */
   public Command idle() {
     return run(() -> {
-          setShootingSpeed(ShotConstants.idleSpeed);
+          ShotParameters parameters = _shotParametersSupplier.get();
+
+          setShootingSpeed(parameters.getFlywheelSpeed().times(idleVelocityPercentage));
         })
         .withName("Idle");
   }
@@ -262,7 +266,7 @@ public class Shooter extends AdvancedSubsystem {
 
   @Logged(name = "Flywheel Reference")
   public AngularVelocity getFlywheelReference() {
-    return _flywheelReference.mut_setMagnitude(_flywheelReferenceGetter.refresh().getValue());
+    return _flywheelReference;
   }
 
   @Override

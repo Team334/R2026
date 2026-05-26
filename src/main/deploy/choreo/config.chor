@@ -4,7 +4,36 @@
  "type":"Swerve",
  "variables":{
   "expressions":{},
-  "poses":{}
+  "poses":{
+   "LeftTail":{
+    "x":{
+     "exp":"5.626 m",
+     "val":5.626
+    },
+    "y":{
+     "exp":"7.457 m",
+     "val":7.457
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "RightTail":{
+    "x":{
+     "exp":"5.626 m",
+     "val":5.626
+    },
+    "y":{
+     "exp":"0.606 m",
+     "val":0.606
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   }
+  }
  },
  "config":{
   "frontLeft":{
@@ -40,16 +69,16 @@
    "val":6.026785714285714
   },
   "radius":{
-   "exp":"1.879 in",
-   "val":0.0477266
+   "exp":"1.9447 in",
+   "val":0.04939538
   },
   "vmax":{
    "exp":"4852 rpm",
    "val":508.1002518405892
   },
   "tmax":{
-   "exp":"0.918 N m",
-   "val":0.918
+   "exp":"1.2239 N m",
+   "val":1.2239
   },
   "cof":{
    "exp":"100",

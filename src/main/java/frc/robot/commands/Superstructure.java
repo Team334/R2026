@@ -51,7 +51,7 @@ public class Superstructure {
                 velX,
                 velY,
                 () -> Rotation2d.fromRadians(_shotParametersSupplier.get().getShotHeading())))
-        .withName("Shoot");
+        .withName("Shoot" + (lowerPivot ? " Pivot Lowered" : ""));
   }
 
   /**
@@ -68,7 +68,7 @@ public class Superstructure {
             () -> {
               _swerve.isOpenLoop = true;
             })
-        .withName("Shoot Manually");
+        .withName("Shoot Manually" + (lowerPivot ? " Pivot Lowered" : ""));
   }
 
   /** Unjam the shooter and hopper. */

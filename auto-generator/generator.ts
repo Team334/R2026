@@ -101,9 +101,16 @@ async function main() {
     saveTrajectory(traj);
 
     console.log(`\nconverted layout into ${traj.name}.traj`)
-    console.log(`now generating ${traj.name}.traj`)
 
-    generateTrajectory(traj);
+    var generate: string = await prompt("proceed to choreo generation? (y/n): ")
+
+    if (generate === "y") {
+        console.log(`now generating ${traj.name}.traj`)
+        generateTrajectory(traj);
+        return;
+    }
+
+    console.log(`ok`);
 }
 
 main();

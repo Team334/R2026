@@ -18,6 +18,7 @@ import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -38,6 +39,7 @@ import frc.lib.InputStream;
 import frc.lib.fault.FaultLogger;
 import frc.lib.fault.FaultsTable.FaultType;
 import frc.robot.Constants.Ports;
+import frc.robot.Constants.ShotConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.Auto;
 import frc.robot.commands.Superstructure;
@@ -124,7 +126,7 @@ public class Robot extends TimedRobot {
     _ntInst = ntInst;
 
     // set up loggers
-    DogLog.setOptions(DogLog.getOptions().withCaptureDs(true));
+    DogLog.setOptions(DogLog.getOptions().withCaptureDs(true).withNtTunables(true));
     DogLog.setPdh(new PowerDistribution());
 
     setFileOnly(false); // file-only once connected to fms
@@ -146,7 +148,7 @@ public class Robot extends TimedRobot {
             _intakePivot::inSafeZone,
             () ->
                 Math.abs(_shotParameters.getShotHeading() - _swerve.getHeading().getRadians())
-                    < 0.08,
+                    < Units.degreesToRadians(5),
             () -> FieldUtil.isShotValid(_swerve.getPose()));
 
     configureDriverBindings();
@@ -226,6 +228,9 @@ public class Robot extends TimedRobot {
         "java.lang.FdLibm$Hypot",
         "choreo.trajectory.Trajectory",
         "choreo.trajectory.SwerveSample");
+
+    // choreo warmup
+    CommandScheduler.getInstance().schedule(_auto.warmup());
   }
 
   // set logging to be file only or not
@@ -285,7 +290,8 @@ public class Robot extends TimedRobot {
                 baseVelX.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
                 baseVelY.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
                 baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
-            .beforeStarting(() -> _swerve.isOpenLoop = true));
+            .beforeStarting(() -> _swerve.isOpenLoop = true)
+            .withName("Drive"));
 
     _driverController.rightTrigger().and(() -> !_shotParameters.isManual).whileTrue(shoot);
     _driverController.rightTrigger().and(() -> _shotParameters.isManual).whileTrue(shootManually);
@@ -293,11 +299,14 @@ public class Robot extends TimedRobot {
     _driverController
         .rightBumper()
         .and(() -> !_shotParameters.isManual)
-        .whileTrue(shootPivotLowered);
+        .whileTrue(
+            parallel(shootPivotLowered, _intakeFeed.feedIn()).withName("Shoot Pivot Lowered"));
     _driverController
         .rightBumper()
         .and(() -> _shotParameters.isManual)
-        .whileTrue(shootManuallyPivotLowered);
+        .whileTrue(
+            parallel(shootManuallyPivotLowered, _intakeFeed.feedIn())
+                .withName("Shoot Manually Pivot Lowered"));
 
     _driverController.leftTrigger().whileTrue(_intakeFeed.feedIn());
 
@@ -323,14 +332,28 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     DogLog.time("Timing/Robot/robotPeriodic()");
 
-    // auton hack for now for snm
-    FieldUtil.getShotParameters(
-        _swerve.getPose(),
-        DriverStation.isTeleop()
-            ? ChassisSpeeds.fromRobotRelativeSpeeds(
-                _swerve.getChassisSpeeds(), _swerve.getHeading())
-            : zeroSpeeds,
-        _shotParameters);
+    if (_shotParameters.isManual) {
+      if (_driverController.x().getAsBoolean()) {
+        _shotParameters.setPreset(
+            ShotConstants.ferryFlywheelSpeed,
+            ShotConstants.ferryRollerSpeed,
+            ShotConstants.ferryFloorSpeed);
+      } else {
+        _shotParameters.setPreset(
+            ShotConstants.towerFlywheelSpeed,
+            ShotConstants.towerRollerSpeed,
+            ShotConstants.towerFloorSpeed);
+      }
+    } else {
+      // auton hack for now for snm
+      FieldUtil.getShotParameters(
+          _swerve.getPose(),
+          DriverStation.isTeleop()
+              ? ChassisSpeeds.fromRobotRelativeSpeeds(
+                  _swerve.getChassisSpeeds(), _swerve.getHeading())
+              : zeroSpeeds,
+          _shotParameters);
+    }
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,

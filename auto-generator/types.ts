@@ -25,7 +25,7 @@ export interface LocationProperties {
 export type AllLocationProperties = Record<GenericLocation, LocationProperties>;
 
 // UPDATE AFTER FILE ADD/DELETE CHANGES TO all-location-properties
-export type AllLocationPropertiesName = "snm"
+export type AllLocationPropertiesName = "snm" | "safe";
 
 export interface Layout {
     name: string,

@@ -93,7 +93,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   // for drive facing
   private final TimeoutLinearFilter _omegaFeedforwardFilter =
       new TimeoutLinearFilter(
-          LinearFilter.singlePoleIIR(0.2, Constants.robotPeriod.in(Seconds)), 2);
+          LinearFilter.singlePoleIIR(0.1, Constants.robotPeriod.in(Seconds)), 2);
   private Rotation2d _previousRotationSetpoint = Rotation2d.kZero;
 
   private double _lastSimTime = 0;
@@ -199,25 +199,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
       SwerveDrivetrainConstants drivetrainConstants,
       SwerveModuleConstants<?, ?, ?>... moduleConstants) {
     super(drivetrainConstants, SwerveConstants.odometryFrequency.in(Hertz), moduleConstants);
-
-    final var frontLeftDriveConfigurator = getModule(0).getDriveMotor().getConfigurator();
-    final var frontRightDriveConfigurator = getModule(1).getDriveMotor().getConfigurator();
-
-    final var currentLimitConfigs = new CurrentLimitsConfigs();
-
-    CTREUtil.attempt(
-        () -> frontLeftDriveConfigurator.refresh(currentLimitConfigs),
-        getModule(0).getDriveMotor());
-    currentLimitConfigs.StatorCurrentLimit = SwerveConstants.frontSlipCurrent.in(Amps);
-    CTREUtil.attempt(
-        () -> frontLeftDriveConfigurator.apply(currentLimitConfigs), getModule(0).getDriveMotor());
-
-    CTREUtil.attempt(
-        () -> frontRightDriveConfigurator.refresh(currentLimitConfigs),
-        getModule(1).getDriveMotor());
-    currentLimitConfigs.StatorCurrentLimit = SwerveConstants.frontSlipCurrent.in(Amps);
-    CTREUtil.attempt(
-        () -> frontRightDriveConfigurator.apply(currentLimitConfigs), getModule(1).getDriveMotor());
 
     _robotCentricRequest
         .withDeadband(SwerveConstants.translationalDeadband)
