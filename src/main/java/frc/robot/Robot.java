@@ -8,7 +8,11 @@ import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.hardware.TalonFX;
+
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
@@ -17,6 +21,7 @@ import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -108,6 +113,8 @@ public class Robot extends TimedRobot {
 
   private final ChassisSpeeds zeroSpeeds = new ChassisSpeeds();
 
+  private final Orchestra _orchestra = new Orchestra();
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -181,6 +188,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData(
         "Calculate Motor Max Speed And Torque", _swerve.calculateMotorMaxSpeedAndTorque());
 
+    SmartDashboard.putData("Posal", sequence(runOnce(() -> _swerve.resetPose(Pose2d.kZero)), _swerve.driveTo(new Pose2d(0, -1, Rotation2d.k180deg)), runOnce(() ->_orchestra.play())));
+
     SmartDashboard.putData(
         "Robot Self Check",
         sequence(
@@ -201,6 +210,15 @@ public class Robot extends TimedRobot {
     autonomous().whileTrue(_auto.getAutoScheduler());
 
     preventChoreoDelay();
+  }
+
+  private void addMotors() {
+    for (int i = 1; i <= 8; i++) 
+      _orchestra.addInstrument(new TalonFX(i, Constants.swerveBus));
+
+    for (int i = 1; i <= 6; i++)
+      _orchestra.addInstrument(new TalonFX(i, Constants.subsystemBus));
+
   }
 
   /** Watchdog config / class preloading needed to prevent choreo delay. */

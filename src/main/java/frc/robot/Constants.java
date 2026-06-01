@@ -73,6 +73,8 @@ public final class Constants {
   public static final Frequency simNotifierFrequency = Hertz.of(200);
 
   public static final CANBus subsystemBus = determineBus("subsystems");
+  public static final CANBus swerveBus = determineBus("swerve");
+
 
   public static class Ports {
     public static final int driverController = 0;
