@@ -200,9 +200,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   private boolean _hasAppliedDriverPerspective = false;
 
   // filtered chassis speeds
-  private final LinearFilter _vxFilter = LinearFilter.movingAverage(3);
-  private final LinearFilter _vyFilter = LinearFilter.movingAverage(3);
-  private final LinearFilter _omegaFilter = LinearFilter.movingAverage(3);
+  private final LinearFilter _vxFilter = LinearFilter.movingAverage(5);
+  private final LinearFilter _vyFilter = LinearFilter.movingAverage(5);
+  private final LinearFilter _omegaFilter = LinearFilter.movingAverage(5);
 
   private ChassisSpeeds _filteredSpeeds = new ChassisSpeeds();
 
@@ -646,7 +646,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     if (!suppressVision) {
       _acceptedEstimates.sort(VisionPoseEstimate.sorter);
 
-      double stdDevsMultiplier = _isAligning ? VisionConstants.aligningStdDevsMultiplier : 1.0;
+      double stdDevsMultiplier = _isAligning ? VisionConstants.aligningStdDevsMultiplier : VisionConstants.translationStdDevsScaler;
 
       _acceptedEstimates.forEach(
           (e) -> {
