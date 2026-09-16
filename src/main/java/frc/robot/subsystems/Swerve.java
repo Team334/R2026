@@ -4,7 +4,13 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Hertz;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import choreo.trajectory.SwerveSample;
@@ -17,13 +23,20 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import com.ctre.phoenix6.swerve.SwerveRequest.*;
+import com.ctre.phoenix6.swerve.SwerveRequest.ApplyFieldSpeeds;
+import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentric;
+import com.ctre.phoenix6.swerve.SwerveRequest.RobotCentric;
+import com.ctre.phoenix6.swerve.SwerveRequest.SwerveDriveBrake;
+import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveRotation;
+import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveSteerGains;
+import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveTranslation;
 import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -186,6 +199,24 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   private boolean _hasAppliedDriverPerspective = false;
 
+  // filtered chassis speeds
+  private final LinearFilter _vxFilter = LinearFilter.movingAverage(3);
+  private final LinearFilter _vyFilter = LinearFilter.movingAverage(3);
+  private final LinearFilter _omegaFilter = LinearFilter.movingAverage(3);
+
+  private ChassisSpeeds _filteredSpeeds = new ChassisSpeeds();
+
+  // stability debouncers
+  private final Debouncer _yawStableDebouncer = new Debouncer(0.1);
+  private final Debouncer _pitchStableDebouncer = new Debouncer(0.1);
+  private final Debouncer _rollStableDebouncer = new Debouncer(0.1);
+
+  // vision suppression post reset
+  private double _lastPoseResetTime = Double.NEGATIVE_INFINITY;
+  private static final double VISION_SUPPRESS_POST_RESET_SECS = 0.5;
+
+  private boolean _isAligning = false;
+
   /**
    * Creates a new Swerve.
    *
@@ -215,6 +246,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     SysId.displayRoutine("Swerve Steer", _steerRoutine);
     SysId.displayRoutine("Swerve Rotation", _rotationRoutine);
 
+    getOdometryThread().setThreadPriority(31);
+
     registerFallibles();
 
     if (Robot.isSimulation()) {
@@ -242,6 +275,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     }
 
     return "None";
+  }
+
+  public void setAligning(boolean aligning) {
+    _isAligning = aligning;
   }
 
   /** Adds a new fault under this subsystem. */
@@ -330,6 +367,12 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     return run(() -> setControl(_brakeRequest)).withName("Brake");
   }
 
+  @Override
+  public void resetPose(Pose2d pose) {
+    super.resetPose(pose);
+    _lastPoseResetTime = Utils.getCurrentTimeSeconds();
+  }
+
   /** Resets the heading to face away from the alliance wall. */
   public Command resetHeading() {
     return runOnce(
@@ -387,10 +430,11 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
             runOnce(
                 () -> {
                   isOpenLoop = false;
-
+                  setAligning(true);
                   // auton hack for now for snm
                   _holonomicController.useFilteringHeading(DriverStation.isTeleop());
                 }))
+        .finallyDo(() -> setAligning(false))
         .withName("Drive Facing");
   }
 
@@ -510,6 +554,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
             () -> {
               _holonomicController.useFilteringTranslation(false);
               _holonomicController.useFilteringHeading(false);
+              setAligning(true);
 
               _holonomicController.reset(
                   getPose(),
@@ -517,6 +562,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
                   ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getHeading()));
             })
         .until(_holonomicController::isFinished)
+        .finallyDo(() -> setAligning(false))
         .withName("Drive To");
   }
 
@@ -537,7 +583,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   /** Wrapper for getting current robot-relative chassis speeds. */
   public ChassisSpeeds getChassisSpeeds() {
-    return getState().Speeds;
+    // return getState().Speeds;
+    return getFilteredChassisSpeeds();
   }
 
   // updates pose estimator with vision
@@ -577,6 +624,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     DogLog.time("Timing/Swerve/periodic()");
 
     updateVisionPoseEstimates();
+    updateFilteredSpeeds(getState().Speeds);
 
     if (!_hasAppliedDriverPerspective || DriverStation.isDisabled()) {
       DriverStation.getAlliance()
@@ -589,14 +637,22 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
               });
     }
 
-    if (!_ignoreVisionEstimates) {
+    boolean suppressVision =
+        _ignoreVisionEstimates
+            || !pitchStable()
+            || (Utils.getCurrentTimeSeconds() - _lastPoseResetTime
+                < VISION_SUPPRESS_POST_RESET_SECS);
+
+    if (!suppressVision) {
       _acceptedEstimates.sort(VisionPoseEstimate.sorter);
+
+      double stdDevsMultiplier = _isAligning ? VisionConstants.aligningStdDevsMultiplier : 1.0;
 
       _acceptedEstimates.forEach(
           (e) -> {
             var stdDevs = e.stdDevs();
-            _visionStdDevs.set(0, 0, stdDevs[0]);
-            _visionStdDevs.set(1, 0, stdDevs[1]);
+            _visionStdDevs.set(0, 0, stdDevs[0] * stdDevsMultiplier);
+            _visionStdDevs.set(1, 0, stdDevs[1] * stdDevsMultiplier);
             _visionStdDevs.set(2, 0, stdDevs[2]);
 
             addVisionMeasurement(
@@ -631,6 +687,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     DogLog.log(getName() + "/Current Command", currentCommandName());
     DogLog.log(getName() + "/Has Error", _hasError);
 
+    DogLog.log("Swerve/Filtered Speeds", _filteredSpeeds);
+    DogLog.log("Swerve/Pitch Stable", pitchStable());
+    DogLog.log("Swerve/Aligning", _isAligning);
     DogLog.timeEnd("Timing/Swerve/periodic()");
   }
 
@@ -809,6 +868,38 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   private Command selfCheckModule(String name, SwerveModule<TalonFX, TalonFX, CANcoder> module) {
     return shiftSequence();
+  }
+
+  private void updateFilteredSpeeds(ChassisSpeeds speeds) {
+    _filteredSpeeds =
+        new ChassisSpeeds(
+            _vxFilter.calculate(speeds.vxMetersPerSecond),
+            _vyFilter.calculate(speeds.vyMetersPerSecond),
+            _omegaFilter.calculate(speeds.omegaRadiansPerSecond));
+  }
+
+  public ChassisSpeeds getFilteredChassisSpeeds() {
+    return _filteredSpeeds;
+  }
+
+  public boolean yawStable() {
+    return _yawStableDebouncer.calculate(
+        Math.abs(getPigeon2().getAngularVelocityZWorld().getValueAsDouble())
+            < SwerveConstants.maxYawRateThreshold);
+  }
+
+  public boolean pitchStable() {
+    return _pitchStableDebouncer.calculate(
+        Math.abs(getPigeon2().getPitch().getValueAsDouble()) < SwerveConstants.maxPitchThreshold);
+  }
+
+  public boolean rollStable() {
+    return _rollStableDebouncer.calculate(
+        Math.abs(getPigeon2().getRoll().getValueAsDouble()) < SwerveConstants.maxRollThreshold);
+  }
+
+  public boolean isStable() {
+    return yawStable() && pitchStable() && rollStable();
   }
 
   @Override

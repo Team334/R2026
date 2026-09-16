@@ -139,6 +139,7 @@ public final class Constants {
 
     public static final double translationStdDevsScaler = 1;
     public static final double thetaStdDevsScaler = 1;
+    public static final double aligningStdDevsMultiplier = 0.5;
 
     public static final double ambiguityThreshold = 0.2;
 
@@ -158,8 +159,8 @@ public final class Constants {
                     Units.inchesToMeters(9.6913),
                     Units.inchesToMeters(20.2395)),
                 new Rotation3d(0, 0, -Units.degreesToRadians(15))),
-            0.1,
-            5,
+            0.15,
+            4,
             9);
 
     public static final VisionPoseEstimatorConstants rightArducam =
@@ -171,8 +172,8 @@ public final class Constants {
                     -Units.inchesToMeters(9.6913),
                     Units.inchesToMeters(20.2395)),
                 new Rotation3d(0, 0, Units.degreesToRadians(15))),
-            0.1,
-            5,
+            0.15,
+            4,
             9);
   }
 
@@ -365,5 +366,9 @@ public final class Constants {
 
     public static final LinearVelocity translationalDeadband = MetersPerSecond.of(0.01);
     public static final AngularVelocity rotationalDeadband = RadiansPerSecond.of(0.01);
+
+    public static final double maxYawRateThreshold = 5.0;
+    public static final double maxPitchThreshold = 2.0;
+    public static final double maxRollThreshold = 2.0;
   }
 }
