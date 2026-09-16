@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import frc.lib.fault.FaultLogger;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.VisionConstants;
@@ -418,6 +419,11 @@ public class VisionPoseEstimator implements AutoCloseable {
   public void update() {
     DogLog.log("Is " + camName + " Connected", _camera.isConnected());
 
+    // feed current heading into photon every loop for better disambiguation
+    _poseEstimator.addHeadingData(
+        Timer.getFPGATimestamp(),
+        _gyroAtTime.apply(Timer.getFPGATimestamp()));
+
     _newEstimates.clear(); // reset new estimates
 
     var results = _camera.getAllUnreadResults();
@@ -427,7 +433,7 @@ public class VisionPoseEstimator implements AutoCloseable {
 
       if (est.isEmpty())
         est =
-            _poseEstimator.estimateLowestAmbiguityPose(
+            _poseEstimator.estimatePnpDistanceTrigSolvePose( // TODO: test this
                 result); // this is actually "closest-to-gyro" in the robot code
 
       if (est.isPresent()) {
