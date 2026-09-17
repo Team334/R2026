@@ -11,6 +11,7 @@ import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -134,6 +135,17 @@ public final class Constants {
     // }
   }
 
+  public static class ResetPoses {
+    public static final Pose2d blueTop =
+        new Pose2d(Units.inchesToMeters(16.5), Units.inchesToMeters(16.75), Rotation2d.kZero);
+    public static final Pose2d blueBottom =
+        new Pose2d(Units.inchesToMeters(16.5), Units.inchesToMeters(300.94), Rotation2d.kZero);
+    public static final Pose2d redTop =
+        new Pose2d(Units.inchesToMeters(634.72), Units.inchesToMeters(16.75), Rotation2d.k180deg);
+    public static final Pose2d redBottom =
+        new Pose2d(Units.inchesToMeters(634.72), Units.inchesToMeters(300.94), Rotation2d.k180deg);
+  }
+
   public static class VisionConstants {
     public static final double singleTagStdDevsScaler = 5;
 
@@ -159,9 +171,9 @@ public final class Constants {
                     Units.inchesToMeters(9.6913),
                     Units.inchesToMeters(20.2395)),
                 new Rotation3d(0, 0, -Units.degreesToRadians(15))),
-            0.15,
+            0.2,
             4,
-            9);
+            6);
 
     public static final VisionPoseEstimatorConstants rightArducam =
         new VisionPoseEstimatorConstants(
@@ -172,9 +184,9 @@ public final class Constants {
                     -Units.inchesToMeters(9.6913),
                     Units.inchesToMeters(20.2395)),
                 new Rotation3d(0, 0, Units.degreesToRadians(15))),
-            0.15,
+            0.2,
             4,
-            9);
+            6);
   }
 
   public static class ShotConstants {
@@ -368,7 +380,7 @@ public final class Constants {
     public static final AngularVelocity rotationalDeadband = RadiansPerSecond.of(0.01);
 
     public static final double maxYawRateThreshold = 5.0;
-    public static final double maxPitchThreshold = 2.0;
+    public static final double maxPitchThreshold = 2.0; // tune
     public static final double maxRollThreshold = 2.0;
   }
 }

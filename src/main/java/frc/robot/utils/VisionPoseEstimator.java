@@ -421,8 +421,7 @@ public class VisionPoseEstimator implements AutoCloseable {
 
     // feed current heading into photon every loop for better disambiguation
     _poseEstimator.addHeadingData(
-        Timer.getFPGATimestamp(),
-        _gyroAtTime.apply(Timer.getFPGATimestamp()));
+        Timer.getFPGATimestamp(), _gyroAtTime.apply(Timer.getFPGATimestamp()));
 
     _newEstimates.clear(); // reset new estimates
 
@@ -433,7 +432,7 @@ public class VisionPoseEstimator implements AutoCloseable {
 
       if (est.isEmpty())
         est =
-            _poseEstimator.estimatePnpDistanceTrigSolvePose( // TODO: test this
+            _poseEstimator.estimatePnpDistanceTrigSolvePose(
                 result); // this is actually "closest-to-gyro" in the robot code
 
       if (est.isPresent()) {

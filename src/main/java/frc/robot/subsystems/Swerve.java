@@ -637,6 +637,11 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
               });
     }
 
+    double stdDevsMultiplier =
+        _isAligning
+            ? VisionConstants.aligningStdDevsMultiplier
+            : VisionConstants.translationStdDevsScaler;
+
     boolean suppressVision =
         _ignoreVisionEstimates
             || !pitchStable()
@@ -645,8 +650,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
     if (!suppressVision) {
       _acceptedEstimates.sort(VisionPoseEstimate.sorter);
-
-      double stdDevsMultiplier = _isAligning ? VisionConstants.aligningStdDevsMultiplier : VisionConstants.translationStdDevsScaler;
 
       _acceptedEstimates.forEach(
           (e) -> {
@@ -690,6 +693,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     DogLog.log("Swerve/Filtered Speeds", _filteredSpeeds);
     DogLog.log("Swerve/Pitch Stable", pitchStable());
     DogLog.log("Swerve/Aligning", _isAligning);
+    DogLog.log("Swerve/suppressVision", suppressVision);
+
+    DogLog.log("Swerve/STDMultiplier", stdDevsMultiplier);
     DogLog.timeEnd("Timing/Swerve/periodic()");
   }
 

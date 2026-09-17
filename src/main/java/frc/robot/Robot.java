@@ -23,6 +23,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.ClassPreloader;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -39,6 +40,7 @@ import frc.lib.InputStream;
 import frc.lib.fault.FaultLogger;
 import frc.lib.fault.FaultsTable.FaultType;
 import frc.robot.Constants.Ports;
+import frc.robot.Constants.ResetPoses;
 import frc.robot.Constants.ShotConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.Auto;
@@ -170,6 +172,24 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData(
         "Reset Pose", runOnce(() -> _swerve.resetPose(Pose2d.kZero)).ignoringDisable(true));
     SmartDashboard.putData("Reset Heading", _swerve.resetHeading());
+
+    // reset location
+    if (DriverStation.getAlliance().get().equals(Alliance.Blue)) {
+      SmartDashboard.putData(
+          "Reset Pose To Left",
+          runOnce(() -> _swerve.resetPose(ResetPoses.blueBottom)).ignoringDisable(true));
+      SmartDashboard.putData(
+          "Reset Pose To Right",
+          runOnce(() -> _swerve.resetPose(ResetPoses.blueTop)).ignoringDisable(true));
+
+    } else {
+      SmartDashboard.putData(
+          "Reset Pose To Right",
+          runOnce(() -> _swerve.resetPose(ResetPoses.redBottom)).ignoringDisable(true));
+      SmartDashboard.putData(
+          "Reset Pose To Left",
+          runOnce(() -> _swerve.resetPose(ResetPoses.redTop)).ignoringDisable(true));
+    }
 
     SmartDashboard.putData("Reset Intake Pivot", _intakePivot.reset());
 
@@ -319,6 +339,14 @@ public class Robot extends TimedRobot {
         .onTrue(runOnce(() -> _shotParameters.isManual = !_shotParameters.isManual));
 
     _driverController.a().whileTrue(_superstructure.unjam());
+
+    if (DriverStation.getAlliance().get().equals(Alliance.Blue)) {
+      _driverController.povRight().onTrue(runOnce(() -> _swerve.resetPose(ResetPoses.blueTop)));
+      _driverController.povLeft().onTrue(runOnce(() -> _swerve.resetPose(ResetPoses.blueBottom)));
+    } else {
+      _driverController.povRight().onTrue(runOnce(() -> _swerve.resetPose(ResetPoses.redBottom)));
+      _driverController.povLeft().onTrue(runOnce(() -> _swerve.resetPose(ResetPoses.redTop)));
+    }
   }
 
   /**
