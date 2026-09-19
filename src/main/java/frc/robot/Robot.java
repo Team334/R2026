@@ -174,7 +174,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Reset Heading", _swerve.resetHeading());
 
     // reset location
-    if (DriverStation.getAlliance().get().equals(Alliance.Blue)) {
+    if (!DriverStation.getAlliance().isEmpty()
+        && DriverStation.getAlliance().get().equals(Alliance.Blue)) {
       SmartDashboard.putData(
           "Reset Pose To Left",
           runOnce(() -> _swerve.resetPose(ResetPoses.blueBottom)).ignoringDisable(true));
@@ -340,7 +341,8 @@ public class Robot extends TimedRobot {
 
     _driverController.a().whileTrue(_superstructure.unjam());
 
-    if (DriverStation.getAlliance().get().equals(Alliance.Blue)) {
+    if (!DriverStation.getAlliance().isEmpty()
+        && DriverStation.getAlliance().get().equals(Alliance.Blue)) {
       _driverController.povRight().onTrue(runOnce(() -> _swerve.resetPose(ResetPoses.blueTop)));
       _driverController.povLeft().onTrue(runOnce(() -> _swerve.resetPose(ResetPoses.blueBottom)));
     } else {

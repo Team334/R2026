@@ -4,11 +4,15 @@
 
 package frc.robot.utils;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import dev.doglog.DogLog;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
@@ -340,6 +344,10 @@ public class VisionPoseEstimator implements AutoCloseable {
       }
     }
 
+    logRotationDiff(
+        estimatedPose.transformBy(robotToCam),
+        new Rotation3d(0, 0, gyroHeading.getRadians())); // Comment during Comp
+
     // ---- FILTER ----
     // get tag distance
     for (int i = 0; i < tagAmount; i++) {
@@ -413,6 +421,29 @@ public class VisionPoseEstimator implements AutoCloseable {
         avgTagDistance,
         stdDevs,
         isValid);
+  }
+
+  /**
+   * 4481 Rembrandts Log the difference between the camera rotation entered in constants and the
+   * camera rotation measured by the vision system. A positive error means that the camera rotation
+   * needs to be reduced in constants.
+   *
+   * @param fieldSpaceCameraPose The detected pose of the camera in field space
+   * @param robotRotation Rotation of the robot
+   */
+  private void logRotationDiff(Pose3d fieldSpaceCameraPose, Rotation3d robotRotation) {
+    Rotation3d rotation = fieldSpaceCameraPose.getRotation();
+    Rotation3d cameraRotation = this.robotToCam.getRotation();
+    double cameraYaw = robotRotation.getZ() + cameraRotation.getZ();
+    DogLog.log(
+        "Vision/Camera Rotation Error/" + this.camName + "/x (roll, deg)",
+        cameraRotation.getMeasureX().minus(rotation.getMeasureX()).in(Degrees));
+    DogLog.log(
+        "Vision/Camera Rotation Error/" + this.camName + "/y (pitch, deg)",
+        cameraRotation.getMeasureY().minus(rotation.getMeasureY()).in(Degrees));
+    DogLog.log(
+        "Vision/Camera Rotation Error/" + this.camName + "/z (yaw, deg)",
+        Math.toDegrees(MathUtil.angleModulus(cameraYaw - rotation.getZ())));
   }
 
   /** Reads from the camera and generates an array of new latest {@link VisionPoseEstimate}(s). */
