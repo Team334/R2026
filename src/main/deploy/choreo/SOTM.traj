@@ -1,5 +1,5 @@
 {
- "name":"Warmup",
+ "name":"SOTM",
  "version":3,
  "snapshot":{
   "waypoints":[
@@ -122,6 +122,6 @@
   "splits":[0]
  },
  "events":[
-   {"name":"shoot", "from":{"target":1, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
-   {"name":"stop shooting", "from":{"target":2, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
+   {"name":"shoot", "from":{"target":1, "targetTimestamp":0.28469, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"stop shooting", "from":{"target":2, "targetTimestamp":2.36405, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }
