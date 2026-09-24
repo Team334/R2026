@@ -153,10 +153,10 @@ public final class Constants {
     public static final double thetaStdDevsScaler = 1;
     public static final double aligningStdDevsMultiplier = 0.5;
 
-    public static final double ambiguityThreshold = 0.2;
+    public static final double ambiguityThreshold = 0.3;
 
-    public static final double xBoundMargin = 0.01;
-    public static final double yBoundMargin = 0.01;
+    public static final double xBoundMargin = 0.5;
+    public static final double yBoundMargin = 0.5;
     public static final double zBoundMargin = 0.1;
 
     public static final String leftArducamName = "left-arducam";

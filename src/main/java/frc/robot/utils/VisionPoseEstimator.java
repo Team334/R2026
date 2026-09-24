@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.function.Function;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.targeting.PhotonTrackedTarget;
