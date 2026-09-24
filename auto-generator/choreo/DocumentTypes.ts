@@ -5,7 +5,6 @@ import { ConstraintData } from "./ConstraintDefinitions";
 export { TRAJ_SCHEMA_VERSION } from "./TrajSchemaVersion";
 import { TRAJ_SCHEMA_VERSION } from "./TrajSchemaVersion";
 export { PROJECT_SCHEMA_VERSION } from "./ProjectSchemaVersion";
-import { PROJECT_SCHEMA_VERSION } from "./ProjectSchemaVersion";
 
 export type Expr = { exp: string; val: number };
 
