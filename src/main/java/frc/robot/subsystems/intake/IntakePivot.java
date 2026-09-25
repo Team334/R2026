@@ -48,7 +48,7 @@ public class IntakePivot extends AdvancedSubsystem {
   private final StatusSignal<Angle> _pivotAngleGetter = _pivotMotor.getPosition();
 
   @Logged(name = "Lower Default")
-  private boolean _lowerDefault = true;
+  private boolean _lowerDefault = false;
 
   @Logged(name = "Lower Depot")
   public boolean lowerDepot = false;

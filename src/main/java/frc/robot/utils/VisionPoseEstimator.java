@@ -343,9 +343,9 @@ public class VisionPoseEstimator implements AutoCloseable {
       }
     }
 
-    logRotationDiff(
-        estimatedPose.transformBy(robotToCam),
-        new Rotation3d(0, 0, gyroHeading.getRadians())); // Comment during Comp
+    // logRotationDiff(
+    //     estimatedPose.transformBy(robotToCam),
+    //     new Rotation3d(0, 0, gyroHeading.getRadians())); // Comment during Comp
 
     // ---- FILTER ----
     // get tag distance
