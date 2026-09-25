@@ -168,6 +168,7 @@ public class Auto {
     _routineChooser.addOption("Test", Pair.of("Test", this::test));
     _routineChooser.addOption("Houston", Pair.of("Houston", this::houston));
     _routineChooser.addOption("Bump", Pair.of("Bump", this::bump));
+    _routineChooser.addOption("BumpSotmTwoSwipe", Pair.of("BumpSotmTwoSwipe", this::BumpSotmTwoSwipe));
 
     _layoutChooser.onChange(
         l -> {
@@ -266,6 +267,21 @@ public class Auto {
 
     return routine.cmd();
   }
+
+  private Command BumpSotmTwoSwipe() {
+    AutoRoutine routine = _factory.newRoutine("BumpSotmTwoSwipe");
+    AutoTrajectory trajectory = routine.trajectory("BumpSotmTwoSwipe");
+
+        routine.active().onTrue(
+        sequence(
+            trajectory.resetOdometry(),
+            trajectory.cmd()
+        )
+    );
+
+    return routine.cmd();
+  }
+
 
   private Command houston() {
     AutoRoutine routine = _factory.newRoutine("Houston");

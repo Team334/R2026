@@ -1,0 +1,9 @@
+{
+  "name": "Matan",
+  "allLocationProperties": "sotm",
+  "layout": [
+    "r_start",
+    "r_neutralmiddle"
+  ],
+  "splitCommands": {}
+}

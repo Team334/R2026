@@ -7,233 +7,217 @@ import {
     AllLocationProperties
 } from "../types";
 
-const HUB_X = 4.63710355758667;
-const HUB_Y = 4.025846004486084;
+function waypoint(
+    x: number,
+    y: number,
+    heading: number,
+    intervals: number,
+    fixTranslation = true,
+    fixHeading = true
+) {
+    const wp = makeWaypoint(
+        x,
+        y,
+        heading,
+        fixTranslation,
+        fixHeading,
+        false
+    );
 
-/*
- * SOTM route based on the waypoint layout from the SOTM.traj you provided.
- *
- * Important:
- * - The waypoint coordinates/poses below are copied from the PARAMS section
- *   of that trajectory, not from the generated samples.
- * - There are two shoot-on-the-move windows:
- *      waypoint 6 -> 8
- *      waypoint 15 -> 17
- * - Both windows are capped at 1.5 m/s.
- * - Shooting is controlled with event markers, not splitCommands.
- * - PointAt toward the Hub should be added to those same two ranges once the
- *   project's local PointAt ConstraintData shape is confirmed.
- */
+    wp.intervals = intervals;
+    return wp;
+}
 
 export const allLocationProperties: AllLocationProperties = {
     start: {
         leftWaypoints: [
-            makeWaypoint(4.4603095054626465, 7.474021911621094, 0.0)
+            waypoint(
+                4.437711238861084,
+                0.43769314885139465,
+                1.5707963267948966,
+                29
+            )
         ],
 
         rightWaypoints: reflectWaypoints(
-            makeWaypoint(4.4603095054626465, 7.474021911621094, 0.0)
+            waypoint(
+                4.437711238861084,
+                0.43769314885139465,
+                1.5707963267948966,
+                29
+            )
         ),
 
         eventMarkers: [
             makeEventMarker("pivot raise", 0, 0)
+        ],
+
+        constraints: [
+            makeConstraint(0, 1, {
+                type: "MaxVelocity",
+                props: {
+                    max: toExpr(5.12, "m/s")
+                }
+            }),
+            makeConstraint(0, 17, {
+                type: "MaxAcceleration",
+                props: {
+                    max: toExpr(10.0, "m/s^2")
+                }
+            })
         ]
     },
 
     neutralmiddle: {
-        /*
-         * Global waypoints 1 through 22 from SOTM.traj.
-         * Because start contributes global waypoint 0, these are local 0..21.
-         */
         leftWaypoints: [
-            // 1
-            makeWaypoint(4.4603095054626465, 7.474021911621094, 0.0),
-
-            // 2
-            makeWaypoint(4.809019565582275, 7.477536201477051, 0.0),
-
-            // 3
-            makeWaypoint(7.610898208618164, 7.091128826141357, -1.4711286226200226),
-
-            // 4
-            makeWaypoint(7.637355518341065, 5.014767646789551, -0.03591356551337211),
-
-            // 5
-            makeWaypoint(6.150235176086426, 5.5619797706604, 3.141592653589793),
-
-            // 6 - SHOOT START
-            makeWaypoint(3.0093276500701904, 5.499744415283203, 3.141592653589793),
-
-            // 7
-            makeWaypoint(2.9915871620178223, 5.483294486999512, -0.7301040444124813),
-
-            // 8 - SHOOT STOP
-            makeWaypoint(2.9354302883148193, 6.875729084014893, -1.17555532309072),
-
-            // 9
-            makeWaypoint(3.2754716873168945, 7.364711284637451, -0.020472520090271434),
-
-            // 10 - first return to start area
-            makeWaypoint(4.448259353637695, 7.463142395019531, 0.0),
-
-            // 11
-            makeWaypoint(4.809019565582275, 7.477536201477051, 0.0),
-
-            // 12
-            makeWaypoint(7.610898208618164, 7.091128826141357, -1.4711286226200226),
-
-            // 13
-            makeWaypoint(7.621798992156982, 5.009193420410156, -2.4227627089480697),
-
-            // 14
-            makeWaypoint(6.150235176086426, 5.5619797706604, 3.141592653589793),
-
-            // 15 - SHOOT START
-            makeWaypoint(3.006711959838867, 5.49761438369751, 3.141592653589793),
-
-            // 16
-            makeWaypoint(2.9915871620178223, 5.483294486999512, -0.7301040444124813),
-
-            // 17 - SHOOT STOP
-            makeWaypoint(2.9235498905181885, 6.875729084014893, -1.02652324394404),
-
-            // 18
-            makeWaypoint(3.279958963394165, 7.350941181182861, -0.020472520090271434),
-
-            // 19 - second return
-            makeWaypoint(4.456109046936035, 7.4697442054748535, 0.0),
-
-            // 20
-            makeWaypoint(4.824398517608643, 7.4697442054748535, 0.0),
-
-            // 21
-            makeWaypoint(7.610898208618164, 7.091128826141357, -1.4711286226200226),
-
-            // 22
-            makeWaypoint(7.610898208618164, 7.091128826141357, -1.4711286226200226)
+            waypoint(4.437711238861084, 0.43769314885139465, 1.5707963267948966, 29),
+            waypoint(8.128582000732422, 0.951529436492921, 1.6839471199122955, 32),
+            waypoint(7.58929443359375, 3.22220986404419, 2.0863448821145987, 29),
+            waypoint(5.7869415283203125, 2.552360468292237, 1.5469914909759674, 38),
+            waypoint(3.0905120372772217, 2.129444532775878, 0.8934711829610875, 3),
+            waypoint(3.104701280593872, 2.1407994560241708, 0.8904947688844378, 34, false, false),
+            waypoint(2.891824960708618, 0.7642001441955574, 0.0, 22, true, false)
         ],
 
         rightWaypoints: reflectWaypoints(
-            makeWaypoint(4.4603095054626465, 7.474021911621094, 0.0),
-            makeWaypoint(4.809019565582275, 7.477536201477051, 0.0),
-            makeWaypoint(7.610898208618164, 7.091128826141357, -1.4711286226200226),
-            makeWaypoint(7.637355518341065, 5.014767646789551, -0.03591356551337211),
-            makeWaypoint(6.150235176086426, 5.5619797706604, 3.141592653589793),
-            makeWaypoint(3.0093276500701904, 5.499744415283203, 3.141592653589793),
-            makeWaypoint(2.9915871620178223, 5.483294486999512, -0.7301040444124813),
-            makeWaypoint(2.9354302883148193, 6.875729084014893, -1.17555532309072),
-            makeWaypoint(3.2754716873168945, 7.364711284637451, -0.020472520090271434),
-            makeWaypoint(4.448259353637695, 7.463142395019531, 0.0),
-            makeWaypoint(4.809019565582275, 7.477536201477051, 0.0),
-            makeWaypoint(7.610898208618164, 7.091128826141357, -1.4711286226200226),
-            makeWaypoint(7.621798992156982, 5.009193420410156, -2.4227627089480697),
-            makeWaypoint(6.150235176086426, 5.5619797706604, 3.141592653589793),
-            makeWaypoint(3.006711959838867, 5.49761438369751, 3.141592653589793),
-            makeWaypoint(2.9915871620178223, 5.483294486999512, -0.7301040444124813),
-            makeWaypoint(2.9235498905181885, 6.875729084014893, -1.02652324394404),
-            makeWaypoint(3.279958963394165, 7.350941181182861, -0.020472520090271434),
-            makeWaypoint(4.456109046936035, 7.4697442054748535, 0.0),
-            makeWaypoint(4.824398517608643, 7.4697442054748535, 0.0),
-            makeWaypoint(7.610898208618164, 7.091128826141357, -1.4711286226200226),
-            makeWaypoint(7.610898208618164, 7.091128826141357, -1.4711286226200226)
+            waypoint(4.437711238861084, 0.43769314885139465, 1.5707963267948966, 29),
+            waypoint(8.128582000732422, 0.951529436492921, 1.6839471199122955, 32),
+            waypoint(7.58929443359375, 3.22220986404419, 2.0863448821145987, 29),
+            waypoint(5.7869415283203125, 2.552360468292237, 1.5469914909759674, 38),
+            waypoint(3.0905120372772217, 2.129444532775878, 0.8934711829610875, 3),
+            waypoint(3.104701280593872, 2.1407994560241708, 0.8904947688844378, 34, false, false),
+            waypoint(2.891824960708618, 0.7642001441955574, 0.0, 22, true, false)
         ),
 
         constraints: [
-            // Keep the first bump/shooting path away from the protected areas.
-            makeConstraint(5, 7, {
-                type: "KeepOutCircle",
+            makeConstraint(0, 3, {
+                type: "MaxVelocity",
                 props: {
-                    x: toExpr(4.612211856842041, "m"),
-                    y: toExpr(6.084839515686035, "m"),
-                    r: toExpr(0.9316006363189093, "m")
+                    max: toExpr(2.0, "m/s")
                 }
             }),
-
-            makeConstraint(5, 7, {
-                type: "KeepOutCircle",
+            makeConstraint(3, 5, {
+                type: "MaxVelocity",
                 props: {
-                    x: toExpr(4.612211856842041, "m"),
-                    y: toExpr(1.978060484313966, "m"),
-                    r: toExpr(0.9316006363189093, "m")
+                    max: toExpr(2.0, "m/s")
                 }
             }),
-
-            // Stop at the end of the first loop.
-            makeConstraint(9, undefined, {
+            makeConstraint(5, 6, {
+                type: "PointAt",
+                props: {
+                    x: toExpr(4.637411117553711, "m"),
+                    y: toExpr(4.031760215759277, "m"),
+                    tolerance: toExpr(5, "deg"),
+                    flip: false
+                }
+            }),
+            makeConstraint(4, undefined, {
                 type: "StopPoint",
                 props: {}
             }),
-
-            // Stop at the end of the second loop.
-            makeConstraint(18, undefined, {
+            makeConstraint(6, undefined, {
                 type: "StopPoint",
                 props: {}
             }),
-
-            /*
-             * SOTM WINDOW #1
-             * Global 6 -> 8 = local 5 -> 7
-             */
-            makeConstraint(5, 7, {
+            makeConstraint(5, 6, {
                 type: "MaxVelocity",
                 props: {
-                    max: toExpr(1.5, "m/s")
-                }
-            }),
-
-            /*
-             * SOTM WINDOW #2
-             * Global 15 -> 17 = local 14 -> 16
-             */
-            makeConstraint(14, 16, {
-                type: "MaxVelocity",
-                props: {
-                    max: toExpr(1.5, "m/s")
+                    max: toExpr(1.0, "m/s")
                 }
             })
-
-            /*
-             * PointAt goes here once ConstraintDefinitions.ts is used to confirm
-             * the exact local props shape:
-             *
-             * global 6 -> 8  => local 5 -> 7
-             * global 15 ->17 => local 14 ->16
-             *
-             * Target:
-             *     HUB_X = 4.63710355758667 m
-             *     HUB_Y = 4.025846004486084 m
-             */
         ],
 
         eventMarkers: [
-            // Source SOTM.traj global target 1
             makeEventMarker("stop shooting", 0, 0.2),
-
-            // global target 3
-            makeEventMarker("feed in", 2, 0),
-
-            // global target 5
-            makeEventMarker("feed stop", 4, -0.3),
-
-            // global target 6
-            makeEventMarker("shoot", 5, -0.1),
-
-            // global target 8
-            makeEventMarker("stop shooting", 7, 0),
-
-            // global target 14
-            makeEventMarker("feed stop", 13, -0.3),
-
-            // global target 15
-            makeEventMarker("shoot", 14, -0.1),
-
-            // global target 17
-            makeEventMarker("stop shooting", 16, 0)
+            makeEventMarker("feed in", 3, 0),
+            makeEventMarker("shoot", 4, -0.1),
+            makeEventMarker("stop shooting", 6, 0)
         ]
     },
 
     neutralbump: {
-        /** @todo */
+        leftWaypoints: [
+            waypoint(2.891824960708618, 0.7642001441955574, 0.0, 22, true, false),
+            waypoint(4.438725471496582, 0.43778985000610415, 1.5707963267948966, 16),
+            waypoint(5.90047550201416, 0.693241053009034, 1.5707963267948966, 23),
+            waypoint(6.0074944496154785, 1.976436071777344, 1.5707963267948966, 26, true, false),
+            waypoint(6.0074944496154785, 3.600603037261963, 1.5413932999533333, 15, true, false),
+            waypoint(6.310672283172607, 3.990403108978272, 0.0, 34),
+            waypoint(7.106773853302002, 2.4955930046081547, -3.141592653589793, 26),
+            waypoint(5.832298755645752, 2.4175557426452633, 1.5707963267948966, 38),
+            waypoint(3.104701042175293, 2.1407994560241708, 0.0, 33, true, false),
+            waypoint(2.920208215713501, 0.7642001441955574, 0.0, 21, true, false),
+            waypoint(4.437710762023926, 0.4463900856018061, 1.5707963267948966, 25),
+            waypoint(7.787977695465088, 0.5938991836547867, 1.5707963267948966, 40)
+        ],
+
+        rightWaypoints: reflectWaypoints(
+            waypoint(2.891824960708618, 0.7642001441955574, 0.0, 22, true, false),
+            waypoint(4.438725471496582, 0.43778985000610415, 1.5707963267948966, 16),
+            waypoint(5.90047550201416, 0.693241053009034, 1.5707963267948966, 23),
+            waypoint(6.0074944496154785, 1.976436071777344, 1.5707963267948966, 26, true, false),
+            waypoint(6.0074944496154785, 3.600603037261963, 1.5413932999533333, 15, true, false),
+            waypoint(6.310672283172607, 3.990403108978272, 0.0, 34),
+            waypoint(7.106773853302002, 2.4955930046081547, -3.141592653589793, 26),
+            waypoint(5.832298755645752, 2.4175557426452633, 1.5707963267948966, 38),
+            waypoint(3.104701042175293, 2.1407994560241708, 0.0, 33, true, false),
+            waypoint(2.920208215713501, 0.7642001441955574, 0.0, 21, true, false),
+            waypoint(4.437710762023926, 0.4463900856018061, 1.5707963267948966, 25),
+            waypoint(7.787977695465088, 0.5938991836547867, 1.5707963267948966, 40)
+        ),
+
+        constraints: [
+            makeConstraint(0, 2, {
+                type: "MaxVelocity",
+                props: {
+                    max: toExpr(4.0, "m/s")
+                }
+            }),
+            makeConstraint(2, 8, {
+                type: "MaxVelocity",
+                props: {
+                    max: toExpr(2.0, "m/s")
+                }
+            }),
+            makeConstraint(5, 5, {
+                type: "KeepOutCircle",
+                props: {
+                    x: toExpr(4.61231791973114, "m"),
+                    y: toExpr(4.0446482971310616, "m"),
+                    r: toExpr(0.6450773307498116, "m")
+                }
+            }),
+            makeConstraint(8, undefined, {
+                type: "StopPoint",
+                props: {}
+            }),
+            makeConstraint(8, 9, {
+                type: "MaxVelocity",
+                props: {
+                    max: toExpr(1.0, "m/s")
+                }
+            }),
+            makeConstraint(8, 9, {
+                type: "PointAt",
+                props: {
+                    x: toExpr(4.621539115905762, "m"),
+                    y: toExpr(4.029186248779297, "m"),
+                    tolerance: toExpr(5, "deg"),
+                    flip: false
+                }
+            }),
+            makeConstraint(9, undefined, {
+                type: "StopPoint",
+                props: {}
+            })
+        ],
+
+        eventMarkers: [
+            makeEventMarker("feed in", 2, 0),
+            makeEventMarker("feed stop", 6, 0),
+            makeEventMarker("shoot", 8, -0.1),
+            makeEventMarker("stop shooting", 9, 0)
+        ]
     },
 
     depot: {
