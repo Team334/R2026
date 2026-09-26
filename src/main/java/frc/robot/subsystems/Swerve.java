@@ -213,7 +213,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   // vision suppression post reset
   private double _lastPoseResetTime = Double.NEGATIVE_INFINITY;
-  private static final double VISION_SUPPRESS_POST_RESET_SECS = 0.5;
 
   private boolean _isAligning = false;
 
@@ -626,6 +625,11 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     updateVisionPoseEstimates();
     updateFilteredSpeeds(getState().Speeds);
 
+    double filteredOmega = getFilteredChassisSpeeds().omegaRadiansPerSecond;
+
+    boolean angularVelocityTooHigh =
+      Math.abs(filteredOmega) > VisionConstants.maxAngularVelocityForThetaTrust.magnitude();
+
     if (!_hasAppliedDriverPerspective || DriverStation.isDisabled()) {
       DriverStation.getAlliance()
           .ifPresent(
@@ -642,27 +646,21 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
             ? VisionConstants.aligningStdDevsMultiplier
             : VisionConstants.translationStdDevsScaler;
 
-    boolean suppressVision =
-        _ignoreVisionEstimates
-            || !pitchStable()
-            || (Utils.getCurrentTimeSeconds() - _lastPoseResetTime
-                < VISION_SUPPRESS_POST_RESET_SECS);
+    _acceptedEstimates.sort(VisionPoseEstimate.sorter);
 
-    if (!suppressVision) {
-      _acceptedEstimates.sort(VisionPoseEstimate.sorter);
-
-      _acceptedEstimates.forEach(
-          (e) -> {
-            var stdDevs = e.stdDevs();
-            _visionStdDevs.set(0, 0, stdDevs[0] * stdDevsMultiplier);
-            _visionStdDevs.set(1, 0, stdDevs[1] * stdDevsMultiplier);
-            _visionStdDevs.set(2, 0, stdDevs[2]);
-
-            addVisionMeasurement(
-                e.pose().toPose2d(), Utils.fpgaToCurrentTime(e.timestamp()), _visionStdDevs);
-          });
-    }
-
+    _acceptedEstimates.forEach(
+        (e) -> {
+          var stdDevs = e.stdDevs();
+          _visionStdDevs.set(0, 0, stdDevs[0] * stdDevsMultiplier);
+          _visionStdDevs.set(1, 0, stdDevs[1] * stdDevsMultiplier);
+          _visionStdDevs.set(
+              2,
+              0,
+              angularVelocityTooHigh ? 999999999 : stdDevs[2]);
+          addVisionMeasurement(
+              e.pose().toPose2d(), Utils.fpgaToCurrentTime(e.timestamp()), _visionStdDevs);
+      });
+      
     SwerveDriveState state = getState();
 
     DogLog.log("Swerve/Pose", state.Pose);
@@ -693,7 +691,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     DogLog.log("Swerve/Filtered Speeds", _filteredSpeeds);
     DogLog.log("Swerve/Pitch Stable", pitchStable());
     DogLog.log("Swerve/Aligning", _isAligning);
-    DogLog.log("Swerve/suppressVision", suppressVision);
 
     DogLog.log("Swerve/STDMultiplier", stdDevsMultiplier);
     DogLog.timeEnd("Timing/Swerve/periodic()");

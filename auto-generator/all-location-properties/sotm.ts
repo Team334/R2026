@@ -28,157 +28,248 @@ function waypoint(
     return wp;
 }
 
+// Swipe 1: SOTMBumpFirstSwipe
+const neutralMiddlePathLeft = [
+    waypoint(
+        4.424533843994141,
+        7.610918521881104,
+        -1.5707963267948966,
+        29
+    ),
+    waypoint(
+        8.128582000732422,
+        7.11137056350708,
+        -1.6839471199122955,
+        34
+    ),
+    waypoint(
+        7.750766754150391,
+        4.440641403198242,
+        -1.592532512087892,
+        28
+    ),
+    waypoint(
+        5.7869415283203125,
+        5.510539531707764,
+        -1.5707963267948966,
+        45
+    ),
+    waypoint(
+        3.127305746078491,
+        5.631696701049805,
+        -0.8934711829610875,
+        73,
+        true,
+        false
+    ),
+    waypoint(
+        2.891824960708618,
+        7.298699855804443,
+        0.0,
+        22,
+        true,
+        false
+    )
+];
+
+// Swipe 2: SOTMBumpSecondSwipe
+// Index 0 is the handoff point copied from neutralmiddle's final point.
+const neutralBumpPathLeft = [
+    ...neutralMiddlePathLeft.slice(-1),
+
+    waypoint(
+        4.438725471496582,
+        7.625110149383545,
+        -1.5707963267948966,
+        16
+    ),
+    waypoint(
+        5.90047550201416,
+        7.369658946990967,
+        -1.5707963267948966,
+        23
+    ),
+    waypoint(
+        6.0074944496154785,
+        6.086463928222656,
+        -1.5707963267948966,
+        24,
+        true,
+        false
+    ),
+    waypoint(
+        5.931700229644775,
+        4.635540962219238,
+        -1.5413932999533333,
+        16,
+        true,
+        false
+    ),
+    waypoint(
+        5.942527770996094,
+        3.9858744144439697,
+        0.0,
+        33
+    ),
+    waypoint(
+        7.859044551849365,
+        4.137463569641113,
+        1.5469907766412327,
+        31
+    ),
+    waypoint(
+        7.891528129577637,
+        5.913218975067139,
+        3.141592653589793,
+        34
+    ),
+    waypoint(
+        5.832298755645752,
+        5.645344257354736,
+        -1.5707963267948966,
+        46
+    ),
+    waypoint(
+        3.104701042175293,
+        5.92210054397583,
+        0.0,
+        60,
+        true,
+        false
+    ),
+    waypoint(
+        2.920208215713501,
+        7.298699855804443,
+        0.0,
+        21,
+        true,
+        false
+    ),
+    waypoint(
+        4.437466621398926,
+        7.613180160522461,
+        -1.5707963267948966,
+        25
+    ),
+    waypoint(
+        7.787977695465088,
+        7.469000816345215,
+        -1.5707963267948966,
+        40
+    )
+];
+
+const keepInField = {
+    type: "KeepInRectangle" as const,
+    props: {
+        x: toExpr(0.0, "m"),
+        y: toExpr(0.0, "m"),
+        w: toExpr(16.541, "m"),
+        h: toExpr(8.0692, "m")
+    }
+};
+
 export const allLocationProperties: AllLocationProperties = {
     start: {
-        leftWaypoints: [
-            waypoint(
-                4.437711238861084,
-                0.43769314885139465,
-                1.5707963267948966,
-                29
-            )
-        ],
-
-        rightWaypoints: reflectWaypoints(
-            waypoint(
-                4.437711238861084,
-                0.43769314885139465,
-                1.5707963267948966,
-                29
-            )
-        ),
-
+        leftWaypoints: [neutralMiddlePathLeft[0]],
+        rightWaypoints: reflectWaypoints(neutralMiddlePathLeft[0]),
         eventMarkers: [
-            makeEventMarker("pivot raise", 0, 0)
+            makeEventMarker("pivot raise", 0, 0),
+            makeEventMarker("pivot lower", 0, 0.4)
         ],
-
         constraints: [
+            makeConstraint(0, undefined, {
+                type: "StopPoint",
+                props: {}
+            })
+        ]
+    },
+
+    neutralmiddle: {
+        leftWaypoints: neutralMiddlePathLeft,
+        rightWaypoints: reflectWaypoints(...neutralMiddlePathLeft),
+        constraints: [
+            // Stop only at the end of neutralmiddle.
+            makeConstraint(5, undefined, {
+                type: "StopPoint",
+                props: {}
+            }),
+
+            makeConstraint(0, 5, keepInField),
+
+            // Original Swipe 1: 1 -> 3
+            makeConstraint(1, 3, {
+                type: "MaxVelocity",
+                props: {
+                    max: toExpr(2.0, "m/s")
+                }
+            }),
+
+            // Original Swipe 1: 4 -> 5
+            makeConstraint(4, 5, {
+                type: "PointAt",
+                props: {
+                    x: toExpr(4.637411117553711, "m"),
+                    y: toExpr(4.031760215759277, "m"),
+                    tolerance: toExpr(1, "deg"),
+                    flip: false
+                }
+            }),
+
+            // Original Swipe 1: 0 -> 1
             makeConstraint(0, 1, {
                 type: "MaxVelocity",
                 props: {
                     max: toExpr(5.12, "m/s")
                 }
             }),
-            makeConstraint(0, 17, {
+
+            // Original Swipe 1: 3 -> 4
+            makeConstraint(3, 4, {
+                type: "MaxVelocity",
+                props: {
+                    max: toExpr(1.5, "m/s")
+                }
+            }),
+
+            // Original Swipe 1: 4 -> 5
+            makeConstraint(4, 5, {
+                type: "MaxVelocity",
+                props: {
+                    max: toExpr(0.5, "m/s")
+                }
+            }),
+
+            // Original Swipe 1: 0 -> 5
+            makeConstraint(0, 5, {
                 type: "MaxAcceleration",
                 props: {
                     max: toExpr(10.0, "m/s^2")
                 }
             })
-        ]
-    },
-
-    neutralmiddle: {
-        leftWaypoints: [
-            waypoint(4.437711238861084, 0.43769314885139465, 1.5707963267948966, 29),
-            waypoint(8.128582000732422, 0.951529436492921, 1.6839471199122955, 32),
-            waypoint(7.58929443359375, 3.22220986404419, 2.0863448821145987, 29),
-            waypoint(5.7869415283203125, 2.552360468292237, 1.5469914909759674, 38),
-            waypoint(3.0905120372772217, 2.129444532775878, 0.8934711829610875, 3),
-            waypoint(3.104701280593872, 2.1407994560241708, 0.8904947688844378, 34, false, false),
-            waypoint(2.891824960708618, 0.7642001441955574, 0.0, 22, true, false)
         ],
-
-        rightWaypoints: reflectWaypoints(
-            waypoint(4.437711238861084, 0.43769314885139465, 1.5707963267948966, 29),
-            waypoint(8.128582000732422, 0.951529436492921, 1.6839471199122955, 32),
-            waypoint(7.58929443359375, 3.22220986404419, 2.0863448821145987, 29),
-            waypoint(5.7869415283203125, 2.552360468292237, 1.5469914909759674, 38),
-            waypoint(3.0905120372772217, 2.129444532775878, 0.8934711829610875, 3),
-            waypoint(3.104701280593872, 2.1407994560241708, 0.8904947688844378, 34, false, false),
-            waypoint(2.891824960708618, 0.7642001441955574, 0.0, 22, true, false)
-        ),
-
-        constraints: [
-            makeConstraint(0, 3, {
-                type: "MaxVelocity",
-                props: {
-                    max: toExpr(2.0, "m/s")
-                }
-            }),
-            makeConstraint(3, 5, {
-                type: "MaxVelocity",
-                props: {
-                    max: toExpr(2.0, "m/s")
-                }
-            }),
-            makeConstraint(5, 6, {
-                type: "PointAt",
-                props: {
-                    x: toExpr(4.637411117553711, "m"),
-                    y: toExpr(4.031760215759277, "m"),
-                    tolerance: toExpr(5, "deg"),
-                    flip: false
-                }
-            }),
-            makeConstraint(4, undefined, {
-                type: "StopPoint",
-                props: {}
-            }),
-            makeConstraint(6, undefined, {
-                type: "StopPoint",
-                props: {}
-            }),
-            makeConstraint(5, 6, {
-                type: "MaxVelocity",
-                props: {
-                    max: toExpr(1.0, "m/s")
-                }
-            })
-        ],
-
         eventMarkers: [
-            makeEventMarker("stop shooting", 0, 0.2),
-            makeEventMarker("feed in", 3, 0),
-            makeEventMarker("shoot", 4, -0.1),
-            makeEventMarker("stop shooting", 6, 0)
+            makeEventMarker("feed in", 1, -0.1),
+            makeEventMarker("feed stop", 3, 0),
+            makeEventMarker("shoot", 4, 0),
+            makeEventMarker("stop shooting", 5, 0)
         ]
     },
 
     neutralbump: {
-        leftWaypoints: [
-            waypoint(2.891824960708618, 0.7642001441955574, 0.0, 22, true, false),
-            waypoint(4.438725471496582, 0.43778985000610415, 1.5707963267948966, 16),
-            waypoint(5.90047550201416, 0.693241053009034, 1.5707963267948966, 23),
-            waypoint(6.0074944496154785, 1.976436071777344, 1.5707963267948966, 26, true, false),
-            waypoint(6.0074944496154785, 3.600603037261963, 1.5413932999533333, 15, true, false),
-            waypoint(6.310672283172607, 3.990403108978272, 0.0, 34),
-            waypoint(7.106773853302002, 2.4955930046081547, -3.141592653589793, 26),
-            waypoint(5.832298755645752, 2.4175557426452633, 1.5707963267948966, 38),
-            waypoint(3.104701042175293, 2.1407994560241708, 0.0, 33, true, false),
-            waypoint(2.920208215713501, 0.7642001441955574, 0.0, 21, true, false),
-            waypoint(4.437710762023926, 0.4463900856018061, 1.5707963267948966, 25),
-            waypoint(7.787977695465088, 0.5938991836547867, 1.5707963267948966, 40)
-        ],
-
-        rightWaypoints: reflectWaypoints(
-            waypoint(2.891824960708618, 0.7642001441955574, 0.0, 22, true, false),
-            waypoint(4.438725471496582, 0.43778985000610415, 1.5707963267948966, 16),
-            waypoint(5.90047550201416, 0.693241053009034, 1.5707963267948966, 23),
-            waypoint(6.0074944496154785, 1.976436071777344, 1.5707963267948966, 26, true, false),
-            waypoint(6.0074944496154785, 3.600603037261963, 1.5413932999533333, 15, true, false),
-            waypoint(6.310672283172607, 3.990403108978272, 0.0, 34),
-            waypoint(7.106773853302002, 2.4955930046081547, -3.141592653589793, 26),
-            waypoint(5.832298755645752, 2.4175557426452633, 1.5707963267948966, 38),
-            waypoint(3.104701042175293, 2.1407994560241708, 0.0, 33, true, false),
-            waypoint(2.920208215713501, 0.7642001441955574, 0.0, 21, true, false),
-            waypoint(4.437710762023926, 0.4463900856018061, 1.5707963267948966, 25),
-            waypoint(7.787977695465088, 0.5938991836547867, 1.5707963267948966, 40)
-        ),
-
+        leftWaypoints: neutralBumpPathLeft,
+        rightWaypoints: reflectWaypoints(...neutralBumpPathLeft),
         constraints: [
-            makeConstraint(0, 2, {
-                type: "MaxVelocity",
-                props: {
-                    max: toExpr(4.0, "m/s")
-                }
+            // Final point = Swipe 2 WP11, now index 12.
+            makeConstraint(12, undefined, {
+                type: "StopPoint",
+                props: {}
             }),
-            makeConstraint(2, 8, {
-                type: "MaxVelocity",
-                props: {
-                    max: toExpr(2.0, "m/s")
-                }
-            }),
+
+            // Whole stitched neutralbump path.
+            makeConstraint(0, 12, keepInField),
+
+            // Original Swipe 2 WP4 -> stitched WP5.
             makeConstraint(5, 5, {
                 type: "KeepOutCircle",
                 props: {
@@ -187,44 +278,73 @@ export const allLocationProperties: AllLocationProperties = {
                     r: toExpr(0.6450773307498116, "m")
                 }
             }),
-            makeConstraint(8, undefined, {
+
+            // Original Swipe 2 WP1 -> WP7 becomes WP2 -> WP8.
+            makeConstraint(2, 8, {
+                type: "MaxVelocity",
+                props: {
+                    max: toExpr(2.0, "m/s")
+                }
+            }),
+
+            // Original Swipe 2 WP8 becomes stitched WP9.
+            makeConstraint(9, undefined, {
                 type: "StopPoint",
                 props: {}
             }),
-            makeConstraint(8, 9, {
+
+            // Original Swipe 2 WP8 -> WP9 becomes WP9 -> WP10.
+            makeConstraint(9, 10, {
                 type: "MaxVelocity",
                 props: {
-                    max: toExpr(1.0, "m/s")
+                    max: toExpr(0.5, "m/s")
                 }
             }),
-            makeConstraint(8, 9, {
+
+            // Original Swipe 2 WP8 -> WP9 becomes WP9 -> WP10.
+            makeConstraint(9, 10, {
                 type: "PointAt",
                 props: {
                     x: toExpr(4.621539115905762, "m"),
                     y: toExpr(4.029186248779297, "m"),
-                    tolerance: toExpr(5, "deg"),
+                    tolerance: toExpr(1, "deg"),
                     flip: false
                 }
             }),
-            makeConstraint(9, undefined, {
+
+            // Original Swipe 2 WP9 becomes stitched WP10.
+            makeConstraint(10, undefined, {
                 type: "StopPoint",
                 props: {}
+            }),
+
+            // Original Swipe 2 WP0 -> WP11 becomes WP1 -> WP12.
+            makeConstraint(1, 12, {
+                type: "MaxAcceleration",
+                props: {
+                    max: toExpr(10.0, "m/s^2")
+                }
+            }),
+
+            // Original Swipe 2 WP0 -> WP1 becomes WP1 -> WP2.
+            makeConstraint(1, 2, {
+                type: "MaxVelocity",
+                props: {
+                    max: toExpr(5.0, "m/s")
+                }
+            }),
+
+            // Original Swipe 2 WP7 -> WP8 becomes WP8 -> WP9.
+            makeConstraint(8, 9, {
+                type: "MaxVelocity",
+                props: {
+                    max: toExpr(1.5, "m/s")
+                }
             })
         ],
-
-        eventMarkers: [
-            makeEventMarker("feed in", 2, 0),
-            makeEventMarker("feed stop", 6, 0),
-            makeEventMarker("shoot", 8, -0.1),
-            makeEventMarker("stop shooting", 9, 0)
-        ]
+        eventMarkers: []
     },
 
-    depot: {
-        /** @todo */
-    },
-
-    human: {
-        /** @todo */
-    }
+    depot: {},
+    human: {}
 };

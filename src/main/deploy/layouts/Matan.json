@@ -3,7 +3,8 @@
   "allLocationProperties": "sotm",
   "layout": [
     "r_start",
-    "r_neutralmiddle"
+    "r_neutralmiddle",
+    "r_neutralbump"
   ],
   "splitCommands": {}
 }
