@@ -60,7 +60,7 @@ public class VisionPoseEstimator implements AutoCloseable {
    * theta std devs will be super high).
    */
   @Logged(name = "Ignore Theta Estimate")
-  public boolean ignoreThetaEstimate = true;
+  public boolean ignoreThetaEstimate = false;
 
   private final PhotonCamera _camera;
   private final PhotonCameraSim _cameraSim;
