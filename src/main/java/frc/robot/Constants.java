@@ -152,7 +152,8 @@ public final class Constants {
     public static final double translationStdDevsScaler = 1;
     public static final double thetaStdDevsScaler = 1;
     public static final double aligningStdDevsMultiplier = 0.5;
-    public static final AngularVelocity maxAngularVelocityForThetaTrust = RadiansPerSecond.of(2.0); // TODO: tune
+    public static final AngularVelocity maxAngularVelocityForThetaTrust =
+        RadiansPerSecond.of(Math.PI); // TODO: tune
 
     public static final double ambiguityThreshold = 0.3;
 
@@ -350,6 +351,7 @@ public final class Constants {
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
     public static final LinearVelocity driverTranslationalVelocityBump = MetersPerSecond.of(1.5);
     public static final AngularVelocity driverAngularVelocity = RadiansPerSecond.of(Math.PI * 2);
+    public static final AngularVelocity driverAngularVelocityBump = RadiansPerSecond.of(Math.PI);
 
     public static final LinearVelocity driverTranslationalShootingVelocity =
         MetersPerSecond.of(2.25);

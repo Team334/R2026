@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
@@ -79,6 +80,7 @@ import frc.robot.Constants.VisionConstants;
 import frc.robot.Robot;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.utils.FieldUtil;
 import frc.robot.utils.HolonomicController;
 import frc.robot.utils.VisionPoseEstimator;
 import frc.robot.utils.VisionPoseEstimator.VisionPoseEstimate;
@@ -212,8 +214,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   private final Debouncer _rollStableDebouncer = new Debouncer(0.1);
 
   // vision suppression post reset
+  @Logged(name = "Last Pose Reset Time")
   private double _lastPoseResetTime = Double.NEGATIVE_INFINITY;
 
+  @Logged(name = "Is Aligning")
   private boolean _isAligning = false;
 
   /**
@@ -447,25 +451,33 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    */
   public Command drive(InputStream velX, InputStream velY, InputStream velOmega) {
     return run(() -> {
-          if (isFieldOriented) {
-            setControl(
-                _fieldCentricRequest
-                    .withVelocityX(velX.get())
-                    .withVelocityY(velY.get())
-                    .withRotationalRate(velOmega.get())
-                    .withDriveRequestType(
-                        isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
-          } else {
-            setControl(
-                _robotCentricRequest
-                    .withVelocityX(velX.get())
-                    .withVelocityY(velY.get())
-                    .withRotationalRate(velOmega.get())
-                    .withDriveRequestType(
-                        isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
-          }
-        })
-        .withName("Drive");
+      double speedMultiplier =
+          FieldUtil.inBumpZone(getPose())
+              ? SwerveConstants.driverTranslationalVelocityBump.in(MetersPerSecond)
+                  / SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)
+              : 1.0;
+
+      double x = velX.get() * speedMultiplier;
+      double y = velY.get() * speedMultiplier;
+
+      if (isFieldOriented) {
+        setControl(
+            _fieldCentricRequest
+                .withVelocityX(x)
+                .withVelocityY(y)
+                .withRotationalRate(velOmega.get())
+                .withDriveRequestType(
+                    isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
+      } else {
+        setControl(
+            _robotCentricRequest
+                .withVelocityX(x)
+                .withVelocityY(y)
+                .withRotationalRate(velOmega.get())
+                .withDriveRequestType(
+                    isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
+      }
+    }).withName("Drive");
   }
 
   /**
@@ -628,7 +640,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     double filteredOmega = getFilteredChassisSpeeds().omegaRadiansPerSecond;
 
     boolean angularVelocityTooHigh =
-      Math.abs(filteredOmega) > VisionConstants.maxAngularVelocityForThetaTrust.magnitude();
+        Math.abs(filteredOmega) > VisionConstants.maxAngularVelocityForThetaTrust.magnitude();
 
     if (!_hasAppliedDriverPerspective || DriverStation.isDisabled()) {
       DriverStation.getAlliance()
@@ -653,14 +665,12 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
           var stdDevs = e.stdDevs();
           _visionStdDevs.set(0, 0, stdDevs[0] * stdDevsMultiplier);
           _visionStdDevs.set(1, 0, stdDevs[1] * stdDevsMultiplier);
-          _visionStdDevs.set(
-              2,
-              0,
-              angularVelocityTooHigh ? 999999999 : stdDevs[2]);
+          _visionStdDevs.set(2, 0, angularVelocityTooHigh ? 999999999 : stdDevs[2]);
+          // _visionStdDevs.set(2, 0, stdDevs[2] * stdDevsMultiplier);
           addVisionMeasurement(
               e.pose().toPose2d(), Utils.fpgaToCurrentTime(e.timestamp()), _visionStdDevs);
-      });
-      
+        });
+
     SwerveDriveState state = getState();
 
     DogLog.log("Swerve/Pose", state.Pose);
@@ -690,7 +700,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
     DogLog.log("Swerve/Filtered Speeds", _filteredSpeeds);
     DogLog.log("Swerve/Pitch Stable", pitchStable());
-    DogLog.log("Swerve/Aligning", _isAligning);
 
     DogLog.log("Swerve/STDMultiplier", stdDevsMultiplier);
     DogLog.timeEnd("Timing/Swerve/periodic()");

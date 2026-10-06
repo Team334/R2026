@@ -304,15 +304,15 @@ public class Robot extends TimedRobot {
             baseVelY.scale(SwerveConstants.driverTranslationalShootingVelocity.in(MetersPerSecond)),
             baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)),
             true);
-
+            
     _swerve.setDefaultCommand(
-        _swerve
-            .drive(
-                baseVelX.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
-                baseVelY.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
-                baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
-            .beforeStarting(() -> _swerve.isOpenLoop = true)
-            .withName("Drive"));
+      _swerve
+          .drive(
+              baseVelX.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+              baseVelY.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
+              baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
+          .beforeStarting(() -> _swerve.isOpenLoop = true)
+          .withName("Drive"));
 
     _driverController.rightTrigger().and(() -> !_shotParameters.isManual).whileTrue(shoot);
     _driverController.rightTrigger().and(() -> _shotParameters.isManual).whileTrue(shootManually);

@@ -168,8 +168,12 @@ public class Auto {
     _routineChooser.addOption("Test", Pair.of("Test", this::test));
     _routineChooser.addOption("Houston", Pair.of("Houston", this::houston));
     _routineChooser.addOption("Bump", Pair.of("Bump", this::bump));
-    _routineChooser.addOption("BumpSotmTwoSwipe", Pair.of("BumpSotmTwoSwipe", this::BumpSotmTwoSwipe));
-    _routineChooser.addOption("BumpSotmTwoSwipeSlowed", Pair.of("BumpSotmTwoSwipeSlowed", this::BumpSotmTwoSwipeSlowed));
+    _routineChooser.addOption(
+        "BumpSotmTwoSwipe", Pair.of("BumpSotmTwoSwipe", this::BumpSotmTwoSwipe));
+    _routineChooser.addOption(
+        "BumpSotmTwoSwipeSlowed", Pair.of("BumpSotmTwoSwipeSlowed", this::BumpSotmTwoSwipeSlowed));
+    _routineChooser.addOption("Matan", Pair.of("Matan", this::Matan));
+    _routineChooser.addOption("Evan", Pair.of("Evan", this::Evan));
 
     _layoutChooser.onChange(
         l -> {
@@ -273,11 +277,7 @@ public class Auto {
     AutoRoutine routine = _factory.newRoutine("BumpSotmTwoSwipe");
     AutoTrajectory trajectory = routine.trajectory("BumpSotmTwoSwipe");
 
-        routine.active().onTrue(
-        sequence(
-            trajectory.cmd()
-        )
-    );
+    routine.active().onTrue(sequence(trajectory.cmd()));
 
     return routine.cmd();
   }
@@ -286,16 +286,28 @@ public class Auto {
     AutoRoutine routine = _factory.newRoutine("BumpSotmTwoSwipeSlowed");
     AutoTrajectory trajectory = routine.trajectory("BumpSotmTwoSwipeSlowed");
 
-        routine.active().onTrue(
-        sequence(
-            trajectory.resetOdometry(),
-            trajectory.cmd()
-        )
-    );
+    routine.active().onTrue(sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
     return routine.cmd();
   }
 
+  private Command Matan() {
+    AutoRoutine routine = _factory.newRoutine("Matan");
+    AutoTrajectory trajectory = routine.trajectory("Matan");
+
+    routine.active().onTrue(sequence(trajectory.resetOdometry(), trajectory.cmd()));
+
+    return routine.cmd();
+  }
+
+  private Command Evan() {
+    AutoRoutine routine = _factory.newRoutine("Evan");
+    AutoTrajectory trajectory = routine.trajectory("Evan");
+
+    routine.active().onTrue(sequence(trajectory.resetOdometry(), trajectory.cmd()));
+
+    return routine.cmd();
+  }
 
   private Command houston() {
     AutoRoutine routine = _factory.newRoutine("Houston");
