@@ -451,33 +451,34 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
    */
   public Command drive(InputStream velX, InputStream velY, InputStream velOmega) {
     return run(() -> {
-      double speedMultiplier =
-          FieldUtil.inBumpZone(getPose())
-              ? SwerveConstants.driverTranslationalVelocityBump.in(MetersPerSecond)
-                  / SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)
-              : 1.0;
+          double speedMultiplier =
+              FieldUtil.inBumpZone(getPose())
+                  ? SwerveConstants.driverTranslationalVelocityBump.in(MetersPerSecond)
+                      / SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)
+                  : 1.0;
 
-      double x = velX.get() * speedMultiplier;
-      double y = velY.get() * speedMultiplier;
+          double x = velX.get() * speedMultiplier;
+          double y = velY.get() * speedMultiplier;
 
-      if (isFieldOriented) {
-        setControl(
-            _fieldCentricRequest
-                .withVelocityX(x)
-                .withVelocityY(y)
-                .withRotationalRate(velOmega.get())
-                .withDriveRequestType(
-                    isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
-      } else {
-        setControl(
-            _robotCentricRequest
-                .withVelocityX(x)
-                .withVelocityY(y)
-                .withRotationalRate(velOmega.get())
-                .withDriveRequestType(
-                    isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
-      }
-    }).withName("Drive");
+          if (isFieldOriented) {
+            setControl(
+                _fieldCentricRequest
+                    .withVelocityX(x)
+                    .withVelocityY(y)
+                    .withRotationalRate(velOmega.get())
+                    .withDriveRequestType(
+                        isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
+          } else {
+            setControl(
+                _robotCentricRequest
+                    .withVelocityX(x)
+                    .withVelocityY(y)
+                    .withRotationalRate(velOmega.get())
+                    .withDriveRequestType(
+                        isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
+          }
+        })
+        .withName("Drive");
   }
 
   /**
@@ -888,6 +889,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
             _vxFilter.calculate(speeds.vxMetersPerSecond),
             _vyFilter.calculate(speeds.vyMetersPerSecond),
             _omegaFilter.calculate(speeds.omegaRadiansPerSecond));
+  }
+
+  public VisionPoseEstimate getLastAcceptedEstimate() {
+    return _acceptedEstimates.get(_acceptedEstimates.size() - 1);
   }
 
   public ChassisSpeeds getFilteredChassisSpeeds() {

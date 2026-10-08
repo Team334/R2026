@@ -78,7 +78,8 @@ public class ShotParameters {
       BooleanSupplier shooterInTolerance,
       BooleanSupplier intakePivotInSafeZone,
       BooleanSupplier headingInTolerance,
-      BooleanSupplier isShotValid) {
+      BooleanSupplier isShotValid,
+      BooleanSupplier isVisionEstimateClose) {
     new Trigger(() -> isManual)
         .onTrue(
             runOnce(
@@ -110,6 +111,7 @@ public class ShotParameters {
               && headingInTolerance.getAsBoolean()
               && isShotValid.getAsBoolean()
               && inBounds
+              && isVisionEstimateClose.getAsBoolean()
               && !failedToConverge;
         };
   }

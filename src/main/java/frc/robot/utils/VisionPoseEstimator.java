@@ -343,9 +343,9 @@ public class VisionPoseEstimator implements AutoCloseable {
       }
     }
 
-    // logRotationDiff(
-    //     estimatedPose.transformBy(robotToCam),
-    //     new Rotation3d(0, 0, gyroHeading.getRadians())); // Comment during Comp
+    logRotationDiff(
+        estimatedPose.transformBy(robotToCam),
+        new Rotation3d(0, 0, gyroHeading.getRadians())); // Comment during Comp
 
     // ---- FILTER ----
     // get tag distance
@@ -435,13 +435,13 @@ public class VisionPoseEstimator implements AutoCloseable {
     Rotation3d cameraRotation = this.robotToCam.getRotation();
     double cameraYaw = robotRotation.getZ() + cameraRotation.getZ();
     DogLog.log(
-        "Vision/Camera Rotation Error/" + this.camName + "/x (roll, deg)",
+        "Swerve/Camera Rotation Error/" + this.camName + "/x (roll, deg)",
         cameraRotation.getMeasureX().minus(rotation.getMeasureX()).in(Degrees));
     DogLog.log(
-        "Vision/Camera Rotation Error/" + this.camName + "/y (pitch, deg)",
+        "Swerve/Camera Rotation Error/" + this.camName + "/y (pitch, deg)",
         cameraRotation.getMeasureY().minus(rotation.getMeasureY()).in(Degrees));
     DogLog.log(
-        "Vision/Camera Rotation Error/" + this.camName + "/z (yaw, deg)",
+        "Swerve/Camera Rotation Error/" + this.camName + "/z (yaw, deg)",
         Math.toDegrees(MathUtil.angleModulus(cameraYaw - rotation.getZ())));
   }
 

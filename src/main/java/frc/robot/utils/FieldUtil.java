@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShotConstants;
+import frc.robot.utils.VisionPoseEstimator.VisionPoseEstimate;
+import java.util.function.DoubleSupplier;
 
 public class FieldUtil {
   // newton's method constants
@@ -33,6 +35,8 @@ public class FieldUtil {
 
   private static final BooleanSubscriber _useFudge = DogLog.tunable("Use Fudge", true);
 
+  private static DoubleSupplier visionToOdometryDistance;
+
   static {
     // teleop().onTrue(runOnce(() -> _useFudge.getTopic().publish().set(true)));
   }
@@ -46,6 +50,7 @@ public class FieldUtil {
     DogLog.log("FieldUtil/In Alliance Zone", inAllianceZone(robotPose));
     DogLog.log("FieldUtil/Match Time", getMatchTime());
     DogLog.log("FieldUtil/Shift Time", getShiftTime());
+    DogLog.log("FieldUtil/Odometry Vision Distance", visionToOdometryDistance.getAsDouble());
   }
 
   /** Gets the alliance from the DS. If the alliance can't be retreived, blue is used by default. */
@@ -127,6 +132,19 @@ public class FieldUtil {
     }
 
     return true;
+  }
+
+  // compares last vision estimates pose to odometry, looking for low discrepancy
+  public static boolean isVisionEstimateClose(
+      Pose2d robotPose, VisionPoseEstimate lastAcceptedEstimate) {
+    Pose2d visionEstPose = lastAcceptedEstimate.pose().toPose2d();
+    visionToOdometryDistance =
+        () ->
+            Math.pow(
+                Math.pow(robotPose.getX() - visionEstPose.getX(), 2)
+                    + Math.pow(robotPose.getY() - visionEstPose.getY(), 2),
+                0.5);
+    return visionToOdometryDistance.getAsDouble() < 0.5;
   }
 
   /** Whether the supplied robot pose is in the bump zone(s). */
