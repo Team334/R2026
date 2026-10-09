@@ -139,11 +139,7 @@ public class FieldUtil {
       Pose2d robotPose, VisionPoseEstimate lastAcceptedEstimate) {
     Pose2d visionEstPose = lastAcceptedEstimate.pose().toPose2d();
     visionToOdometryDistance =
-        () ->
-            Math.pow(
-                Math.pow(robotPose.getX() - visionEstPose.getX(), 2)
-                    + Math.pow(robotPose.getY() - visionEstPose.getY(), 2),
-                0.5);
+        () -> visionEstPose.getTranslation().getDistance(robotPose.getTranslation());
     return visionToOdometryDistance.getAsDouble() < 0.5;
   }
 
