@@ -14,10 +14,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 
-import java.lang.reflect.Field;
-
 import com.ctre.phoenix6.SignalLogger;
-
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
@@ -63,6 +60,7 @@ import frc.robot.subsystems.intake.IntakeFeed;
 import frc.robot.subsystems.intake.IntakePivot;
 import frc.robot.utils.FieldUtil;
 import frc.robot.utils.ShotParameters;
+import java.lang.reflect.Field;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -161,6 +159,8 @@ public class Robot extends TimedRobot {
                 Math.abs(_shotParameters.getShotHeading() - _swerve.getHeading().getRadians())
                     < Units.degreesToRadians(5),
             () -> FieldUtil.isShotValid(_swerve.getPose()));
+
+    _swerve.setShotParameters(_shotParameters);
 
     configureDriverBindings();
 
@@ -321,17 +321,19 @@ public class Robot extends TimedRobot {
             true);
 
     _swerve.setDefaultCommand(
-      _swerve
-          .drive(
-              InputStream.of(() -> baseVelX.get() * _swerve.getDriverTranslationalVelocity()),
-              InputStream.of(() -> baseVelY.get() * _swerve.getDriverTranslationalVelocity()),
-              InputStream.of(() -> baseVelOmega.get() * _swerve.getDriverAngularVelocity()))
-          .beforeStarting(() -> _swerve.isOpenLoop = true)
-          .withName("Drive"));
+        _swerve
+            .drive(
+                InputStream.of(() -> baseVelX.get() * _swerve.getDriverTranslationalVelocity()),
+                InputStream.of(() -> baseVelY.get() * _swerve.getDriverTranslationalVelocity()),
+                InputStream.of(() -> baseVelOmega.get() * _swerve.getDriverAngularVelocity()))
+            .beforeStarting(() -> _swerve.isOpenLoop = true)
+            .withName("Drive"));
 
     _driverController.rightTrigger().and(() -> !_shotParameters.isManual).whileTrue(shoot);
     _driverController.rightTrigger().and(() -> _shotParameters.isManual).whileTrue(shootManually);
-    _driverController.povUp().toggleOnTrue(new StartEndCommand(() -> setDefenseMode(true), () -> setDefenseMode(false)));
+    _driverController
+        .povUp()
+        .toggleOnTrue(new StartEndCommand(() -> setDefenseMode(true), () -> setDefenseMode(false)));
 
     _driverController
         .rightBumper()

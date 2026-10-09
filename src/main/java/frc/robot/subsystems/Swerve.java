@@ -15,14 +15,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
-
-import org.photonvision.simulation.VisionSystemSim;
-
+import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -40,8 +33,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveRotation;
 import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveSteerGains;
 import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveTranslation;
 import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
-
-import choreo.trajectory.SwerveSample;
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
@@ -96,6 +87,12 @@ import frc.robot.utils.HolonomicController;
 import frc.robot.utils.ShotParameters;
 import frc.robot.utils.VisionPoseEstimator;
 import frc.robot.utils.VisionPoseEstimator.VisionPoseEstimate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
+import org.photonvision.simulation.VisionSystemSim;
 
 public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChecked {
   // teleop requests
@@ -331,7 +328,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
       boolean failed =
           CTREUtil.attempt(() -> driveMotor.getConfigurator().refresh(limits), driveMotor);
       if (failed) {
-        FaultLogger.report("Failed to change drive current limits for " + module.toString(), FaultType.ERROR);
+        FaultLogger.report(
+            "Failed to change drive current limits for " + module.toString(), FaultType.ERROR);
         continue;
       }
 
@@ -509,10 +507,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   public Command drive(InputStream velX, InputStream velY, InputStream velOmega) {
     return run(() -> {
           double speedMultiplier =
-            FieldUtil.inBumpZone(getPose())
-                ? SwerveConstants.driverTranslationalVelocityBump.in(MetersPerSecond)
-                    / getDriverTranslationalVelocity()
-                : 1.0;
+              FieldUtil.inBumpZone(getPose())
+                  ? SwerveConstants.driverTranslationalVelocityBump.in(MetersPerSecond)
+                      / getDriverTranslationalVelocity()
+                  : 1.0;
 
           double x = velX.get() * speedMultiplier;
           double y = velY.get() * speedMultiplier;
@@ -695,7 +693,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     updateVisionPoseEstimates();
     updateFilteredSpeeds(getState().Speeds);
 
-
     // vision vs. odometry disagreement
     if (!_acceptedEstimates.isEmpty()) {
       Translation2d odomTranslation = getState().Pose.getTranslation(); // see note below
@@ -704,8 +701,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
       for (var e : _acceptedEstimates) {
         maxDisagreement =
             Math.max(
-                maxDisagreement,
-                e.pose().toPose2d().getTranslation().getDistance(odomTranslation));
+                maxDisagreement, e.pose().toPose2d().getTranslation().getDistance(odomTranslation));
       }
 
       DogLog.log("Swerve/Vision Disagreement", maxDisagreement);

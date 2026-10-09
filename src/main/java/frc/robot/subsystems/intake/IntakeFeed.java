@@ -138,8 +138,7 @@ public class IntakeFeed extends AdvancedSubsystem {
 
   /** Runs the feed wheels inwards */
   public Command feedIn() {
-    return run(() ->
-            _feedMotor.setControl(_feedVelocitySetter.withVelocity(targetFeedSpeed())))
+    return run(() -> _feedMotor.setControl(_feedVelocitySetter.withVelocity(targetFeedSpeed())))
         .withName("Feed In");
   }
 
