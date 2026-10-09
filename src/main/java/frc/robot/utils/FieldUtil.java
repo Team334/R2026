@@ -35,7 +35,7 @@ public class FieldUtil {
 
   private static final BooleanSubscriber _useFudge = DogLog.tunable("Use Fudge", true);
 
-  private static DoubleSupplier visionToOdometryDistance;
+  private static DoubleSupplier visionToOdometryDistance = () -> 0;
 
   static {
     // teleop().onTrue(runOnce(() -> _useFudge.getTopic().publish().set(true)));
@@ -137,6 +137,7 @@ public class FieldUtil {
   // compares last vision estimates pose to odometry, looking for low discrepancy
   public static boolean isVisionEstimateClose(
       Pose2d robotPose, VisionPoseEstimate lastAcceptedEstimate) {
+        if(lastAcceptedEstimate == null){return false;}
     Pose2d visionEstPose = lastAcceptedEstimate.pose().toPose2d();
     visionToOdometryDistance =
         () -> visionEstPose.getTranslation().getDistance(robotPose.getTranslation());

@@ -892,6 +892,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   }
 
   public VisionPoseEstimate getLastAcceptedEstimate() {
+    if(_acceptedEstimates.isEmpty()){ return null;}
     return _acceptedEstimates.get(_acceptedEstimates.size() - 1);
   }
 
