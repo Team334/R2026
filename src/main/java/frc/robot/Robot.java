@@ -4,11 +4,20 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.wpilibj2.command.Commands.*;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.wpilibj2.command.Commands.parallel;
+import static edu.wpi.first.wpilibj2.command.Commands.run;
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 
+import java.lang.reflect.Field;
+
 import com.ctre.phoenix6.SignalLogger;
+
 import dev.doglog.DogLog;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
@@ -33,6 +42,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.GcStatsCollector;
@@ -53,7 +63,6 @@ import frc.robot.subsystems.intake.IntakeFeed;
 import frc.robot.subsystems.intake.IntakePivot;
 import frc.robot.utils.FieldUtil;
 import frc.robot.utils.ShotParameters;
-import java.lang.reflect.Field;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -269,6 +278,12 @@ public class Robot extends TimedRobot {
             new NTEpilogueBackend(_ntInst), new FileBackend(DataLogManager.getLog()));
   }
 
+  private void setDefenseMode(boolean enabled) {
+    _swerve.setDefenseMode(enabled);
+    _shooter.setDefenseMode(enabled);
+    _intakeFeed.setDefenseMode(enabled);
+  }
+
   private void configureDriverBindings() {
     final InputStream baseVelX =
         InputStream.of(_driverController::getLeftY).deadband(0.02, 1).negate().signedPow(2);
@@ -306,16 +321,17 @@ public class Robot extends TimedRobot {
             true);
 
     _swerve.setDefaultCommand(
-        _swerve
-            .drive(
-                baseVelX.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
-                baseVelY.scale(SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)),
-                baseVelOmega.scale(SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))
-            .beforeStarting(() -> _swerve.isOpenLoop = true)
-            .withName("Drive"));
+      _swerve
+          .drive(
+              InputStream.of(() -> baseVelX.get() * _swerve.getDriverTranslationalVelocity()),
+              InputStream.of(() -> baseVelY.get() * _swerve.getDriverTranslationalVelocity()),
+              InputStream.of(() -> baseVelOmega.get() * _swerve.getDriverAngularVelocity()))
+          .beforeStarting(() -> _swerve.isOpenLoop = true)
+          .withName("Drive"));
 
     _driverController.rightTrigger().and(() -> !_shotParameters.isManual).whileTrue(shoot);
     _driverController.rightTrigger().and(() -> _shotParameters.isManual).whileTrue(shootManually);
+    _driverController.povUp().toggleOnTrue(new StartEndCommand(() -> setDefenseMode(true), () -> setDefenseMode(false)));
 
     _driverController
         .rightBumper()

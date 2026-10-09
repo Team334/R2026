@@ -60,6 +60,9 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Idle Velocity Percentage")
   private final double idleVelocityPercentage = 0.5;
 
+  @Logged(name = "Defense Mode")
+  private boolean _defenseMode = false;
+
   private final SysIdRoutine _flywheelRoutine =
       new SysIdRoutine(
           new SysIdRoutine.Config(
@@ -228,6 +231,11 @@ public class Shooter extends AdvancedSubsystem {
   /** Idle at a constant speed. */
   public Command idle() {
     return run(() -> {
+          if (_defenseMode) {
+            _inTolerance = false;
+            setShootingSpeed(RotationsPerSecond.of(0));
+          }
+
           ShotParameters parameters = _shotParametersSupplier.get();
 
           setShootingSpeed(parameters.getFlywheelSpeed().times(idleVelocityPercentage));
@@ -267,6 +275,10 @@ public class Shooter extends AdvancedSubsystem {
   @Logged(name = "Flywheel Reference")
   public AngularVelocity getFlywheelReference() {
     return _flywheelReference;
+  }
+
+  public void setDefenseMode(boolean enabled) {
+    _defenseMode = enabled;
   }
 
   @Override

@@ -338,6 +338,7 @@ public final class Constants {
     public static final Angle pivotForwardSoftLimitThreshold = Rotations.of(0.61);
 
     public static final AngularVelocity feedSpeed = RotationsPerSecond.of(100);
+    public static final AngularVelocity defenseFeedSpeed = RotationsPerSecond.of(70); 
   }
 
   public static class SwerveConstants {
@@ -347,6 +348,12 @@ public final class Constants {
     public static final MomentOfInertia moi = KilogramSquareMeters.of(8.234);
 
     public static final Current frontSlipCurrent = Amps.of(40);
+    public static final Current driveSupplyLimit = Amps.of(40);
+
+    // defense mode
+    public static final LinearVelocity defenseTranslationalVelocity = MetersPerSecond.of(4.5);
+    public static final AngularVelocity defenseAngularVelocity = RadiansPerSecond.of(Math.PI * 2.5); // tune
+    public static final Current defenseDriveSupplyLimit = Amps.of(60); // tune
 
     public static final LinearVelocity driverTranslationalVelocity = MetersPerSecond.of(4);
     public static final LinearVelocity driverTranslationalVelocityBump = MetersPerSecond.of(1.5);
