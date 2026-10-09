@@ -155,6 +155,9 @@ public final class Constants {
     public static final AngularVelocity maxAngularVelocityForThetaTrust =
         RadiansPerSecond.of(Math.PI); // TODO: tune
 
+    public static final double maxEstimateAge = 0.3;
+    public static final Distance maxPoseDisagreement = Meters.of(0.5);
+
     public static final double ambiguityThreshold = 0.3;
 
     public static final double xBoundMargin = 0.5;

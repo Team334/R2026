@@ -15,8 +15,10 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShotConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.utils.VisionPoseEstimator.VisionPoseEstimate;
 import java.util.function.DoubleSupplier;
 
@@ -136,12 +138,22 @@ public class FieldUtil {
 
   // compares last vision estimates pose to odometry, looking for low discrepancy
   public static boolean isVisionEstimateClose(
-      Pose2d robotPose, VisionPoseEstimate lastAcceptedEstimate) {
-        if(lastAcceptedEstimate == null){return false;}
-    Pose2d visionEstPose = lastAcceptedEstimate.pose().toPose2d();
-    visionToOdometryDistance =
-        () -> visionEstPose.getTranslation().getDistance(robotPose.getTranslation());
-    return visionToOdometryDistance.getAsDouble() < 0.5;
+    Pose2d robotPose, VisionPoseEstimate lastAcceptedEstimate) {
+    if (lastAcceptedEstimate == null) return false;
+
+    double age = Timer.getFPGATimestamp() - lastAcceptedEstimate.timestamp();
+    if (age > VisionConstants.maxEstimateAge) return false;
+
+    double distance =
+        lastAcceptedEstimate
+            .pose()
+            .toPose2d()
+            .getTranslation()
+            .getDistance(robotPose.getTranslation());
+
+    DogLog.log("FieldUtil/Vision To Odometry Distance", distance);
+
+    return distance < VisionConstants.maxPoseDisagreement.magnitude();
   }
 
   /** Whether the supplied robot pose is in the bump zone(s). */

@@ -152,9 +152,7 @@ public class Robot extends TimedRobot {
                 Math.abs(_shotParameters.getShotHeading() - _swerve.getHeading().getRadians())
                     < Units.degreesToRadians(5),
             () -> FieldUtil.isShotValid(_swerve.getPose()),
-            () ->
-                FieldUtil.isVisionEstimateClose(
-                    _swerve.getPose(), _swerve.getLastAcceptedEstimate()));
+            () -> FieldUtil.isVisionEstimateClose(_swerve.getPose(), _swerve.getLastAcceptedEstimate()));
 
     configureDriverBindings();
 
