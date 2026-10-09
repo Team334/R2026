@@ -162,6 +162,8 @@ public class Robot extends TimedRobot {
                     < Units.degreesToRadians(5),
             () -> FieldUtil.isShotValid(_swerve.getPose()));
 
+    _swerve.setShotParameters(_shotParameters);
+
     configureDriverBindings();
 
     new Trigger(() -> _shotParameters.isErrorSensitive)
