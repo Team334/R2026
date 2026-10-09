@@ -147,6 +147,7 @@ public final class Constants {
   }
 
   public static class VisionConstants {
+    public static final double kMaxPoseDisagreement = 0.5;
     public static final double singleTagStdDevsScaler = 5;
 
     public static final double translationStdDevsScaler = 1;

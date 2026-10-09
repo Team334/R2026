@@ -53,6 +53,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
@@ -92,6 +93,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.utils.FieldUtil;
 import frc.robot.utils.HolonomicController;
+import frc.robot.utils.ShotParameters;
 import frc.robot.utils.VisionPoseEstimator;
 import frc.robot.utils.VisionPoseEstimator.VisionPoseEstimate;
 
@@ -229,6 +231,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   @Logged(name = "Supply Limit")
   private double supplyLimit = SwerveConstants.driveSupplyLimit.in(Amps);
+
+  private ShotParameters _shotParameters;
 
   /**
    * Creates a new Swerve.
@@ -691,6 +695,23 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
     updateVisionPoseEstimates();
     updateFilteredSpeeds(getState().Speeds);
 
+
+    // vision vs. odometry disagreement
+    if (!_acceptedEstimates.isEmpty()) {
+      Translation2d odomTranslation = getState().Pose.getTranslation(); // see note below
+
+      double maxDisagreement = 0;
+      for (var e : _acceptedEstimates) {
+        maxDisagreement =
+            Math.max(
+                maxDisagreement,
+                e.pose().toPose2d().getTranslation().getDistance(odomTranslation));
+      }
+
+      DogLog.log("Swerve/Vision Disagreement", maxDisagreement);
+      _shotParameters.poseMismatch = maxDisagreement > VisionConstants.kMaxPoseDisagreement;
+    }
+
     double filteredOmega = getFilteredChassisSpeeds().omegaRadiansPerSecond;
 
     boolean angularVelocityTooHigh =
@@ -757,6 +778,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
     DogLog.log("Swerve/STDMultiplier", stdDevsMultiplier);
     DogLog.timeEnd("Timing/Swerve/periodic()");
+  }
+
+  public void setShotParameters(ShotParameters shotParameters) {
+    _shotParameters = shotParameters;
   }
 
   @Override
