@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Hertz;
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -220,6 +221,12 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
   @Logged(name = "Is Aligning")
   private boolean _isAligning = false;
 
+  @Logged(name = "Defense Mode")
+  private boolean _defenseMode = false;
+
+  @Logged(name = "Supply Limit")
+  private double supplyLimit = SwerveConstants.driveSupplyLimit.in(Amps);
+
   /**
    * Creates a new Swerve.
    *
@@ -282,6 +289,51 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
 
   public void setAligning(boolean aligning) {
     _isAligning = aligning;
+  }
+
+  public boolean isDefenseMode() {
+    return _defenseMode;
+  }
+
+  public double getDriverTranslationalVelocity() {
+    return (_defenseMode
+            ? SwerveConstants.defenseTranslationalVelocity
+            : SwerveConstants.driverTranslationalVelocity)
+        .in(MetersPerSecond);
+  }
+
+  public double getDriverAngularVelocity() {
+    return (_defenseMode
+            ? SwerveConstants.defenseAngularVelocity
+            : SwerveConstants.driverAngularVelocity)
+        .in(RadiansPerSecond);
+  }
+
+  public void setDefenseMode(boolean enabled) {
+    if (_defenseMode == enabled) {
+      return;
+    }
+
+    _defenseMode = enabled;
+    supplyLimit =
+        (enabled ? SwerveConstants.defenseDriveSupplyLimit : SwerveConstants.driveSupplyLimit)
+            .in(Amps);
+
+    for (SwerveModule<TalonFX, TalonFX, CANcoder> module : getModules()) {
+      TalonFX driveMotor = module.getDriveMotor();
+      CurrentLimitsConfigs limits = new CurrentLimitsConfigs();
+
+      boolean failed =
+          CTREUtil.attempt(() -> driveMotor.getConfigurator().refresh(limits), driveMotor);
+      if (failed) {
+        FaultLogger.report(
+            "Failed to change drive current limits for " + module, FaultType.ERROR);
+        continue;
+      }
+
+      limits.SupplyCurrentLimit = supplyLimit;
+      CTREUtil.attempt(() -> driveMotor.getConfigurator().apply(limits), driveMotor);
+    }
   }
 
   /** Adds a new fault under this subsystem. */
@@ -454,7 +506,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem, SelfChec
           double speedMultiplier =
               FieldUtil.inBumpZone(getPose())
                   ? SwerveConstants.driverTranslationalVelocityBump.in(MetersPerSecond)
-                      / SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)
+                      / getDriverTranslationalVelocity()
                   : 1.0;
 
           double x = velX.get() * speedMultiplier;

@@ -41,6 +41,9 @@ public class IntakeFeed extends AdvancedSubsystem {
   private Notifier _simNotifier;
   private double _lastSimTime;
 
+  @Logged(name = "Defense Mode")
+  private boolean _defenseMode = false;
+
   public IntakeFeed() {
     var feedMotorConfigs = new TalonFXConfiguration();
 
@@ -125,10 +128,18 @@ public class IntakeFeed extends AdvancedSubsystem {
     return _feedVelocityGetter.refresh().getValue();
   }
 
+  public void setDefenseMode(boolean enabled) {
+    _defenseMode = enabled;
+  }
+
+  private AngularVelocity targetFeedSpeed() {
+    return _defenseMode ? IntakeConstants.defenseFeedSpeed : IntakeConstants.feedSpeed;
+  }
+
   /** Runs the feed wheels inwards */
   public Command feedIn() {
     return run(() ->
-            _feedMotor.setControl(_feedVelocitySetter.withVelocity(IntakeConstants.feedSpeed)))
+            _feedMotor.setControl(_feedVelocitySetter.withVelocity(targetFeedSpeed())))
         .withName("Feed In");
   }
 

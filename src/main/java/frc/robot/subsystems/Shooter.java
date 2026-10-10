@@ -55,6 +55,9 @@ public class Shooter extends AdvancedSubsystem {
 
   private boolean _inTolerance = false;
 
+  @Logged(name = "Defense Mode")
+  private boolean _defenseMode = false;
+
   private final Supplier<ShotParameters> _shotParametersSupplier;
 
   @Logged(name = "Idle Velocity Percentage")
@@ -203,6 +206,11 @@ public class Shooter extends AdvancedSubsystem {
   }
 
   private void setShootingSpeed(AngularVelocity speed) {
+    if (_defenseMode) {
+      speed = RotationsPerSecond.of(0);
+      _inTolerance = false;
+    }
+
     _flywheelReference.mut_setMagnitude(speed.in(RotationsPerSecond));
 
     double errorRPS = speed.minus(getFlywheelSpeed()).in(RotationsPerSecond);
@@ -222,6 +230,13 @@ public class Shooter extends AdvancedSubsystem {
       _flywheelMotor.setControl(_flywheelDutyCycleSetter.withOutput(1));
     } else {
       _flywheelMotor.setControl(_flywheelVelocitySetter.withVelocity(speed));
+    }
+  }
+
+  public void setDefenseMode(boolean enabled) {
+    _defenseMode = enabled;
+    if (enabled) {
+      _flywheelMotor.setControl(_flywheelDutyCycleSetter.withOutput(0));
     }
   }
 
